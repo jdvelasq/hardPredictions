@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Cashflows: A library in Python for time series predictions
+hardPredictions: A library in Python for time series predictions
 ============================================================================================
 
-**Date**: May 20, 2018  **Version**: 0.0.0
+**Date**: June 25, 2018  **Version**: 0.0.0
 
 **Binary Installers:** https://pypi.org/project/hardPredictions
 
@@ -18,7 +18,7 @@ Cashflows: A library in Python for time series predictions
 package to do financial computations. The package was developed and tested in Python
 version 3.6. It can be installed from the command line using:
 
-``$ pip install hardPrediction``
+``$ pip install hardPredictions``
 
 **hardPredictions** can be used interactively at the Python’s command prompt, but a better
 experience is achieved when IPython or Jupyter’s notebook are used, allows the

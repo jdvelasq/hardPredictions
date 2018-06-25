@@ -3,30 +3,30 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Cashflows: A Package for Investment Modeling and Advanced Engineering Economics using Python
+Cashflows: A library in Python for time series predictions
 ============================================================================================
 
 **Date**: May 20, 2018  **Version**: 0.0.0
 
-**Binary Installers:** https://pypi.org/project/cashflows
+**Binary Installers:** https://pypi.org/project/hardPredictions
 
-**Source Repository**: https://github.com/jdvelasq/cashflows
+**Source Repository**: https://github.com/jdvelasq/hardPredictions
 
-**Documentation**: http://cashflows.readthedocs.io/en/latest/
+**Documentation**: http://hardPredictions.readthedocs.io/en/latest/
 
-**cashflows** is an open source (distributed under the MIT license) and friendly-user
+**hardPredictions** is an open source (distributed under the MIT license) and friendly-user
 package to do financial computations. The package was developed and tested in Python
 version 3.6. It can be installed from the command line using:
 
-``$ pip install cashflows``
+``$ pip install hardPrediction``
 
-**cashflows** can be used interactively at the Python’s command prompt, but a better
+**hardPredictions** can be used interactively at the Python’s command prompt, but a better
 experience is achieved when IPython or Jupyter’s notebook are used, allows the
 user to fully document the analysis and draw conclusions. Due to the design of
 the package, it is easy to use cashflows with the tools available in the ecosystem
 of open source tools for data science.
 
-**cashflows** is well suited for many financial computations and it can be used to:
+**hardPredictions** is well suited for many financial computations and it can be used to:
 
 * Realize compound interest rate calculations.
 
@@ -72,7 +72,7 @@ Indices and Tables
 MIT license
 ===============================================================================
 
-Copyright (c) 2018 Juan David Velásquez-Henao, Maria Alejandra Arango-Gonzalez
+Copyright (c) 2018 Juan David Velásquez-Henao, María Alejandra Arango-González
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

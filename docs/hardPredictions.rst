@@ -1,4 +1,4 @@
-HardPredictions
+hardPredictions
 ****************
 .. automodule:: hardPredictions.hardPredictions
     :members:

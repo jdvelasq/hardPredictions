@@ -1,7 +1,7 @@
 Time series transformation module
 ***********************************
 
-.. automodule:: pytimeseries.transformer
+.. automodule:: hardPredictions.transformer
     :members:
     :undoc-members:
     :show-inheritance:

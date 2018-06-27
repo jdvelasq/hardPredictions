@@ -8,7 +8,7 @@ from paver.tasks import task, needs
 @task
 def nosetests():
     """unit testing"""
-    sh('nosetests --cover-package=hardPredictions --cover-tests '
+    sh('nosetests --cover-package=pytimeseries --cover-tests '
        ' --with-doctest --rednose  ./hardPredictions/')
 
 @task
@@ -25,7 +25,7 @@ def pypi():
 @task
 def local():
     """local install"""
-    sh("pip uninstall hardPredictions")
+    sh("pip uninstall pytimeseries")
     sh("python setup.py install develop")
 
 
@@ -38,4 +38,4 @@ def sphinx():
 @task
 def default():
     """default"""
-pass
+    pass

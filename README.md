@@ -1,2 +1,2 @@
 # hardPredictions
-A library in Python for time series prediction
+A library in Python for time series forecasting

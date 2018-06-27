@@ -1,5 +1,6 @@
+**********************************
 Time series transformation module
-***********************************
+**********************************
 
 .. automodule:: hardPredictions.transformer
     :members:

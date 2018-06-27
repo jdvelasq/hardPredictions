@@ -4,18 +4,18 @@ def readme():
     with open('README.md') as f:
         return f.read()
 
-setup(name='hardPredictions',
+setup(name='pytimeseries',
       version='0.0.0',
-      description='Time Series Predictions using Python',
-      long_description='A library in Python for time series predictions',
+      description='Time Series Forecasting using Python',
+      long_description='A library in Python for time series forecasting',
       classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.6',
-        'Topic :: Office/Business :: Time Series',
+        'Programming Language :: Python :: 3.5',
+        'Topic :: Office/Business :: Financial',
       ],
       keywords='time-series forecast predict',
-      url='http://github.com/jdvelasq/hardPredictions',
+      url='http://github.com/jdvelasq/pytimeseries',
       author='Juan David Velásquez & María Alejandra Arango',
       author_email='jdvelasq@unal.edu.co',
       license='MIT',

@@ -4,7 +4,7 @@ Time series' transformation module
 
 """
 
-from hardPredictions.extras import *
+import hardPredictions.extras
 
 import pandas
 import numpy

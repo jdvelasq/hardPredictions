@@ -9,6 +9,7 @@ Welcome to hardPredictions: A library in Python for time series forecasting's do
 .. toctree::
    :maxdepth: 2
 
+   hardPredictions
    extras
    transformer
 

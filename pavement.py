@@ -8,7 +8,7 @@ from paver.tasks import task, needs
 @task
 def nosetests():
     """unit testing"""
-    sh('nosetests --cover-package=pytimeseries --cover-tests '
+    sh('nosetests --cover-package=hardPredictions --cover-tests '
        ' --with-doctest --rednose  ./hardPredictions/')
 
 @task

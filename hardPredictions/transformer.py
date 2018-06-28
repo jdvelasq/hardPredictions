@@ -57,7 +57,7 @@ class transformer():
         
         
         """ Get frequency integer """
-        self.intfrq = extras.get_frequency(ts)          
+        self.intfrq = hardPredictions.extras.get_frequency(ts)          
         
         
         """ Applying transformation

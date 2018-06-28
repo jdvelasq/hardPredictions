@@ -4,7 +4,7 @@ def readme():
     with open('README.md') as f:
         return f.read()
 
-setup(name='pytimeseries',
+setup(name='hardPredictions',
       version='0.0.0',
       description='Time Series Forecasting using Python',
       long_description='A library in Python for time series forecasting',

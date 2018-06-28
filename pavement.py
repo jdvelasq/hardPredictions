@@ -25,7 +25,7 @@ def pypi():
 @task
 def local():
     """local install"""
-    sh("pip uninstall pytimeseries")
+    sh("pip uninstall hardPredictions")
     sh("python setup.py install develop")
 
 

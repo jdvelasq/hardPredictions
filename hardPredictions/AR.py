@@ -161,7 +161,7 @@ class AR(base_model):
         return error_list
 
     def simulate(self, ts):
-        errors = self.filter_ts(ts)           
+        pass
             
             
     

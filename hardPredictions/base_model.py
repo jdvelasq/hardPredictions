@@ -1,5 +1,7 @@
 """
 Base Model
+------------------
+
 Base structure for creation of new models
 
 Methods:

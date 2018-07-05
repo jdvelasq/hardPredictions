@@ -24,6 +24,7 @@ import pandas
 import hardPredictions.extras
 from sklearn import linear_model
 from sklearn.model_selection import TimeSeriesSplit
+from sklearn.utils import resample
 
 class AR(base_model):
     """ Parameter optimization method: scipy's minimization 
@@ -160,10 +161,28 @@ class AR(base_model):
             
         return error_list
 
-    def simulate(self, ts):
-        pass
+    def simulate(self, ts, iterations = 1000, sample_size = 0.5):
+        values = self.filter_ts(ts)
+        n_size = int(len(ts) * sample_size)
+        # run bootstrap
+        stats = list()
+        for i in range(iterations):
+	        # Prepare train and test sets
+	        train = resample(values, n_samples = n_size)
+	        #test = numpy.array([x for x in values if x.tolist() not in train.tolist()])
+	        
+	        stats.append(score)
+        
+        return stats
             
-            
+    def intervals(self, ts, alpha = 0.95, iterations = 1000, sample_size = 0.5):
+        #stats = self.simulate(ts, iterations, sample_size)
+        #p = ((1.0-alpha)/2.0) * 100
+        #lower = max(0.0, numpy.percentile(stats, p))
+        #p = (alpha+((1.0-alpha)/2.0)) * 100
+        #upper = min(1.0, numpy.percentile(stats, p))
+        #print('%.1f confidence interval %.1f%% and %.1f%%' % (alpha*100, lower*100, upper*100))
+        pass    
     
     
 class AR_Ridge(AR):

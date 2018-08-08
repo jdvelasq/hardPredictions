@@ -116,9 +116,21 @@ class AR(base_model):
         
         return self
     
-    def forecast(self, ts, periods):
+    #def forward(self, y):
+    #    y = y.values
+    #    lon = len(y)
+    #    if lon <= self.p:
+    #        y_last = y[0:lon]
+    #        result = self.phi0 + numpy.dot(y_last, self.phi[0:lon])
+    #    else:
+    #        y_last = y[lon-self.p:lon]
+    #        result = self.phi0 + numpy.dot(y_last, self.phi)
+            
+    #    return result
+    
+    def forecast(ts, periods):
         
-        def forward(y):
+        def forward(self, y):
             y = y.values
             lon = len(y)
             if lon <= self.p:
@@ -127,7 +139,7 @@ class AR(base_model):
             else:
                 y_last = y[lon-self.p:lon]
                 result = self.phi0 + numpy.dot(y_last, self.phi)
-            
+                    
             return result
         
         for i in range(periods):  
@@ -161,19 +173,27 @@ class AR(base_model):
             
         return error_list
 
-    def simulate(self, ts, iterations = 1000, sample_size = 0.5):
+    def simulate(self, ts, periods = 5, iterations = 1000):
         values = self.filter_ts(ts)
-        n_size = int(len(ts) * sample_size)
-        # run bootstrap
-        stats = list()
+        results = list()
         for i in range(iterations):
-	        # Prepare train and test sets
-	        train = resample(values, n_samples = n_size)
-	        #test = numpy.array([x for x in values if x.tolist() not in train.tolist()])
-	        
-	        stats.append(score)
+            
+            for j in range(periods):
+                train = resample(values, n_samples = 1)
+            
+                if j == 0:
+                    y = ts
+                else:
+                    y = y.append(next_value_bootstrap)
+                    
+                next_value = self.forecast(y, 1)
+                next_value_bootstrap = next_value + train
+                result_complete = y.append(next_value_bootstrap)
+                result = result_complete[-periods:]
+            
+            results[i] = result
         
-        return stats
+        return results
             
     def intervals(self, ts, alpha = 0.95, iterations = 1000, sample_size = 0.5):
         #stats = self.simulate(ts, iterations, sample_size)

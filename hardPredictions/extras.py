@@ -1,6 +1,6 @@
 """
 ExtraFunctions
-pytimeseries
+hardPredictions
 
 """
 
@@ -39,6 +39,6 @@ def add_next_date(ts, value):
 
 
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()  
+#if __name__ == "__main__":
+#    import doctest
+#    doctest.testmod()  

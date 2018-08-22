@@ -16,12 +16,12 @@ Classes
 
 """
 
-from hardPredictions.base_model import base_model
+from base_model import base_model
 
 import numpy
 import scipy
 import pandas
-import hardPredictions.extras
+import extras
 from sklearn import linear_model
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.utils import resample
@@ -99,7 +99,7 @@ class AR(base_model):
                 y_last = y[i-self.p:i]
                 result = self.phi0 + numpy.dot(y_last, self.phi)
                 prediction.append(result)
-        prediction = pandas.Series((v for v in prediction), index = ts.index)
+        prediction = pandas.Series((v[0] for v in prediction), index = ts.index)
         return prediction    
     
     
@@ -116,41 +116,28 @@ class AR(base_model):
         
         return self
     
-    #def forward(self, y):
-    #    y = y.values
-    #    lon = len(y)
-    #    if lon <= self.p:
-    #        y_last = y[0:lon]
-    #        result = self.phi0 + numpy.dot(y_last, self.phi[0:lon])
-    #    else:
-    #        y_last = y[lon-self.p:lon]
-    #        result = self.phi0 + numpy.dot(y_last, self.phi)
+    def forward(self, y):
+        y = y.values
+        lon = len(y)
+        if lon <= self.p:
+            y_last = y[0:lon]
+            result = self.phi0 + numpy.dot(y_last, self.phi[0:lon])
+        else:
+            y_last = y[lon-self.p:lon]
+            result = self.phi0 + numpy.dot(y_last, self.phi)
             
-    #    return result
+        return result[0]
     
-    def forecast(ts, periods):
-        
-        def forward(self, y):
-            y = y.values
-            lon = len(y)
-            if lon <= self.p:
-                y_last = y[0:lon]
-                result = self.phi0 + numpy.dot(y_last, self.phi[0:lon])
-            else:
-                y_last = y[lon-self.p:lon]
-                result = self.phi0 + numpy.dot(y_last, self.phi)
-                    
-            return result
-        
+    def forecast(self, ts, periods):     
         for i in range(periods):  
             if i == 0:
                 y = ts
-                value = forward(y)
+                value = self.forward(y)
             
-            value = forward(y)
-            y = hardPredictions.extras.add_next_date(y, value)
+            value = self.forward(y)
+            y = extras.add_next_date(y, value)
         
-        return y[-periods:]
+        return y
     
     def cross_validation(self, ts, n_splits, error_type = None):
         X = numpy.array(self.get_X(ts))
@@ -173,8 +160,8 @@ class AR(base_model):
             
         return error_list
 
-    def simulate(self, ts, periods = 5, iterations = 1000):
-        values = self.filter_ts(ts)
+    def simulate(self, ts, periods = 5, iterations = 1000, confidence_interval = 0.95):
+        values = self.filter_ts(ts).values
         results = list()
         for i in range(iterations):
             
@@ -191,18 +178,29 @@ class AR(base_model):
                 result_complete = y.append(next_value_bootstrap)
                 result = result_complete[-periods:]
             
-            results[i] = result
+            results.append(result)
+            results = pandas.DataFrame(results)
+            minim = results.quantile(1-confidence_interval)
+            maxim = results.quantile(confidence_interval)
+            final_result = pandas.DataFrame([minim, maxim])            
+        
+        return final_result
+            
+    def fit_intervals(self, ts, confidence_interval = 0.95, iterations = 1000):
+        values = self.filter_ts(ts).values
+        results = list()
+        #for i in range(iterations):
+            
+            
+        #    for j in range(len(ts)):
+        #        train = resample(values, n_samples = 1)
+            
+        #    results.
+            
+            
         
         return results
             
-    def intervals(self, ts, alpha = 0.95, iterations = 1000, sample_size = 0.5):
-        #stats = self.simulate(ts, iterations, sample_size)
-        #p = ((1.0-alpha)/2.0) * 100
-        #lower = max(0.0, numpy.percentile(stats, p))
-        #p = (alpha+((1.0-alpha)/2.0)) * 100
-        #upper = min(1.0, numpy.percentile(stats, p))
-        #print('%.1f confidence interval %.1f%% and %.1f%%' % (alpha*100, lower*100, upper*100))
-        pass    
     
     
 class AR_Ridge(AR):

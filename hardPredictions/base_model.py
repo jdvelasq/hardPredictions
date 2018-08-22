@@ -1,7 +1,5 @@
 """
 Base Model
-------------------
-
 Base structure for creation of new models
 
 Methods:
@@ -10,7 +8,7 @@ Methods:
 
 """
 
-from hardPredictions.hardPredictions import series_viewer
+from hardPredictions import series_viewer
 import sklearn
 
 class base_model():

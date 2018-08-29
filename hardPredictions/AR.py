@@ -16,12 +16,12 @@ Classes
 
 """
 
-from base_model import base_model
+from hardPredictions.base_model import base_model
 
 import numpy
 import scipy
 import pandas
-import extras
+from hardPredictions.extras import add_next_date
 from sklearn import linear_model
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.utils import resample
@@ -135,9 +135,9 @@ class AR(base_model):
                 value = self.forward(y)
             
             value = self.forward(y)
-            y = extras.add_next_date(y, value)
+            y = add_next_date(y, value)
         
-        return y
+        return y[-periods:]
     
     def cross_validation(self, ts, n_splits, error_type = None):
         X = numpy.array(self.get_X(ts))
@@ -171,35 +171,41 @@ class AR(base_model):
                 if j == 0:
                     y = ts
                 else:
-                    y = y.append(next_value_bootstrap)
+                    y = add_next_date(y, next_value_bootstrap)
                     
-                next_value = self.forecast(y, 1)
-                next_value_bootstrap = next_value + train
-                result_complete = y.append(next_value_bootstrap)
+                next_value = self.forward(y)
+                next_value_bootstrap = next_value + train[0]
+                result_complete = add_next_date(y, next_value_bootstrap)
                 result = result_complete[-periods:]
             
             results.append(result)
-            results = pandas.DataFrame(results)
-            minim = results.quantile(1-confidence_interval)
-            maxim = results.quantile(confidence_interval)
-            final_result = pandas.DataFrame([minim, maxim])            
+        
+        results = pandas.DataFrame(results)
+        minim = results.quantile(1-confidence_interval)
+        maxim = results.quantile(confidence_interval)
+        final_result = pandas.DataFrame([minim, maxim])            
         
         return final_result
             
     def fit_intervals(self, ts, confidence_interval = 0.95, iterations = 1000):
         values = self.filter_ts(ts).values
+        serie = self.predict(ts).values
         results = list()
-        #for i in range(iterations):
+        for i in range(iterations):            
+            result = list()
+            for j in range(len(serie)):
+                train = resample(values, n_samples = 1)
+                new_value = train[0] + serie[j]
+                result.append(new_value)
             
-            
-        #    for j in range(len(ts)):
-        #        train = resample(values, n_samples = 1)
-            
-        #    results.
-            
-            
+            results.append(result)
         
-        return results
+        results = pandas.DataFrame(results)    
+        minim = results.quantile(1-confidence_interval)
+        maxim = results.quantile(confidence_interval)
+        final_result = pandas.DataFrame([minim, maxim])         
+            
+        return final_result
             
     
     

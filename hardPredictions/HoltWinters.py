@@ -9,7 +9,6 @@ from hardPredictions.base_model import base_model
 import numpy
 import scipy
 import pandas
-import hardPredictions.extras
 import random
 from sklearn import linear_model
 

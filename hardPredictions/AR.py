@@ -37,7 +37,11 @@ class AR(base_model):
 
     **Example**
 
-    
+    >>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
+    >>> model = AR(p = 3)
+    >>> model = model.fit(ts)
+    >>> fitted_model = model.predict(ts)
+    >>> prediction = model.forecast(ts, periods = 2)
 
     """
 

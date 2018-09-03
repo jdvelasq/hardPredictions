@@ -42,6 +42,10 @@ class AR(base_model):
     >>> model = model.fit(ts)
     >>> fitted_model = model.predict(ts)
     >>> prediction = model.forecast(ts, periods = 2)
+    >>> prediction
+    1972-10-01    6100.380339
+    1972-11-01    5637.974302
+    dtype: float64
 
     """
 

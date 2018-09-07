@@ -78,7 +78,9 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.utils import resample
 
 class AR(base_model):
-    """ Parameter optimization method: scipy's minimization
+    """ Autoregressive model
+    
+    Parameter optimization method: scipy's minimization
 
     Args:
         p (int): order.
@@ -94,6 +96,15 @@ class AR(base_model):
         self.phi = numpy.random.rand(p)
 
     def params2vector(self):
+        """ Parameters to vector
+        
+        Args:
+            None
+            
+        Returns:
+            Vector parameters of length p+1 to use in optimization
+
+        """        
         params = list()
         params.append(self.phi0)
         for i in range(len(self.phi)):
@@ -101,6 +112,16 @@ class AR(base_model):
         return params
 
     def vector2params(self, vector):
+        """ Vector to parameters
+        
+        Args:
+            vector: vector of length p+1 to convert into parameters of the
+            model
+            
+        Returns:
+            self
+
+        """ 
         self.phi0 = vector[0]
         self.phi = vector[1:]
         return self

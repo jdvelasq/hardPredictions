@@ -145,6 +145,15 @@ class AR(base_model):
         return X
 
     def predict(self, ts):
+        """ Fits a time series using self model parameters
+        
+        Args:
+            ts: Time series to fit
+        
+        Returns:
+            Fitted time series
+            
+        """
         y = ts.values
         prediction = list()
         for i in range(len(y)):
@@ -164,7 +173,16 @@ class AR(base_model):
 
 
     def fit(self, ts, error_type = 'mean_squared_error'):
-
+        """ Finds optimal parameters using a given optimization function
+        
+        Args:
+            ts: Time series to fit
+            error_type: Function to estimates error
+            
+        Return:
+            self
+        
+        """
         def f(x):
             self.vector2params(x)
             return self.calc_error(ts, error_type)
@@ -189,6 +207,16 @@ class AR(base_model):
         return result[0]
 
     def forecast(self, ts, periods):
+        """ Predicts future values in a given period
+        
+        Args:
+            ts: Time series to predict
+            periods: Number of periods ahead to predict
+            
+        Returns:
+            Time series of predicted values
+        
+        """
         for i in range(periods):
             if i == 0:
                 y = ts

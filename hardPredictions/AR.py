@@ -66,7 +66,7 @@ class AR(base_model):
         self.phi = vector[1:]
         return self
 
-    def get_X(self, ts):
+    def __get_X__(self, ts):
         y = ts.values
         X = list()
         for i in range(len(ts)):
@@ -116,7 +116,7 @@ class AR(base_model):
 
         return self
 
-    def forward(self, y):
+    def __forward__(self, y):
         y = y.values
         lon = len(y)
         if lon <= self.p:
@@ -132,15 +132,15 @@ class AR(base_model):
         for i in range(periods):
             if i == 0:
                 y = ts
-                value = self.forward(y)
+                value = self.__forward__(y)
 
-            value = self.forward(y)
+            value = self.__forward__(y)
             y = add_next_date(y, value)
 
         return y[-periods:]
 
     def cross_validation(self, ts, n_splits, error_type = None):
-        X = numpy.array(self.get_X(ts))
+        X = numpy.array(self.__get_X__(ts))
         y = numpy.array(ts.values.tolist())
         y_index = numpy.array(ts.index)
         tscv = TimeSeriesSplit(n_splits = n_splits)
@@ -148,7 +148,6 @@ class AR(base_model):
 
         error_list = list()
         for train_index, test_index in splits:
-            #X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
             y_train_index, y_test_index = y_index[train_index], y_index[test_index]
 
@@ -173,7 +172,7 @@ class AR(base_model):
                 else:
                     y = add_next_date(y, next_value_bootstrap)
 
-                next_value = self.forward(y)
+                next_value = self.__forward__(y)
                 next_value_bootstrap = next_value + train[0]
                 result_complete = add_next_date(y, next_value_bootstrap)
                 result = result_complete[-periods:]
@@ -226,7 +225,7 @@ class AR_Ridge(AR):
 
     def fit(self, ts):
 
-        X = self.get_X(ts)
+        X = self.__get_X__(ts)
         y = ts.values.tolist()
         ridge_model = linear_model.Ridge(alpha = self.alpha, copy_X = self.copy_X,
                                          fit_intercept = self.fit_intercept,
@@ -251,7 +250,7 @@ class AR_Ridge_2(AR):
 
     def fit(self, ts, **kwargs):
 
-        X = self.get_X(ts)
+        X = self.__get_X__(ts)
         y = ts.values.tolist()
         ridge_model = linear_model.Ridge(**kwargs)
         ridge_model.fit(X, y)
@@ -285,7 +284,7 @@ class AR_Lasso(AR):
 
     def fit(self, ts):
 
-        X = self.get_X(ts)
+        X = self.__get_X__(ts)
         y = ts.values.tolist()
         lasso_model = linear_model.Lasso(alpha = self.alpha, copy_X = self.copy_X,
                                          fit_intercept = self.fit_intercept,
@@ -329,7 +328,7 @@ class AR_ElasticNet(AR):
 
     def fit(self, ts):
 
-        X = self.get_X(ts)
+        X = self.__get_X__(ts)
         y = ts.values.tolist()
         lasso_model = linear_model.ElasticNet(alpha = self.alpha, copy_X = self.copy_X,
                                          fit_intercept = self.fit_intercept,

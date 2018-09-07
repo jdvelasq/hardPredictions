@@ -10,8 +10,10 @@ This module contains AR models using four diferent parameter optimization
 methods: SciPy's minimization, SciKit's Ridge linear model, SciKit's Lasso
 linear model and SciKit's Elastic Net linear model.
 
-Example
+Examples
 -------------------------------------------------------------------------------
+
+AR model using SciPy's minimization:
 
 >>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
 >>> model = AR(p = 3)
@@ -22,6 +24,43 @@ Example
 1972-10-01    6100.380339
 1972-11-01    5637.974302
 dtype: float64
+
+AR model using SciKit's Ridge linear model:
+    
+>>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
+>>> model = AR_Ridge(p = 3)
+>>> model = model.fit(ts)
+>>> fitted_model = model.predict(ts)
+>>> prediction = model.forecast(ts, periods = 2)
+>>> prediction
+1972-10-01    6056.234637
+1972-11-01    5514.641861
+dtype: float64
+
+AR model using SciKit's Lasso linear model:
+    
+>>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
+>>> model = AR_Lasso(p = 3)
+>>> model = model.fit(ts)
+>>> fitted_model = model.predict(ts)
+>>> prediction = model.forecast(ts, periods = 2)
+>>> prediction
+1972-10-01    6056.234513
+1972-11-01    5514.641777
+dtype: float64
+
+AR model using SciKit's Elastic Net linear model:
+    
+>>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
+>>> model = AR_ElasticNet(p = 3)
+>>> model = model.fit(ts)
+>>> fitted_model = model.predict(ts)
+>>> prediction = model.forecast(ts, periods = 2)
+>>> prediction
+1972-10-01    6056.233741
+1972-11-01    5514.641325
+dtype: float64       
+
 
 Classes
 -------------------------------------------------------------------------------

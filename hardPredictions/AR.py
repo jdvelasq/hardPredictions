@@ -10,6 +10,18 @@ This module contains AR models using four diferent parameter optimization
 methods: SciPy's minimization, SciKit's Ridge linear model, SciKit's Lasso
 linear model and SciKit's Elastic Net linear model.
 
+Example
+-------------------------------------------------------------------------------
+
+>>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
+>>> model = AR(p = 3)
+>>> model = model.fit(ts)
+>>> fitted_model = model.predict(ts)
+>>> prediction = model.forecast(ts, periods = 2)
+>>> prediction
+1972-10-01    6100.380339
+1972-11-01    5637.974302
+dtype: float64
 
 Classes
 -------------------------------------------------------------------------------
@@ -34,18 +46,6 @@ class AR(base_model):
 
     Returns:
         AR model structure of order p.
-
-    **Example**
-
-    >>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
-    >>> model = AR(p = 3)
-    >>> model = model.fit(ts)
-    >>> fitted_model = model.predict(ts)
-    >>> prediction = model.forecast(ts, periods = 2)
-    >>> prediction
-    1972-10-01    6100.380339
-    1972-11-01    5637.974302
-    dtype: float64
 
     """
 

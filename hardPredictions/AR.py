@@ -99,10 +99,10 @@ class AR(base_model):
         """ Parameters to vector
         
         Args:
-            None
+            None.
             
         Returns:
-            Vector parameters of length p+1 to use in optimization
+            Vector parameters of length p+1 to use in optimization.
 
         """        
         params = list()
@@ -115,8 +115,8 @@ class AR(base_model):
         """ Vector to parameters
         
         Args:
-            vector: vector of length p+1 to convert into parameters of the
-            model
+            vector (list): vector of length p+1 to convert into parameters of 
+            the model.
             
         Returns:
             self
@@ -148,10 +148,10 @@ class AR(base_model):
         """ Fits a time series using self model parameters
         
         Args:
-            ts: Time series to fit
+            ts (pandas.Series): Time series to fit.
         
         Returns:
-            Fitted time series
+            Fitted time series.
             
         """
         y = ts.values
@@ -176,8 +176,8 @@ class AR(base_model):
         """ Finds optimal parameters using a given optimization function
         
         Args:
-            ts: Time series to fit
-            error_type: Function to estimates error
+            ts (pandas.Series): Time series to fit.
+            error_type (function): Function to estimates error.
             
         Return:
             self
@@ -210,11 +210,11 @@ class AR(base_model):
         """ Predicts future values in a given period
         
         Args:
-            ts: Time series to predict
-            periods: Number of periods ahead to predict
+            ts (pandas.Series): Time series to predict.
+            periods (int): Number of periods ahead to predict.
             
         Returns:
-            Time series of predicted values
+            Time series of predicted values.
         
         """
         for i in range(periods):

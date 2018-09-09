@@ -15,7 +15,7 @@ Examples
 
 AR model using SciPy's minimization:
 
->>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('./hardPredicions/champagne.csv', index_col = 0, header = 0)
 >>> model = AR(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)

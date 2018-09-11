@@ -17,11 +17,27 @@ AR model using SciPy's minimization:
 
 Load time series:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne_short.csv', index_col = 0, header = 0)
+>>> ts
+Month
+1964-01-01    2815
+1964-02-01    2672
+1964-03-01    2755
+1964-04-01    2721
+1964-05-01    2946
+1964-06-01    3036
+1964-07-01    2282
+1964-08-01    2212
+1964-09-01    2922
+1964-10-01    4301
+1964-11-01    5764
+1964-12-01    7312
+Name: Perrin, dtype: int64
 
-Define model. In this case, an autoregressive model of order 3:
+Define model. In this case, an autoregressive model of order 1 that is going to
+use SciPy's minimization to find optimal parameters:
 
->>> model = AR(p = 3)
+>>> model = AR(p = 1)
 
 Find optimal parameters for loaded time series:
 
@@ -35,8 +51,8 @@ Forecast series 2 periods ahead:
 
 >>> prediction = model.forecast(ts, periods = 2)
 >>> prediction
-1972-10-01    6100.380339
-1972-11-01    5637.974302
+1965-01-01    3538.454489
+1965-02-01    3165.065093
 dtype: float64
 
 AR model using SciKit's Ridge linear model:
@@ -65,7 +81,7 @@ dtype: float64
 
 AR model using SciKit's Elastic Net linear model:
 
->>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_ElasticNet(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)

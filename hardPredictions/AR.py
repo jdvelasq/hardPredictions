@@ -16,18 +16,23 @@ Examples
 AR model using SciPy's minimization:
 
 Load time series:
+
 >>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
 
 Define model. In this case, an autoregressive model of order 3:
+
 >>> model = AR(p = 3)
 
 Find optimal parameters for loaded time series:
+
 >>> model = model.fit(ts)
 
 Return fitted series using model parameters:
+
 >>> fitted_model = model.predict(ts)
 
 Forecast series 2 periods ahead:
+
 >>> prediction = model.forecast(ts, periods = 2)
 >>> prediction
 1972-10-01    6100.380339

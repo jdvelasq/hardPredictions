@@ -17,7 +17,7 @@ AR model using SciPy's minimization:
 
 Load time series:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne_short.csv', index_col = 0, header = 0)
 >>> ts
 Month
 1964-01-01    2815

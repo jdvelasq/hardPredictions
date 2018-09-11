@@ -15,10 +15,19 @@ Examples
 
 AR model using SciPy's minimization:
 
->>> ts = pandas.Series.from_csv('./hardPredicions/champagne.csv', index_col = 0, header = 0)
+Load time series:
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
+
+Define model. In this case, an autoregressive model of order 3:
 >>> model = AR(p = 3)
+
+Find optimal parameters for loaded time series:
 >>> model = model.fit(ts)
+
+Return fitted series using model parameters:
 >>> fitted_model = model.predict(ts)
+
+Forecast series 2 periods ahead:
 >>> prediction = model.forecast(ts, periods = 2)
 >>> prediction
 1972-10-01    6100.380339
@@ -26,8 +35,8 @@ AR model using SciPy's minimization:
 dtype: float64
 
 AR model using SciKit's Ridge linear model:
-    
->>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
+
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Ridge(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -38,8 +47,8 @@ AR model using SciKit's Ridge linear model:
 dtype: float64
 
 AR model using SciKit's Lasso linear model:
-    
->>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
+
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Lasso(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -50,7 +59,7 @@ AR model using SciKit's Lasso linear model:
 dtype: float64
 
 AR model using SciKit's Elastic Net linear model:
-    
+
 >>> ts = pandas.Series.from_csv('champagne.csv', index_col = 0, header = 0)
 >>> model = AR_ElasticNet(p = 3)
 >>> model = model.fit(ts)
@@ -59,7 +68,7 @@ AR model using SciKit's Elastic Net linear model:
 >>> prediction
 1972-10-01    6056.233741
 1972-11-01    5514.641325
-dtype: float64       
+dtype: float64
 
 
 Classes
@@ -79,7 +88,7 @@ from sklearn.utils import resample
 
 class AR(base_model):
     """ Autoregressive model
-    
+
     Parameter optimization method: scipy's minimization
 
     Args:
@@ -97,14 +106,14 @@ class AR(base_model):
 
     def params2vector(self):
         """ Parameters to vector
-        
+
         Args:
             None.
-            
+
         Returns:
             Vector parameters of length p+1 to use in optimization.
 
-        """        
+        """
         params = list()
         params.append(self.phi0)
         for i in range(len(self.phi)):
@@ -113,15 +122,15 @@ class AR(base_model):
 
     def vector2params(self, vector):
         """ Vector to parameters
-        
+
         Args:
-            vector (list): vector of length p+1 to convert into parameters of 
+            vector (list): vector of length p+1 to convert into parameters of
             the model.
-            
+
         Returns:
             self
 
-        """ 
+        """
         self.phi0 = vector[0]
         self.phi = vector[1:]
         return self
@@ -146,13 +155,13 @@ class AR(base_model):
 
     def predict(self, ts):
         """ Fits a time series using self model parameters
-        
+
         Args:
             ts (pandas.Series): Time series to fit.
-        
+
         Returns:
             Fitted time series.
-            
+
         """
         y = ts.values
         prediction = list()
@@ -174,14 +183,14 @@ class AR(base_model):
 
     def fit(self, ts, error_type = 'mean_squared_error'):
         """ Finds optimal parameters using a given optimization function
-        
+
         Args:
             ts (pandas.Series): Time series to fit.
             error_type (function): Function to estimates error.
-            
+
         Return:
             self
-        
+
         """
         def f(x):
             self.vector2params(x)
@@ -208,14 +217,14 @@ class AR(base_model):
 
     def forecast(self, ts, periods):
         """ Predicts future values in a given period
-        
+
         Args:
             ts (pandas.Series): Time series to predict.
             periods (int): Number of periods ahead to predict.
-            
+
         Returns:
             Time series of predicted values.
-        
+
         """
         for i in range(periods):
             if i == 0:

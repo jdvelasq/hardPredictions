@@ -17,7 +17,7 @@ AR model using SciPy's minimization:
 
 Load time series:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> ts
 Month
 1964-01-01    2815
@@ -57,7 +57,7 @@ dtype: float64
 
 AR model using SciKit's Ridge linear model:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Ridge(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -69,7 +69,7 @@ dtype: float64
 
 AR model using SciKit's Lasso linear model:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Lasso(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -81,7 +81,7 @@ dtype: float64
 
 AR model using SciKit's Elastic Net linear model:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_ElasticNet(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -136,7 +136,7 @@ class AR(base_model):
 
         """
         params = list()
-        params.append(self.phi0)
+        params.append(self.phi0[0])
         for i in range(len(self.phi)):
             params.append(self.phi[i])
         return params

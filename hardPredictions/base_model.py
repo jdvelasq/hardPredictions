@@ -8,7 +8,7 @@ Methods:
 
 """
 
-from hardPredictions import series_viewer
+from hardPredictions.hardPredictions import series_viewer
 import sklearn
 
 class base_model():
@@ -26,37 +26,38 @@ class base_model():
             raise ValueError('Method "fit" has not been defined')
         if (not "forecast" in dir(self)):
             raise ValueError('Method "forecast" has not been defined')    
-        
-    
-    #def __repr__(self):
-    #    return self.ts.__repr__()
+  
 
-    def calc_error(self, ts, error_type = None):
+    def calc_error(self, ts, error_function = None):
         """ Estimates error according to SciKit's regression metrics
         
         Args:
             ts: Time series to estimate the model
-            error_type (mean_squared_error, mean_absolute_error, mean_squared_log_error, median_absolute_error, r2_score, explained_variance_score): Error type
+            error_function (None or error function): Error function whose
+                parameters are real time series and estimated time series. If
+                None, error_function is Sci-Kit learn's mean squared error
         
         """
         y_estimated = self.predict(ts)
         y_real = ts
         
-        if (error_type == None or error_type == 'mean_squared_error'):
+        if (error_function == None):
             error = sklearn.metrics.mean_squared_error(y_real, y_estimated)
-        elif (error_type == 'mean_absolute_error'):
-            error = sklearn.metrics.mean_absolute_error(y_real, y_estimated)
+        else:
+            error = error_function(y_real, y_estimated)
+        #elif (error_type == 'mean_absolute_error'):
+        #    error = sklearn.metrics.mean_absolute_error(y_real, y_estimated)
         #elif (error_type == 'mean_squared_log_error'):
         #    error = sklearn.metrics.mean_squared_log_error(y_real, y_estimated)
-        elif (error_type == 'median_absolute_error'):
-            error = sklearn.metrics.median_absolute_error(y_real, y_estimated)
-        elif (error_type == 'r2_score'):
-            error = sklearn.metrics.r2_score(y_real, y_estimated)
-        elif (error_type == 'explained_variance_score'):
-            error = sklearn.metrics.explained_variance_score(y_real, y_estimated)
-        else:
-            message_error_type = 'Invalid error type: ' + error_type
-            raise ValueError(message_error_type)        
+        #elif (error_type == 'median_absolute_error'):
+        #    error = sklearn.metrics.median_absolute_error(y_real, y_estimated)
+        #elif (error_type == 'r2_score'):
+        #    error = sklearn.metrics.r2_score(y_real, y_estimated)
+        #elif (error_type == 'explained_variance_score'):
+        #    error = sklearn.metrics.explained_variance_score(y_real, y_estimated)
+        #else:
+        #    message_error_type = 'Invalid error type: ' + error_type
+        #    raise ValueError(message_error_type)        
         
         return error
 

@@ -17,7 +17,7 @@ AR model using SciPy's minimization:
 
 Load time series:
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne_short.csv', index_col = 0, header = 0)
 >>> ts
 Month
 1964-01-01    2815
@@ -57,7 +57,7 @@ dtype: float64
 
 AR model using SciKit's Ridge linear model:
 
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Ridge(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -69,7 +69,7 @@ dtype: float64
 
 AR model using SciKit's Lasso linear model:
 
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Lasso(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -81,7 +81,7 @@ dtype: float64
 
 AR model using SciKit's Elastic Net linear model:
 
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_ElasticNet(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -174,56 +174,6 @@ class AR(base_model):
                 X.append(value)
         return X
 
-    def predict(self, ts):
-        """ Fits a time series using self model parameters
-
-        Args:
-            ts (pandas.Series): Time series to fit.
-
-        Returns:
-            Fitted time series.
-
-        """
-        y = ts.values
-        prediction = list()
-        for i in range(len(y)):
-            if i <= self.p:
-                if i == 0:
-                    prediction.append(self.phi0)
-                else:
-                    y_last = y[0:i]
-                    result = self.phi0 + numpy.dot(y_last, self.phi[0:i])
-                    prediction.append(result)
-            else:
-                y_last = y[i-self.p:i]
-                result = self.phi0 + numpy.dot(y_last, self.phi)
-                prediction.append(result)
-        prediction = pandas.Series((v[0] for v in prediction), index = ts.index)
-        return prediction
-
-
-    def fit(self, ts, error_type = 'mean_squared_error'):
-        """ Finds optimal parameters using a given optimization function
-
-        Args:
-            ts (pandas.Series): Time series to fit.
-            error_type (function): Function to estimates error.
-
-        Return:
-            self
-
-        """
-        def f(x):
-            self.vector2params(x)
-            return self.calc_error(ts, error_type)
-
-        x0 = self.params2vector()
-        optim_params = scipy.optimize.minimize(f, x0)
-        self.vector2params(vector = optim_params.x)
-        self.ts = self.predict(ts)
-
-        return self
-
     def __forward__(self, y):
         y = y.values
         lon = len(y)
@@ -234,50 +184,59 @@ class AR(base_model):
             y_last = y[lon-self.p:lon]
             result = self.phi0 + numpy.dot(y_last, self.phi)
 
-        return result[0]
+        return result
 
-    def forecast(self, ts, periods):
-        """ Predicts future values in a given period
+    def predict(self, ts):
+        """ Fits a time series using self model parameters
 
         Args:
-            ts (pandas.Series): Time series to predict.
-            periods (int): Number of periods ahead to predict.
+            ts (pandas.Series): Time series to fit.
 
         Returns:
-            Time series of predicted values.
+            Fitted time series.
 
         """
-        for i in range(periods):
+        y = ts
+        prediction = list()
+        for i in range(len(y)):
             if i == 0:
-                y = ts
-                value = self.__forward__(y)
+                result = self.phi0
+            else:
+                lon = len(prediction)
+                if lon <= self.p:
+                    y_last = y[0:lon]
+                    result = self.phi0 + numpy.dot(y_last, self.phi[0:lon])
+                else:
+                    y_last = y[lon-self.p:lon]
+                    result = self.phi0 + numpy.dot(y_last, self.phi)
+            prediction.append(result)
+        prediction = pandas.Series((v for v in prediction), index = ts.index)
+        return prediction
 
-            value = self.__forward__(y)
-            y = add_next_date(y, value)
 
-        return y[-periods:]
+    def fit(self, ts, error_function = None):
+        """ Finds optimal parameters using a given optimization function
 
-    def cross_validation(self, ts, n_splits, error_type = None):
-        X = numpy.array(self.__get_X__(ts))
-        y = numpy.array(ts.values.tolist())
-        y_index = numpy.array(ts.index)
-        tscv = TimeSeriesSplit(n_splits = n_splits)
-        splits = tscv.split(X)
+        Args:
+            ts (pandas.Series): Time series to fit.
+            error_function (function): Function to estimates error.
 
-        error_list = list()
-        for train_index, test_index in splits:
-            y_train, y_test = y[train_index], y[test_index]
-            y_train_index, y_test_index = y_index[train_index], y_index[test_index]
+        Return:
+            self
 
-            y_train = pandas.Series((v for v in y_train), index = y_train_index)
-            y_test = pandas.Series((v for v in y_test), index = y_test_index)
-            self.fit(y_train)
-            error = self.calc_error(y_test, error_type)
-            error_list.append(error)
+        """
+        def f(x):
+            self.vector2params(x)
+            return self.calc_error(ts, error_function)
 
-        return error_list
+        x0 = self.params2vector()
+        optim_params = scipy.optimize.minimize(f, x0)
+        self.vector2params(vector = optim_params.x)
+        self.ts = self.predict(ts)
 
-    def simulate(self, ts, periods = 5, iterations = 1000, confidence_interval = 0.95):
+        return self
+
+    def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 1000):
         values = self.filter_ts(ts).values
         results = list()
         for i in range(iterations):
@@ -298,13 +257,85 @@ class AR(base_model):
             results.append(result)
 
         results = pandas.DataFrame(results)
-        minim = results.quantile(1-confidence_interval)
-        maxim = results.quantile(confidence_interval)
-        final_result = pandas.DataFrame([minim, maxim])
+        ci_inf = results.quantile(1-confidence_interval)
+        ci_sup = results.quantile(confidence_interval)
+        ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
 
-        return final_result
+        return ci
 
-    def fit_intervals(self, ts, confidence_interval = 0.95, iterations = 1000):
+    def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
+        """ Predicts future values in a given period
+
+        Args:
+            ts (pandas.Series): Time series to predict.
+            periods (int): Number of periods ahead to predict.
+
+        Returns:
+            Time series of predicted values.
+
+        """
+        for i in range(periods):
+            if i == 0:
+                y = ts
+
+            value = self.__forward__(y)
+            y = add_next_date(y, value)
+
+        if confidence_interval == None:
+            for i in range(periods):
+                if i == 0:
+                    ci_zero = ts
+                ci_zero = add_next_date(ci_zero, None)
+
+            ci_inf = ci_zero[-periods:]
+            ci_sup = ci_zero[-periods:]
+            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
+        else:
+            ci = self.simulate(ts, periods, confidence_interval, iterations)
+
+        prediction = y[-periods:]
+        prediction.name = 'series'
+        result = ci.append(prediction)
+
+        return result.transpose()
+
+    def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300):
+        last = ts[-1:]
+        fitted_ts = self.predict(ts)
+        forecast_ts = self.forecast(ts, periods, confidence_interval, iterations)
+        ci_inf = last.append(forecast_ts['ci_inf'])
+        ci_sup = last.append(forecast_ts['ci_sup'])
+        tseries = last.append(forecast_ts['series'])
+
+        matplotlib.pyplot.plot(ts, 'k-')
+        matplotlib.pyplot.plot(fitted_ts, 'b-')
+        matplotlib.pyplot.plot(tseries, 'c-')
+        matplotlib.pyplot.plot(ci_inf, 'r--')
+        matplotlib.pyplot.plot(ci_sup, 'r--')
+
+
+    def cross_validation(self, ts, n_splits, error_function = None):
+        X = numpy.array(self.__get_X__(ts))
+        y = numpy.array(ts.values.tolist())
+        y_index = numpy.array(ts.index)
+        tscv = TimeSeriesSplit(n_splits = n_splits)
+        splits = tscv.split(X)
+
+        error_list = list()
+        for train_index, test_index in splits:
+            y_train, y_test = y[train_index], y[test_index]
+            y_train_index, y_test_index = y_index[train_index], y_index[test_index]
+
+            y_train = pandas.Series((v for v in y_train), index = y_train_index)
+            y_test = pandas.Series((v for v in y_test), index = y_test_index)
+            self.fit(y_train)
+            error = self.calc_error(y_test, error_function)
+            error_list.append(error)
+
+        return error_list
+
+
+    def get_predict_ci(self, ts, confidence_interval = 0.95, iterations = 1000):
         values = self.filter_ts(ts).values
         serie = self.predict(ts).values
         results = list()

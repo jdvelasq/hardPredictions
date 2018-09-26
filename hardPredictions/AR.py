@@ -147,6 +147,10 @@ class AR(base_model):
             self.optim_type = 'no_optim'
 
 
+    def __repr__(self):
+        return 'AR(p = ' + str(self.p) + ', intercept = ' + str(self.phi0[0]) + ', phi = ' + str(self.phi) +')'
+
+
     def params2vector(self):
         """ Parameters to vector
 
@@ -445,6 +449,10 @@ class AR_Ridge(AR):
         elif intercept != None and phi != None:
             self.optim_type = 'no_optim'
 
+    def __repr__(self):
+        return 'AR_Ridge(p = ' + str(self.p) + ', intercept = ' + str(self.phi0[0]) + ', phi = ' + str(self.phi) +')'
+
+
     def fit(self, ts):
 
         if self.optim_type == 'complete':
@@ -547,6 +555,10 @@ class AR_Lasso(AR):
         elif intercept != None and phi != None:
             self.optim_type = 'no_optim'
 
+    def __repr__(self):
+        return 'AR_Lasso(p = ' + str(self.p) + ', intercept = ' + str(self.phi0[0]) + ', phi = ' + str(self.phi) +')'
+
+
     def fit(self, ts):
 
         if self.optim_type == 'complete':
@@ -637,6 +649,10 @@ class AR_ElasticNet(AR):
             self.optim_type = 'optim_params'
         elif intercept != None and phi != None:
             self.optim_type = 'no_optim'
+
+    def __repr__(self):
+        return 'AR_ElasticNet(p = ' + str(self.p) + ', intercept = ' + str(self.phi0[0]) + ', phi = ' + str(self.phi) +')'
+
 
     def fit(self, ts):
 

@@ -120,10 +120,32 @@ class AR(base_model):
 
     """
 
-    def __init__(self, p=None):
+    def __init__(self, p=None, intercept=None, phi=None):
         self.p = p
-        self.phi0 = numpy.random.rand(1)
-        self.phi = numpy.random.rand(p)
+
+        if intercept == None:
+            self.phi0 = numpy.random.rand(1)
+        elif intercept == False:
+            self.phi0 = 0
+        else:
+            self.phi0 = intercept
+
+        if phi == None:
+            self.phi = numpy.random.rand(p)
+        else:
+            self.phi = phi
+
+        if intercept == None and phi == None:
+            self.optim_type = 'complete'
+        elif intercept == None and phi != None:
+            self.optim_type = 'optim_intercept'
+        elif intercept == False and phi == None:
+            self.optim_type = 'no_intercept'
+        elif intercept != None and phi == None:
+            self.optim_type = 'optim_params'
+        elif intercept != None and phi != None:
+            self.optim_type = 'no_optim'
+
 
     def params2vector(self):
         """ Parameters to vector
@@ -136,10 +158,22 @@ class AR(base_model):
 
         """
         params = list()
-        params.append(self.phi0[0])
-        for i in range(len(self.phi)):
-            params.append(self.phi[i])
-        return params
+
+        if self.optim_type == 'complete':
+            params.append(self.phi0[0])
+            for i in range(len(self.phi)):
+                params.append(self.phi[i])
+            return params
+        elif self.optim_type == 'no_intercept' or self.optim_type == 'optim_params':
+            for i in range(len(self.phi)):
+                params.append(self.phi[i])
+            return params
+        elif self.optim_type == 'optim_intercept':
+            params.append(self.phi0[0])
+            return params
+        elif self.optim_type == 'no_optim':
+            pass
+
 
     def vector2params(self, vector):
         """ Vector to parameters
@@ -152,8 +186,17 @@ class AR(base_model):
             self
 
         """
-        self.phi0 = vector[0]
-        self.phi = vector[1:]
+
+        if self.optim_type == 'complete':
+            self.phi0 = vector[0]
+            self.phi = vector[1:]
+        elif self.optim_type == 'no_intercept' or self.optim_type == 'optim_params':
+            self.phi = vector
+        elif self.optim_type == 'optim_intercept':
+            self.phi0 = vector[0]
+        elif self.optim_type == 'no_optim':
+            pass
+
         return self
 
     def __get_X__(self, ts):
@@ -225,16 +268,19 @@ class AR(base_model):
             self
 
         """
-        def f(x):
-            self.vector2params(x)
-            return self.calc_error(ts, error_function)
 
-        x0 = self.params2vector()
-        optim_params = scipy.optimize.minimize(f, x0)
-        self.vector2params(vector = optim_params.x)
-        self.ts = self.predict(ts)
+        if self.optim_type == 'no_optim':
+            pass
+        else:
+            def f(x):
+                self.vector2params(x)
+                return self.calc_error(ts, error_function)
 
-        return self
+            x0 = self.params2vector()
+            optim_params = scipy.optimize.minimize(f, x0)
+            self.vector2params(vector = optim_params.x)
+
+            return self
 
     def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 1000):
         values = self.filter_ts(ts).values
@@ -313,6 +359,10 @@ class AR(base_model):
         matplotlib.pyplot.plot(ci_inf, 'r--')
         matplotlib.pyplot.plot(ci_sup, 'r--')
 
+        if confidence_interval != None:
+            matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast', 'CI', 'CI'])
+        else:
+            matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])
 
     def cross_validation(self, ts, n_splits, error_function = None):
         X = numpy.array(self.__get_X__(ts))
@@ -360,7 +410,7 @@ class AR(base_model):
 class AR_Ridge(AR):
     """ Parameter optimization method: SciKit's Ridge linear model """
 
-    def __init__(self, p=None, alpha=0.5, copy_X=True, fit_intercept=True, max_iter=None,
+    def __init__(self, p=None, intercept=None, phi=None, alpha=0.5, copy_X=True, fit_intercept=True, max_iter=None,
                  normalize=False, random_state=None, solver='auto', tol=0.001):
         self.p = p
         self.alpha = alpha
@@ -372,50 +422,93 @@ class AR_Ridge(AR):
         self.solver = solver
         self.tol = tol
 
+        if intercept == None:
+            self.phi0 = numpy.random.rand(1)
+        elif intercept == False:
+            self.phi0 = 0
+        else:
+            self.phi0 = intercept
+
+        if phi == None:
+            self.phi = numpy.random.rand(p)
+        else:
+            self.phi = phi
+
+        if intercept == None and phi == None:
+            self.optim_type = 'complete'
+        elif intercept == None and phi != None:
+            self.optim_type = 'optim_intercept'
+        elif intercept == False and phi == None:
+            self.optim_type = 'no_intercept'
+        elif intercept != None and phi == None:
+            self.optim_type = 'optim_params'
+        elif intercept != None and phi != None:
+            self.optim_type = 'no_optim'
+
     def fit(self, ts):
 
-        X = self.__get_X__(ts)
-        y = ts.values.tolist()
-        ridge_model = linear_model.Ridge(alpha = self.alpha, copy_X = self.copy_X,
-                                         fit_intercept = self.fit_intercept,
-                                         max_iter = self.max_iter,
-                                         normalize = self.normalize,
-                                         random_state = self.random_state,
-                                         solver = self.solver, tol = self.tol)
-        ridge_model.fit(X, y)
-        optim_params = list()
-        optim_params.append(ridge_model.intercept_)
-        optim_params = optim_params + ridge_model.coef_.tolist()
-        self.vector2params(vector = optim_params)
-        self.ts = self.predict(ts)
+        if self.optim_type == 'complete':
+             X = self.__get_X__(ts)
+             y = ts.values.tolist()
+             ridge_model = linear_model.Ridge(alpha = self.alpha, copy_X = self.copy_X,
+                                              fit_intercept = self.fit_intercept,
+                                              max_iter = self.max_iter,
+                                              normalize = self.normalize,
+                                              random_state = self.random_state,
+                                              solver = self.solver, tol = self.tol)
+             ridge_model.fit(X, y)
+             optim_params = list()
+             optim_params.append(ridge_model.intercept_)
+             optim_params = optim_params + ridge_model.coef_.tolist()
+             self.vector2params(vector = optim_params)
+
+        elif self.optim_type == 'no_intercept':
+            X = self.__get_X__(ts)
+            y = ts.values.tolist()
+            ridge_model = linear_model.Ridge(alpha = self.alpha, copy_X = self.copy_X,
+                                             fit_intercept = False,
+                                             max_iter = self.max_iter,
+                                             normalize = self.normalize,
+                                             random_state = self.random_state,
+                                             solver = self.solver, tol = self.tol)
+            ridge_model.fit(X, y)
+            optim_params = list()
+            optim_params = optim_params + ridge_model.coef_.tolist()
+            self.vector2params(vector = optim_params)
+
+        elif self.optim_type == 'no_optim':
+            pass
+        else:
+            error_message = "Can't apply Lasso regression using given parameters"
+            raise ValueError(error_message)
 
         return self
 
-class AR_Ridge_2(AR):
-    """ Parameter optimization method: SciKit's Ridge linear model """
 
-    def __init__(self, p=None, **kwargs):
-        self.p = p
+#class AR_Ridge_2(AR):
+#    """ Parameter optimization method: SciKit's Ridge linear model """
 
-    def fit(self, ts, **kwargs):
+#   def __init__(self, p=None, **kwargs):
+#        self.p = p
 
-        X = self.__get_X__(ts)
-        y = ts.values.tolist()
-        ridge_model = linear_model.Ridge(**kwargs)
-        ridge_model.fit(X, y)
-        optim_params = list()
-        optim_params.append(ridge_model.intercept_)
-        optim_params = optim_params + ridge_model.coef_.tolist()
-        self.vector2params(vector = optim_params)
-        self.ts = self.predict(ts)
+#    def fit(self, ts, **kwargs):
 
-        return self
+#        X = self.__get_X__(ts)
+#        y = ts.values.tolist()
+#        ridge_model = linear_model.Ridge(**kwargs)
+#        ridge_model.fit(X, y)
+#        optim_params = list()
+#        optim_params.append(ridge_model.intercept_)
+#        optim_params = optim_params + ridge_model.coef_.tolist()
+#        self.vector2params(vector = optim_params)
+
+#        return self
 
 
 class AR_Lasso(AR):
     """ Parameter optimization method: SciKit's Lasso linear model """
 
-    def __init__(self, p=None, alpha=0.1, copy_X=True, fit_intercept=True, max_iter=1000,
+    def __init__(self, p=None, intercept=None, phi=None, alpha=0.1, copy_X=True, fit_intercept=True, max_iter=1000,
                  normalize=False, positive=False, precompute=False, random_state=None,
                  selection='cyclic', tol=0.0001, warm_start=False):
         self.p = p
@@ -431,25 +524,71 @@ class AR_Lasso(AR):
         self.tol = tol
         self.warm_start = warm_start
 
+        if intercept == None:
+            self.phi0 = numpy.random.rand(1)
+        elif intercept == False:
+            self.phi0 = 0
+        else:
+            self.phi0 = intercept
+
+        if phi == None:
+            self.phi = numpy.random.rand(p)
+        else:
+            self.phi = phi
+
+        if intercept == None and phi == None:
+            self.optim_type = 'complete'
+        elif intercept == None and phi != None:
+            self.optim_type = 'optim_intercept'
+        elif intercept == False and phi == None:
+            self.optim_type = 'no_intercept'
+        elif intercept != None and phi == None:
+            self.optim_type = 'optim_params'
+        elif intercept != None and phi != None:
+            self.optim_type = 'no_optim'
+
     def fit(self, ts):
 
-        X = self.__get_X__(ts)
-        y = ts.values.tolist()
-        lasso_model = linear_model.Lasso(alpha = self.alpha, copy_X = self.copy_X,
-                                         fit_intercept = self.fit_intercept,
-                                         max_iter = self.max_iter,
-                                         normalize = self.normalize,
-                                         positive = self.positive,
-                                         precompute = self.precompute,
-                                         random_state = self.random_state,
-                                         selection = self.selection, tol = self.tol,
-                                         warm_start = self.warm_start)
-        lasso_model.fit(X, y)
-        optim_params = list()
-        optim_params.append(lasso_model.intercept_)
-        optim_params = optim_params + lasso_model.coef_.tolist()
-        self.vector2params(vector = optim_params)
-        self.ts = self.predict(ts)
+        if self.optim_type == 'complete':
+            X = self.__get_X__(ts)
+            y = ts.values.tolist()
+            lasso_model = linear_model.Lasso(alpha = self.alpha, copy_X = self.copy_X,
+                                             fit_intercept = self.fit_intercept,
+                                             max_iter = self.max_iter,
+                                             normalize = self.normalize,
+                                             positive = self.positive,
+                                             precompute = self.precompute,
+                                             random_state = self.random_state,
+                                             selection = self.selection, tol = self.tol,
+                                             warm_start = self.warm_start)
+            lasso_model.fit(X, y)
+            optim_params = list()
+            optim_params.append(lasso_model.intercept_)
+            optim_params = optim_params + lasso_model.coef_.tolist()
+            self.vector2params(vector = optim_params)
+
+        elif self.optim_type == 'no_intercept':
+            X = self.__get_X__(ts)
+            y = ts.values.tolist()
+            lasso_model = linear_model.Lasso(alpha = self.alpha, copy_X = self.copy_X,
+                                             fit_intercept = False,
+                                             max_iter = self.max_iter,
+                                             normalize = self.normalize,
+                                             positive = self.positive,
+                                             precompute = self.precompute,
+                                             random_state = self.random_state,
+                                             selection = self.selection, tol = self.tol,
+                                             warm_start = self.warm_start)
+            lasso_model.fit(X, y)
+            optim_params = list()
+            optim_params = optim_params + lasso_model.coef_.tolist()
+            self.vector2params(vector = optim_params)
+
+        elif self.optim_type == 'no_optim':
+            pass
+        else:
+            error_message = "Can't apply Lasso regression using given parameters"
+            raise ValueError(error_message)
 
         return self
 
@@ -458,9 +597,10 @@ class AR_Lasso(AR):
 class AR_ElasticNet(AR):
     """ Parameter optimization method: SciKit's Elastic Net linear model """
 
-    def __init__(self, p=None, alpha=1.0, copy_X=True, fit_intercept=True, l1_ratio=0.5,
+    def __init__(self, p=None, intercept=None, phi=None, alpha=1.0, copy_X=True, fit_intercept=True, l1_ratio=0.5,
                  max_iter=1000, normalize=False, positive=False, precompute=False,
                  random_state=0, selection='cyclic', tol=0.0001, warm_start=False):
+
         self.p = p
         self.alpha = alpha
         self.copy_X = copy_X
@@ -475,25 +615,72 @@ class AR_ElasticNet(AR):
         self.tol = tol
         self.warm_start = warm_start
 
+        if intercept == None:
+            self.phi0 = numpy.random.rand(1)
+        elif intercept == False:
+            self.phi0 = 0
+        else:
+            self.phi0 = intercept
+
+        if phi == None:
+            self.phi = numpy.random.rand(p)
+        else:
+            self.phi = phi
+
+        if intercept == None and phi == None:
+            self.optim_type = 'complete'
+        elif intercept == None and phi != None:
+            self.optim_type = 'optim_intercept'
+        elif intercept == False and phi == None:
+            self.optim_type = 'no_intercept'
+        elif intercept != None and phi == None:
+            self.optim_type = 'optim_params'
+        elif intercept != None and phi != None:
+            self.optim_type = 'no_optim'
+
     def fit(self, ts):
 
-        X = self.__get_X__(ts)
-        y = ts.values.tolist()
-        lasso_model = linear_model.ElasticNet(alpha = self.alpha, copy_X = self.copy_X,
-                                         fit_intercept = self.fit_intercept,
-                                         l1_ratio = self.l1_ratio,
-                                         max_iter = self.max_iter,
-                                         normalize = self.normalize,
-                                         positive = self.positive,
-                                         precompute = self.precompute,
-                                         random_state = self.random_state,
-                                         selection = self.selection, tol = self.tol,
-                                         warm_start = self.warm_start)
-        lasso_model.fit(X, y)
-        optim_params = list()
-        optim_params.append(lasso_model.intercept_)
-        optim_params = optim_params + lasso_model.coef_.tolist()
-        self.vector2params(vector = optim_params)
-        self.ts = self.predict(ts)
+        if self.optim_type == 'complete':
+             X = self.__get_X__(ts)
+             y = ts.values.tolist()
+             lasso_model = linear_model.ElasticNet(alpha = self.alpha, copy_X = self.copy_X,
+                                                   fit_intercept = self.fit_intercept,
+                                                   l1_ratio = self.l1_ratio,
+                                                   max_iter = self.max_iter,
+                                                   normalize = self.normalize,
+                                                   positive = self.positive,
+                                                   precompute = self.precompute,
+                                                   random_state = self.random_state,
+                                                   selection = self.selection, tol = self.tol,
+                                                   warm_start = self.warm_start)
+             lasso_model.fit(X, y)
+             optim_params = list()
+             optim_params.append(lasso_model.intercept_)
+             optim_params = optim_params + lasso_model.coef_.tolist()
+             self.vector2params(vector = optim_params)
+
+        elif self.optim_type == 'no_intercept':
+             X = self.__get_X__(ts)
+             y = ts.values.tolist()
+             lasso_model = linear_model.ElasticNet(alpha = self.alpha, copy_X = self.copy_X,
+                                                   fit_intercept = False,
+                                                   l1_ratio = self.l1_ratio,
+                                                   max_iter = self.max_iter,
+                                                   normalize = self.normalize,
+                                                   positive = self.positive,
+                                                   precompute = self.precompute,
+                                                   random_state = self.random_state,
+                                                   selection = self.selection, tol = self.tol,
+                                                   warm_start = self.warm_start)
+             lasso_model.fit(X, y)
+             optim_params = list()
+             optim_params = optim_params + lasso_model.coef_.tolist()
+             self.vector2params(vector = optim_params)
+
+        elif self.optim_type == 'no_optim':
+            pass
+        else:
+            error_message = "Can't apply Elastic Net regression using given parameters"
+            raise ValueError(error_message)
 
         return self

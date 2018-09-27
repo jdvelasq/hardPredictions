@@ -17,7 +17,7 @@ AR model using SciPy's minimization:
 
 Load time series:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> ts
 Month
 1964-01-01    2815
@@ -35,29 +35,71 @@ Month
 Name: Perrin, dtype: int64
 
 Define model. In this case, an autoregressive model of order 1 that is going to
-use SciPy's minimization to find optimal parameters:
+use SciPy's minimization to find optimal parameters. Random parameters between 0
+and 1 are selected at the beginning if they are not set:
 
 >>> model = AR(p = 1)
+>>> model
+AR(p = 1, intercept = 0.016591369423096025, phi = [0.76245357])
 
 Find optimal parameters for loaded time series:
 
 >>> model = model.fit(ts)
+>>> models
+AR(p = 1, intercept = 903.9444699110963, phi = [0.89730665])
 
 Return fitted series using model parameters:
 
 >>> fitted_model = model.predict(ts)
+>>> fitted_model
+Month
+1964-01-01     903.944470
+1964-02-01    3429.862681
+1964-03-01    3301.547831
+1964-04-01    3376.024282
+1964-05-01    3345.515856
+1964-06-01    3547.409852
+1964-07-01    3628.167450
+1964-08-01    2951.598238
+1964-09-01    2888.786773
+1964-10-01    3525.874492
+1964-11-01    4763.260358
+1964-12-01    6076.019983
+dtype: float64
 
 Forecast series 2 periods ahead:
 
 >>> prediction = model.forecast(ts, periods = 2)
 >>> prediction
-1965-01-01    3538.454489
-1965-02-01    3165.065093
-dtype: float64
+            ci_inf  ci_sup       series
+1965-01-01     NaN     NaN  7465.050672
+1965-02-01     NaN     NaN  7602.384058
+
+Forecast series 2 periods ahead with 95% confidence interval:
+
+>>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
+>>> prediction
+                 ci_inf       ci_sup       series
+1965-01-01  6118.883222  9376.106202  7465.050672
+1965-02-01  5654.860819  9954.661922  7602.384058
+
+Plot series and prediction:
+
+>>> model.plot(ts, periods = 2)
+
+.. image:: ./images/ar_1.png
+    :width: 350px
+    :align: center
+
+Plot series and prediction with 95% confidence interval:
+
+.. image:: ./images/ar_1_ci.png
+    :width: 350px
+    :align: center
 
 AR model using SciKit's Ridge linear model:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Ridge(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -69,7 +111,7 @@ dtype: float64
 
 AR model using SciKit's Lasso linear model:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Lasso(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -81,7 +123,7 @@ dtype: float64
 
 AR model using SciKit's Elastic Net linear model:
 
->>> ts = pandas.Series.from_csv('../hardPredicions/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_ElasticNet(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -279,6 +321,7 @@ class AR(base_model):
             def f(x):
                 self.vector2params(x)
                 return self.calc_error(ts, error_function)
+<<<<<<< HEAD
 
             x0 = self.params2vector()
             optim_params = scipy.optimize.minimize(f, x0)
@@ -286,6 +329,15 @@ class AR(base_model):
 
             return self
 
+=======
+
+            x0 = self.params2vector()
+            optim_params = scipy.optimize.minimize(f, x0)
+            self.vector2params(vector = optim_params.x)
+
+            return self
+
+>>>>>>> origin/master
     def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 1000):
         values = self.filter_ts(ts).values
         results = list()
@@ -298,6 +350,7 @@ class AR(base_model):
                     y = ts
                 else:
                     y = add_next_date(y, next_value_bootstrap)
+<<<<<<< HEAD
 
                 next_value = self.__forward__(y)
                 next_value_bootstrap = next_value + train[0]
@@ -311,6 +364,21 @@ class AR(base_model):
         ci_sup = results.quantile(confidence_interval)
         ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
 
+=======
+
+                next_value = self.__forward__(y)
+                next_value_bootstrap = next_value + train[0]
+                result_complete = add_next_date(y, next_value_bootstrap)
+                result = result_complete[-periods:]
+
+            results.append(result)
+
+        results = pandas.DataFrame(results)
+        ci_inf = results.quantile(1-confidence_interval)
+        ci_sup = results.quantile(confidence_interval)
+        ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
+
+>>>>>>> origin/master
         return ci
 
     def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
@@ -336,6 +404,7 @@ class AR(base_model):
                 if i == 0:
                     ci_zero = ts
                 ci_zero = add_next_date(ci_zero, None)
+<<<<<<< HEAD
 
             ci_inf = ci_zero[-periods:]
             ci_sup = ci_zero[-periods:]
@@ -368,6 +437,40 @@ class AR(base_model):
         else:
             matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])
 
+=======
+
+            ci_inf = ci_zero[-periods:]
+            ci_sup = ci_zero[-periods:]
+            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
+        else:
+            ci = self.simulate(ts, periods, confidence_interval, iterations)
+
+        prediction = y[-periods:]
+        prediction.name = 'series'
+        result = ci.append(prediction)
+
+        return result.transpose()
+
+    def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300):
+        last = ts[-1:]
+        fitted_ts = self.predict(ts)
+        forecast_ts = self.forecast(ts, periods, confidence_interval, iterations)
+        ci_inf = last.append(forecast_ts['ci_inf'])
+        ci_sup = last.append(forecast_ts['ci_sup'])
+        tseries = last.append(forecast_ts['series'])
+
+        matplotlib.pyplot.plot(ts, 'k-')
+        matplotlib.pyplot.plot(fitted_ts, 'b-')
+        matplotlib.pyplot.plot(tseries, 'c-')
+        matplotlib.pyplot.plot(ci_inf, 'r--')
+        matplotlib.pyplot.plot(ci_sup, 'r--')
+
+        if confidence_interval != None:
+            matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast', 'CI', 'CI'])
+        else:
+            matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])
+
+>>>>>>> origin/master
     def cross_validation(self, ts, n_splits, error_function = None):
         X = numpy.array(self.__get_X__(ts))
         y = numpy.array(ts.values.tolist())

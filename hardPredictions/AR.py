@@ -87,15 +87,9 @@ Plot series and prediction:
 
 >>> model.plot(ts, periods = 2)
 
-.. image:: ./images/ar_1.png
-    :width: 350px
-    :align: center
 
 Plot series and prediction with 95% confidence interval:
 
-.. image:: ./images/ar_1_ci.png
-    :width: 350px
-    :align: center
 
 AR model using SciKit's Ridge linear model:
 
@@ -166,7 +160,7 @@ class AR(base_model):
         self.p = p
 
         if intercept == None:
-            self.phi0 = numpy.random.rand(1)
+            self.phi0 = numpy.random.rand(1)[0]
         elif intercept == False:
             self.phi0 = 0
         else:
@@ -190,7 +184,7 @@ class AR(base_model):
 
 
     def __repr__(self):
-        return 'AR(p = ' + str(self.p) + ', intercept = ' + str(self.phi0[0]) + ', phi = ' + str(self.phi) +')'
+        return 'AR(p = ' + str(self.p) + ', intercept = ' + str(self.phi0) + ', phi = ' + str(self.phi) +')'
 
 
     def params2vector(self):
@@ -206,7 +200,7 @@ class AR(base_model):
         params = list()
 
         if self.optim_type == 'complete':
-            params.append(self.phi0[0])
+            params.append(self.phi0)
             for i in range(len(self.phi)):
                 params.append(self.phi[i])
             return params
@@ -215,7 +209,7 @@ class AR(base_model):
                 params.append(self.phi[i])
             return params
         elif self.optim_type == 'optim_intercept':
-            params.append(self.phi0[0])
+            params.append(self.phi0)
             return params
         elif self.optim_type == 'no_optim':
             pass
@@ -321,7 +315,6 @@ class AR(base_model):
             def f(x):
                 self.vector2params(x)
                 return self.calc_error(ts, error_function)
-<<<<<<< HEAD
 
             x0 = self.params2vector()
             optim_params = scipy.optimize.minimize(f, x0)
@@ -329,15 +322,6 @@ class AR(base_model):
 
             return self
 
-=======
-
-            x0 = self.params2vector()
-            optim_params = scipy.optimize.minimize(f, x0)
-            self.vector2params(vector = optim_params.x)
-
-            return self
-
->>>>>>> origin/master
     def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 1000):
         values = self.filter_ts(ts).values
         results = list()
@@ -350,7 +334,6 @@ class AR(base_model):
                     y = ts
                 else:
                     y = add_next_date(y, next_value_bootstrap)
-<<<<<<< HEAD
 
                 next_value = self.__forward__(y)
                 next_value_bootstrap = next_value + train[0]
@@ -364,21 +347,6 @@ class AR(base_model):
         ci_sup = results.quantile(confidence_interval)
         ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
 
-=======
-
-                next_value = self.__forward__(y)
-                next_value_bootstrap = next_value + train[0]
-                result_complete = add_next_date(y, next_value_bootstrap)
-                result = result_complete[-periods:]
-
-            results.append(result)
-
-        results = pandas.DataFrame(results)
-        ci_inf = results.quantile(1-confidence_interval)
-        ci_sup = results.quantile(confidence_interval)
-        ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
-
->>>>>>> origin/master
         return ci
 
     def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
@@ -404,7 +372,6 @@ class AR(base_model):
                 if i == 0:
                     ci_zero = ts
                 ci_zero = add_next_date(ci_zero, None)
-<<<<<<< HEAD
 
             ci_inf = ci_zero[-periods:]
             ci_sup = ci_zero[-periods:]
@@ -437,40 +404,6 @@ class AR(base_model):
         else:
             matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])
 
-=======
-
-            ci_inf = ci_zero[-periods:]
-            ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
-
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        result = ci.append(prediction)
-
-        return result.transpose()
-
-    def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300):
-        last = ts[-1:]
-        fitted_ts = self.predict(ts)
-        forecast_ts = self.forecast(ts, periods, confidence_interval, iterations)
-        ci_inf = last.append(forecast_ts['ci_inf'])
-        ci_sup = last.append(forecast_ts['ci_sup'])
-        tseries = last.append(forecast_ts['series'])
-
-        matplotlib.pyplot.plot(ts, 'k-')
-        matplotlib.pyplot.plot(fitted_ts, 'b-')
-        matplotlib.pyplot.plot(tseries, 'c-')
-        matplotlib.pyplot.plot(ci_inf, 'r--')
-        matplotlib.pyplot.plot(ci_sup, 'r--')
-
-        if confidence_interval != None:
-            matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast', 'CI', 'CI'])
-        else:
-            matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])
-
->>>>>>> origin/master
     def cross_validation(self, ts, n_splits, error_function = None):
         X = numpy.array(self.__get_X__(ts))
         y = numpy.array(ts.values.tolist())

@@ -88,14 +88,18 @@ Plot series and prediction:
 >>> model.plot(ts, periods = 2)
 
 .. image:: ./images/ar_1.png
-  :width: 300
+  :width: 400
   :alt: AR 1
+  :align: center
 
 Plot series and prediction with 95% confidence interval:
 
 >>> model.plot(ts, periods = 2, confidence_interval = 0.95)
 
-
+.. image:: ./images/ar_1_ci.png
+  :width: 400
+  :alt: AR 1
+  :align: center
 
 AR model using SciKit's Ridge linear model:
 

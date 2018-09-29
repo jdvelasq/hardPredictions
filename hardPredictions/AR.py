@@ -126,7 +126,6 @@ AR model using SciKit's Ridge linear model:
 >>> model = model.fit(ts)
 >>> model
 AR_Ridge(p = 3, intercept = 3312.197143588196, phi = [-0.06715507618150979, -0.18725218249116612, 0.5610442989956164])
-
 >>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
 >>> prediction
                  ci_inf        ci_sup       series

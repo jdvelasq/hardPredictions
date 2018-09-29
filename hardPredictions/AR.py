@@ -34,9 +34,10 @@ Month
 1964-12-01    7312
 Name: Perrin, dtype: int64
 
-Define model. In this case, an autoregressive model of order 1 that is going to
-use SciPy's minimization to find optimal parameters. Random parameters between 0
-and 1 are selected at the beginning if they are not set:
+Define a model. In this case, an autoregressive model of order 1 that is going to
+use SciPy's minimization to find optimal parameters. Parameter p is mandatory.
+Random parameters between 0 and 1 are selected at the beginning if they are not
+set:
 
 >>> model = AR(p = 1)
 >>> model
@@ -45,7 +46,7 @@ AR(p = 1, intercept = 0.016591369423096025, phi = [0.76245357])
 Find optimal parameters for loaded time series:
 
 >>> model = model.fit(ts)
->>> models
+>>> model
 AR(p = 1, intercept = 903.9444699110963, phi = [0.89730665])
 
 Return fitted series using model parameters:
@@ -101,17 +102,36 @@ Plot series and prediction with 95% confidence interval:
   :alt: AR 1
   :align: center
 
+Parameters can also be set since the beginning and they will not be optimized:
+
+>>> model = AR(p = 1, intercept = False, phi = [0.9])
+>>> model
+AR(p = 1, intercept = 0, phi = [0.9])
+
+>>> model = model.fit(ts)
+>>> model
+AR(p = 1, intercept = 0, phi = [0.9])
+
+>> model.plot(ts, periods = False)
+
+.. image:: ./images/ar_1_set.png
+  :width: 400
+  :alt: AR 1
+  :align: center
+
 AR model using SciKit's Ridge linear model:
 
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Ridge(p = 3)
 >>> model = model.fit(ts)
->>> fitted_model = model.predict(ts)
->>> prediction = model.forecast(ts, periods = 2)
+>>> model
+AR_Ridge(p = 3, intercept = 3312.197143588196, phi = [-0.06715507618150979, -0.18725218249116612, 0.5610442989956164])
+
+>>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
 >>> prediction
-1972-10-01    6056.234637
-1972-11-01    5514.641861
-dtype: float64
+                 ci_inf        ci_sup       series
+1972-10-01  2749.272522  10076.248084  6056.234637
+1972-11-01  1433.502767   9971.591723  5514.641861
 
 AR model using SciKit's Lasso linear model:
 
@@ -119,11 +139,12 @@ AR model using SciKit's Lasso linear model:
 >>> model = AR_Lasso(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
->>> prediction = model.forecast(ts, periods = 2)
+>>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
 >>> prediction
-1972-10-01    6056.234513
-1972-11-01    5514.641777
-dtype: float64
+                 ci_inf        ci_sup       series
+1972-10-01  2550.837063  10076.248001  6056.234513
+1972-11-01  1878.679179  10958.057492  5514.641777
+
 
 AR model using SciKit's Elastic Net linear model:
 
@@ -131,11 +152,11 @@ AR model using SciKit's Elastic Net linear model:
 >>> model = AR_ElasticNet(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
->>> prediction = model.forecast(ts, periods = 2)
+>>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
 >>> prediction
-1972-10-01    6056.233741
-1972-11-01    5514.641325
-dtype: float64
+                 ci_inf        ci_sup       series
+1972-10-01  2322.686735  10081.406111  6056.233741
+1972-11-01  1478.722475   9495.934253  5514.641325
 
 
 Classes
@@ -330,7 +351,7 @@ class AR(base_model):
             optim_params = scipy.optimize.minimize(f, x0)
             self.vector2params(vector = optim_params.x)
 
-            return self
+        return self
 
     def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 1000):
         values = self.filter_ts(ts).values
@@ -496,7 +517,7 @@ class AR_Ridge(AR):
             self.optim_type = 'no_optim'
 
     def __repr__(self):
-        return 'AR_Ridge(p = ' + str(self.p) + ', intercept = ' + str(self.phi0[0]) + ', phi = ' + str(self.phi) +')'
+        return 'AR_Ridge(p = ' + str(self.p) + ', intercept = ' + str(self.phi0) + ', phi = ' + str(self.phi) +')'
 
 
     def fit(self, ts):
@@ -602,7 +623,7 @@ class AR_Lasso(AR):
             self.optim_type = 'no_optim'
 
     def __repr__(self):
-        return 'AR_Lasso(p = ' + str(self.p) + ', intercept = ' + str(self.phi0[0]) + ', phi = ' + str(self.phi) +')'
+        return 'AR_Lasso(p = ' + str(self.p) + ', intercept = ' + str(self.phi0) + ', phi = ' + str(self.phi) +')'
 
 
     def fit(self, ts):
@@ -697,7 +718,7 @@ class AR_ElasticNet(AR):
             self.optim_type = 'no_optim'
 
     def __repr__(self):
-        return 'AR_ElasticNet(p = ' + str(self.p) + ', intercept = ' + str(self.phi0[0]) + ', phi = ' + str(self.phi) +')'
+        return 'AR_ElasticNet(p = ' + str(self.p) + ', intercept = ' + str(self.phi0) + ', phi = ' + str(self.phi) +')'
 
 
     def fit(self, ts):

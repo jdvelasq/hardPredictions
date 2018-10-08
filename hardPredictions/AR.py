@@ -13,6 +13,8 @@ linear model and SciKit's Elastic Net linear model.
 Examples
 -------------------------------------------------------------------------------
 
+SciPy's minimization
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AR model using SciPy's minimization:
 
 Load time series:
@@ -119,8 +121,8 @@ AR(p = 1, intercept = 0, phi = [0.9])
   :alt: AR 1
   :align: center
 
-## AR Ridge linear model
-
+AR Ridge linear model
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AR model using SciKit's Ridge linear model:
 
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
@@ -134,8 +136,8 @@ AR_Ridge(p = 3, intercept = 3312.197143588196, phi = [-0.06715507618150979, -0.1
 1972-10-01  2749.272522  10076.248084  6056.234637
 1972-11-01  1433.502767   9971.591723  5514.641861
 
-## AR Lasso linear model
-
+AR Lasso linear model
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AR model using SciKit's Lasso linear model:
 
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
@@ -148,8 +150,8 @@ AR model using SciKit's Lasso linear model:
 1972-10-01  2550.837063  10076.248001  6056.234513
 1972-11-01  1878.679179  10958.057492  5514.641777
 
-## AR Elastic Net linear model
-
+AR Elastic Net linear model
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AR model using SciKit's Elastic Net linear model:
 
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)

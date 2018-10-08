@@ -41,7 +41,7 @@ set:
 
 >>> model = AR(p = 1)
 >>> model
-AR(p = 1, intercept = 0.016591369423096025, phi = [0.76245357])
+AR(p = 1, intercept = None, phi = None)
 
 Find optimal parameters for loaded time series:
 
@@ -119,6 +119,8 @@ AR(p = 1, intercept = 0, phi = [0.9])
   :alt: AR 1
   :align: center
 
+## AR Ridge linear model
+
 AR model using SciKit's Ridge linear model:
 
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
@@ -132,6 +134,8 @@ AR_Ridge(p = 3, intercept = 3312.197143588196, phi = [-0.06715507618150979, -0.1
 1972-10-01  2749.272522  10076.248084  6056.234637
 1972-11-01  1433.502767   9971.591723  5514.641861
 
+## AR Lasso linear model
+
 AR model using SciKit's Lasso linear model:
 
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
@@ -144,6 +148,7 @@ AR model using SciKit's Lasso linear model:
 1972-10-01  2550.837063  10076.248001  6056.234513
 1972-11-01  1878.679179  10958.057492  5514.641777
 
+## AR Elastic Net linear model
 
 AR model using SciKit's Elastic Net linear model:
 
@@ -190,14 +195,14 @@ class AR(base_model):
         self.p = p
 
         if intercept == None:
-            self.phi0 = numpy.random.rand(1)[0]
+            self.phi0 = None
         elif intercept == False:
             self.phi0 = 0
         else:
             self.phi0 = intercept
 
         if phi == None:
-            self.phi = numpy.random.rand(p)
+            self.phi = None
         else:
             self.phi = phi
 
@@ -228,6 +233,10 @@ class AR(base_model):
 
         """
         params = list()
+        if self.phi0 == None:
+            self.phi0 = numpy.random.rand(1)[0]
+        if self.phi == None:
+            self.phi = numpy.random.rand(self.p)
 
         if self.optim_type == 'complete':
             params.append(self.phi0)
@@ -418,21 +427,30 @@ class AR(base_model):
     def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300):
         last = ts[-1:]
         fitted_ts = self.predict(ts)
-        forecast_ts = self.forecast(ts, periods, confidence_interval, iterations)
-        ci_inf = last.append(forecast_ts['ci_inf'])
-        ci_sup = last.append(forecast_ts['ci_sup'])
-        tseries = last.append(forecast_ts['series'])
-
-        matplotlib.pyplot.plot(ts, 'k-')
-        matplotlib.pyplot.plot(fitted_ts, 'b-')
-        matplotlib.pyplot.plot(tseries, 'c-')
-        matplotlib.pyplot.plot(ci_inf, 'r--')
-        matplotlib.pyplot.plot(ci_sup, 'r--')
-
-        if confidence_interval != None:
-            matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast', 'CI', 'CI'])
+        if periods == False:
+            pass
         else:
-            matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])
+            forecast_ts = self.forecast(ts, periods, confidence_interval, iterations)
+            ci_inf = last.append(forecast_ts['ci_inf'])
+            ci_sup = last.append(forecast_ts['ci_sup'])
+            tseries = last.append(forecast_ts['series'])
+
+        if periods == False:
+            matplotlib.pyplot.plot(ts, 'k-')
+            matplotlib.pyplot.plot(fitted_ts, 'b-')
+            matplotlib.pyplot.legend(['Real', 'Fitted'])
+        else:
+            matplotlib.pyplot.plot(ts, 'k-')
+            matplotlib.pyplot.plot(fitted_ts, 'c-')
+            matplotlib.pyplot.plot(tseries, 'b-')
+            matplotlib.pyplot.plot(ci_inf, 'r--')
+            matplotlib.pyplot.plot(ci_sup, 'r--')
+            matplotlib.pyplot.axvline(x = ts[-1:].index, color = 'k', linestyle = '--')
+
+            if confidence_interval != None:
+                matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast', 'CI', 'CI'])
+            else:
+                matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])
 
     def cross_validation(self, ts, n_splits, error_function = None):
         X = numpy.array(self.__get_X__(ts))

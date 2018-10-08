@@ -114,7 +114,7 @@ AR(p = 1, intercept = 0, phi = [0.9])
 >>> model
 AR(p = 1, intercept = 0, phi = [0.9])
 
->> model.plot(ts, periods = False)
+>>> model.plot(ts, periods = False)
 
 .. image:: ./images/ar_1_set.png
   :width: 400

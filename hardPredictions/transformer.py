@@ -240,6 +240,337 @@ Month
 1964-12-01    0
 dtype: int64
 
+Restore seasonality
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(seasonal = 'poly2')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.000000
+1964-02-01    2672.000000
+1964-03-01    2755.000000
+1964-04-01    2721.000000
+1964-05-01    2946.000000
+1964-06-01    3036.000000
+1964-07-01    2282.000000
+1964-08-01    2212.000000
+1964-09-01    2922.000000
+1964-10-01    4301.000000
+1964-11-01    5764.000000
+1964-12-01    7312.000000
+1965-01-01    3893.956201
+1965-02-01    2889.402694
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(seasonal = 'diff')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.0
+1964-02-01    2672.0
+1964-03-01    2755.0
+1964-04-01    2721.0
+1964-05-01    2946.0
+1964-06-01    3036.0
+1964-07-01    2282.0
+1964-08-01    2212.0
+1964-09-01    2922.0
+1964-10-01    4301.0
+1964-11-01    5764.0
+1964-12-01    7312.0
+1965-01-01    2815.0
+1965-02-01    2672.0
+dtype: float64
+
+Restore trending
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trend = 'linear')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.000000
+1964-02-01    2672.000000
+1964-03-01    2755.000000
+1964-04-01    2721.000000
+1964-05-01    2946.000000
+1964-06-01    3036.000000
+1964-07-01    2282.000000
+1964-08-01    2212.000000
+1964-09-01    2922.000000
+1964-10-01    4301.000000
+1964-11-01    5764.000000
+1964-12-01    7312.000000
+1965-01-01    8484.284463
+1965-02-01    9098.510083
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trend = 'cuadratic')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.000000
+1964-02-01    2672.000000
+1964-03-01    2755.000000
+1964-04-01    2721.000000
+1964-05-01    2946.000000
+1964-06-01    3036.000000
+1964-07-01    2282.000000
+1964-08-01    2212.000000
+1964-09-01    2922.000000
+1964-10-01    4301.000000
+1964-11-01    5764.000000
+1964-12-01    7312.000000
+1965-01-01    8538.178375
+1965-02-01    9591.355561
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trend = 'cuadratic')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+1964-01-01    2815.000000
+1964-02-01    2672.000000
+1964-03-01    2755.000000
+1964-04-01    2721.000000
+1964-05-01    2946.000000
+1964-06-01    3036.000000
+1964-07-01    2282.000000
+1964-08-01    2212.000000
+1964-09-01    2922.000000
+1964-10-01    4301.000000
+1964-11-01    5764.000000
+1964-12-01    7312.000000
+1965-01-01    8538.178375
+1965-02-01    9591.355561
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trend = 'cubic')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01     2815.000000
+1964-02-01     2672.000000
+1964-03-01     2755.000000
+1964-04-01     2721.000000
+1964-05-01     2946.000000
+1964-06-01     3036.000000
+1964-07-01     2282.000000
+1964-08-01     2212.000000
+1964-09-01     2922.000000
+1964-10-01     4301.000000
+1964-11-01     5764.000000
+1964-12-01     7312.000000
+1965-01-01     9868.705164
+1965-02-01    13524.981509
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trend = 'diff1')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.000000
+1964-02-01    2672.000000
+1964-03-01    2755.000000
+1964-04-01    2721.000000
+1964-05-01    2946.000000
+1964-06-01    3036.000000
+1964-07-01    2282.000000
+1964-08-01    2212.000000
+1964-09-01    2922.000000
+1964-10-01    4301.000000
+1964-11-01    5764.000000
+1964-12-01    7312.000000
+1965-01-01    8712.463721
+1965-02-01    9914.728326
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trend = 'diff2')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01     2815.000000
+1964-02-01     2672.000000
+1964-03-01     2755.000000
+1964-04-01     2721.000000
+1964-05-01     2946.000000
+1964-06-01     3036.000000
+1964-07-01     2282.000000
+1964-08-01     2212.000000
+1964-09-01     2922.000000
+1964-10-01     4301.000000
+1964-11-01     5764.000000
+1964-12-01     7312.000000
+1965-01-01     8989.726850
+1965-02-01    11294.037281
+dtype: float64
+
+Restore transformation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trans = 'log')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.000000
+1964-02-01    2672.000000
+1964-03-01    2755.000000
+1964-04-01    2721.000000
+1964-05-01    2946.000000
+1964-06-01    3036.000000
+1964-07-01    2282.000000
+1964-08-01    2212.000000
+1964-09-01    2922.000000
+1964-10-01    4301.000000
+1964-11-01    5764.000000
+1964-12-01    7312.000000
+1965-01-01    3558.758272
+1965-02-01    3449.753767
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trans = 'log10')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.000000
+1964-02-01    2672.000000
+1964-03-01    2755.000000
+1964-04-01    2721.000000
+1964-05-01    2946.000000
+1964-06-01    3036.000000
+1964-07-01    2282.000000
+1964-08-01    2212.000000
+1964-09-01    2922.000000
+1964-10-01    4301.000000
+1964-11-01    5764.000000
+1964-12-01    7312.000000
+1965-01-01    3558.753355
+1965-02-01    3449.752959
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trans = 'sqrt')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.000000
+1964-02-01    2672.000000
+1964-03-01    2755.000000
+1964-04-01    2721.000000
+1964-05-01    2946.000000
+1964-06-01    3036.000000
+1964-07-01    2282.000000
+1964-08-01    2212.000000
+1964-09-01    2922.000000
+1964-10-01    4301.000000
+1964-11-01    5764.000000
+1964-12-01    7312.000000
+1965-01-01    4472.882806
+1965-02-01    3533.515931
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trans = 'cbrt')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.000000
+1964-02-01    2672.000000
+1964-03-01    2755.000000
+1964-04-01    2721.000000
+1964-05-01    2946.000000
+1964-06-01    3036.000000
+1964-07-01    2282.000000
+1964-08-01    2212.000000
+1964-09-01    2922.000000
+1964-10-01    4301.000000
+1964-11-01    5764.000000
+1964-12-01    7312.000000
+1965-01-01    4023.074533
+1965-02-01    3513.214894
+dtype: float64
+
+>>> from AR import AR
+>>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> mytransform = transformer(trans = 'boxcox')
+>>> transformed = mytransform.fit_transform(ts)
+>>> model = AR(p = 3)
+>>> model = model.fit(transformed)
+>>> ahead = model.forecast(transformed, periods = 2)
+>>> original = mytransform.restore(ahead)
+>>> original
+1964-01-01    2815.000000
+1964-02-01    2671.999999
+1964-03-01    2754.999999
+1964-04-01    2721.000001
+1964-05-01    2946.000000
+1964-06-01    3036.000001
+1964-07-01    2282.000000
+1964-08-01    2212.000001
+1964-09-01    2921.999999
+1964-10-01    4300.999998
+1964-11-01    5763.999989
+1964-12-01    7311.999999
+1965-01-01     518.655992
+1965-02-01     518.679431
+dtype: float64
 
 """
 
@@ -430,59 +761,7 @@ class transformer():
             ts: Time series to restore
         """
 
-        """ Restore seasonality
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(seasonal = 'poly2')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.000000
-        1964-02-01    2672.000000
-        1964-03-01    2755.000000
-        1964-04-01    2721.000000
-        1964-05-01    2946.000000
-        1964-06-01    3036.000000
-        1964-07-01    2282.000000
-        1964-08-01    2212.000000
-        1964-09-01    2922.000000
-        1964-10-01    4301.000000
-        1964-11-01    5764.000000
-        1964-12-01    7312.000000
-        1965-01-01    3893.956201
-        1965-02-01    2889.402694
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(seasonal = 'diff')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.0
-        1964-02-01    2672.0
-        1964-03-01    2755.0
-        1964-04-01    2721.0
-        1964-05-01    2946.0
-        1964-06-01    3036.0
-        1964-07-01    2282.0
-        1964-08-01    2212.0
-        1964-09-01    2922.0
-        1964-10-01    4301.0
-        1964-11-01    5764.0
-        1964-12-01    7312.0
-        1965-01-01    2815.0
-        1965-02-01    2672.0
-        dtype: float64
-
-        """
+        """ Restore seasonality """
         if (self.seasonal == 'poly2'):
             X = ts.index.factorize()[0].reshape(-1,1)
             X = X%self.intfrq
@@ -501,158 +780,7 @@ class transformer():
         else:
             ts_deseasonal = ts
 
-        """ Restore trending
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trend = 'linear')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.000000
-        1964-02-01    2672.000000
-        1964-03-01    2755.000000
-        1964-04-01    2721.000000
-        1964-05-01    2946.000000
-        1964-06-01    3036.000000
-        1964-07-01    2282.000000
-        1964-08-01    2212.000000
-        1964-09-01    2922.000000
-        1964-10-01    4301.000000
-        1964-11-01    5764.000000
-        1964-12-01    7312.000000
-        1965-01-01    8484.284463
-        1965-02-01    9098.510083
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trend = 'cuadratic')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.000000
-        1964-02-01    2672.000000
-        1964-03-01    2755.000000
-        1964-04-01    2721.000000
-        1964-05-01    2946.000000
-        1964-06-01    3036.000000
-        1964-07-01    2282.000000
-        1964-08-01    2212.000000
-        1964-09-01    2922.000000
-        1964-10-01    4301.000000
-        1964-11-01    5764.000000
-        1964-12-01    7312.000000
-        1965-01-01    8538.178375
-        1965-02-01    9591.355561
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trend = 'cuadratic')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        1964-01-01    2815.000000
-        1964-02-01    2672.000000
-        1964-03-01    2755.000000
-        1964-04-01    2721.000000
-        1964-05-01    2946.000000
-        1964-06-01    3036.000000
-        1964-07-01    2282.000000
-        1964-08-01    2212.000000
-        1964-09-01    2922.000000
-        1964-10-01    4301.000000
-        1964-11-01    5764.000000
-        1964-12-01    7312.000000
-        1965-01-01    8538.178375
-        1965-02-01    9591.355561
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trend = 'cubic')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01     2815.000000
-        1964-02-01     2672.000000
-        1964-03-01     2755.000000
-        1964-04-01     2721.000000
-        1964-05-01     2946.000000
-        1964-06-01     3036.000000
-        1964-07-01     2282.000000
-        1964-08-01     2212.000000
-        1964-09-01     2922.000000
-        1964-10-01     4301.000000
-        1964-11-01     5764.000000
-        1964-12-01     7312.000000
-        1965-01-01     9868.705164
-        1965-02-01    13524.981509
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trend = 'diff1')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.000000
-        1964-02-01    2672.000000
-        1964-03-01    2755.000000
-        1964-04-01    2721.000000
-        1964-05-01    2946.000000
-        1964-06-01    3036.000000
-        1964-07-01    2282.000000
-        1964-08-01    2212.000000
-        1964-09-01    2922.000000
-        1964-10-01    4301.000000
-        1964-11-01    5764.000000
-        1964-12-01    7312.000000
-        1965-01-01    8712.463721
-        1965-02-01    9914.728326
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trend = 'diff2')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01     2815.000000
-        1964-02-01     2672.000000
-        1964-03-01     2755.000000
-        1964-04-01     2721.000000
-        1964-05-01     2946.000000
-        1964-06-01     3036.000000
-        1964-07-01     2282.000000
-        1964-08-01     2212.000000
-        1964-09-01     2922.000000
-        1964-10-01     4301.000000
-        1964-11-01     5764.000000
-        1964-12-01     7312.000000
-        1965-01-01     8989.726850
-        1965-02-01    11294.037281
-        dtype: float64
-
-        """
+        """ Restore trending """
         if (self.trend == 'linear'):
             X = ts.index.factorize()[0].reshape(-1,1)
             trending = self.fitting.predict(X)
@@ -682,134 +810,7 @@ class transformer():
         else:
             ts_detrend = ts_deseasonal
 
-        """ Restore transformation
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trans = 'log')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.000000
-        1964-02-01    2672.000000
-        1964-03-01    2755.000000
-        1964-04-01    2721.000000
-        1964-05-01    2946.000000
-        1964-06-01    3036.000000
-        1964-07-01    2282.000000
-        1964-08-01    2212.000000
-        1964-09-01    2922.000000
-        1964-10-01    4301.000000
-        1964-11-01    5764.000000
-        1964-12-01    7312.000000
-        1965-01-01    3558.758272
-        1965-02-01    3449.753767
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trans = 'log10')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.000000
-        1964-02-01    2672.000000
-        1964-03-01    2755.000000
-        1964-04-01    2721.000000
-        1964-05-01    2946.000000
-        1964-06-01    3036.000000
-        1964-07-01    2282.000000
-        1964-08-01    2212.000000
-        1964-09-01    2922.000000
-        1964-10-01    4301.000000
-        1964-11-01    5764.000000
-        1964-12-01    7312.000000
-        1965-01-01    3558.753355
-        1965-02-01    3449.752959
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trans = 'sqrt')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.000000
-        1964-02-01    2672.000000
-        1964-03-01    2755.000000
-        1964-04-01    2721.000000
-        1964-05-01    2946.000000
-        1964-06-01    3036.000000
-        1964-07-01    2282.000000
-        1964-08-01    2212.000000
-        1964-09-01    2922.000000
-        1964-10-01    4301.000000
-        1964-11-01    5764.000000
-        1964-12-01    7312.000000
-        1965-01-01    4472.882806
-        1965-02-01    3533.515931
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trans = 'cbrt')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.000000
-        1964-02-01    2672.000000
-        1964-03-01    2755.000000
-        1964-04-01    2721.000000
-        1964-05-01    2946.000000
-        1964-06-01    3036.000000
-        1964-07-01    2282.000000
-        1964-08-01    2212.000000
-        1964-09-01    2922.000000
-        1964-10-01    4301.000000
-        1964-11-01    5764.000000
-        1964-12-01    7312.000000
-        1965-01-01    4023.074533
-        1965-02-01    3513.214894
-        dtype: float64
-
-        >>> from AR import AR
-        >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
-        >>> mytransform = transformer(trans = 'boxcox')
-        >>> transformed = mytransform.fit_transform(ts)
-        >>> model = AR(p = 3)
-        >>> model = model.fit(transformed)
-        >>> ahead = model.forecast(transformed, periods = 2)
-        >>> original = mytransform.restore(ahead)
-        >>> original
-        1964-01-01    2815.000000
-        1964-02-01    2671.999999
-        1964-03-01    2754.999999
-        1964-04-01    2721.000001
-        1964-05-01    2946.000000
-        1964-06-01    3036.000001
-        1964-07-01    2282.000000
-        1964-08-01    2212.000001
-        1964-09-01    2921.999999
-        1964-10-01    4300.999998
-        1964-11-01    5763.999989
-        1964-12-01    7311.999999
-        1965-01-01     518.655992
-        1965-02-01     518.679431
-        dtype: float64
-
-        """
+        """ Restore transformation """
         if (self.trans == 'log'):
             ts_detrans = numpy.exp(ts_detrend)
         elif (self.trans == 'log10'):

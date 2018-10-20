@@ -443,7 +443,7 @@ class transformer():
         self.seasonal = seasonal
         self.ts = None
 
-        """ Frequency integer od the transformed time series """
+        """ Frequency integer of the transformed time series """
         self.intfrq = None
 
         """ Time series after transformation and restore """
@@ -469,11 +469,12 @@ class transformer():
             ts: Time series to apply transformation
         """
 
+        self.ts = ts
 
-        """ Get frequency integer """
-        self.intfrq = hardPredictions.extras.get_frequency(ts)
+        # Get frequency integer
+        self.intfrq = get_frequency(ts)
 
-        """ Transform """
+        # Transform
         if (self.trans == 'log'):
             ts_trans = numpy.log(ts)
         elif (self.trans == 'log10'):
@@ -493,7 +494,7 @@ class transformer():
             raise ValueError(message_trans)
 
 
-        """ Removing trend """
+        # Removing trend
         if (self.trend == 'linear'):
             X = ts_trans.index.factorize()[0].reshape(-1,1)
             y = ts_trans
@@ -557,7 +558,7 @@ class transformer():
             message_trend = 'Invalid trending value: ' + self.trend
             raise ValueError(message_trend)
 
-        """ Removing seasonality"""
+        # Removing seasonality
         if (self.seasonal == 'poly2'):
             X = ts_trend.index.factorize()[0].reshape(-1,1)
             X = X%self.intfrq
@@ -605,7 +606,7 @@ class transformer():
             ts: Time series to restore
         """
 
-        """ Restore seasonality """
+        # Restore seasonality
         if (self.seasonal == 'poly2'):
             X = ts.index.factorize()[0].reshape(-1,1)
             X = X%self.intfrq
@@ -614,6 +615,8 @@ class transformer():
             ts_deseasonal = [ts[i] + seasonality[i] for i in range(len(ts))]
             ts_deseasonal = pandas.Series((v for v in ts_deseasonal), index = ts.index)
         elif (self.seasonal == 'diff'):
+            len_forecast = len(ts)
+            ts = self.ts.append(ts)
             ts_deseasonal = list()
             for j in range(0, self.intfrq):
                 ts_deseasonal.append(self.diff[j])
@@ -621,10 +624,11 @@ class transformer():
                 value = ts[i] + ts_deseasonal[i-self.intfrq]
                 ts_deseasonal.append(value)
             ts_deseasonal = pandas.Series((v for v in ts_deseasonal), index = ts.index)
+            ts_deseasonal = ts_deseasonal[-len_forecast:]
         else:
             ts_deseasonal = ts
 
-        """ Restore trending """
+        # Restore trending
         if (self.trend == 'linear'):
             X = ts.index.factorize()[0].reshape(-1,1)
             trending = self.fitting.predict(X)
@@ -654,7 +658,7 @@ class transformer():
         else:
             ts_detrend = ts_deseasonal
 
-        """ Restore transformation """
+        # Restore transformation
         if (self.trans == 'log'):
             ts_detrans = numpy.exp(ts_detrend)
         elif (self.trans == 'log10'):

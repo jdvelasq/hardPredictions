@@ -17,7 +17,10 @@ Transform
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 >>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
->>> transformed_ts = transformer(trans = 'log').fit_transform(ts = ts)
+>>> mytransform = transformer(trans = 'log')
+>>> mytransform
+transformer(trans = log, trend = None, seasonal = None)
+>>> transformed_ts = mytransform.fit_transform(ts = ts)
 >>> transformed_ts
 Month
 1964-01-01    7.942718
@@ -553,7 +556,8 @@ class transformer():
 
 
     def __repr__(self):
-        return self.ts.__repr__()
+        return 'transformer(trans = ' + str(self.trans) + ', trend = ' + str(self.trend) + ', seasonal = ' + str(self.seasonal) +')'
+
 
     def fit_transform(self, ts):
         """ Return the transformed series

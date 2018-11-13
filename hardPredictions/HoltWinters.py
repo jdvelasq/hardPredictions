@@ -65,3 +65,8 @@ HoltWinters(alpha = 0.9, beta = 0.1, gamma = False, seasonal = additive)
 """
 
 from hardPredictions.base_model import base_model
+
+import numpy
+import scipy
+import pandas
+import matplotlib

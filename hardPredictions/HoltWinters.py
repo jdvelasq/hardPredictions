@@ -74,7 +74,7 @@ from hardPredictions.extras import add_next_date, get_frequency
 from sklearn.utils import resample
 
 class HoltWinters(base_model):
-    """ """
+    """ HW """
 
     def __init__(self, alpha=None, beta=None, gamma=None, seasonal='additive'):
 

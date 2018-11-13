@@ -71,7 +71,6 @@ import scipy
 import pandas
 import matplotlib
 from hardPredictions.extras import add_next_date, get_frequency
-from sklearn import linear_model
 from sklearn.utils import resample
 
 class HoltWinters(base_model):

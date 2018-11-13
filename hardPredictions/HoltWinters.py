@@ -15,24 +15,43 @@ Examples
 All parameters can be optimized by choosing seasonal type: additive or
 multiplicative. Additive seasonal is set by default.
 
+Load time series:
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+
+Define Holt Winters model:
+
 >>> model = HoltWinters()
 >>> model
 HoltWinters(alpha = None, beta = None, gamma = None, seasonal = additive)
+
+Find optimal parameters for loaded time series:
+
 >>> model = model.fit(ts)
 >>> model
 HoltWinters(alpha = 0.08779225079496673, beta = -0.03280832897112478, gamma = 0.9985667470201687, seasonal = additive)
+
+Return fitted series using model parameters:
+
 >>> fitted_model = model.predict(ts)
+
+Forecast series 2 periods ahead without confidence intervals:
+
 >>> prediction = model.forecast(ts, periods = 2)
 >>> prediction
             ci_inf  ci_sup       series
 1972-10-01     NaN     NaN  6841.767847
 1972-11-01     NaN     NaN  9754.197706
+
+Forecast series 2 periods ahead with confidence intervals:
+
 >>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
 >>> prediction
                  ci_inf       ci_sup       series
 1972-10-01  6817.142357  6851.141877  6841.767847
 1972-11-01  9729.312585  9763.392881  9754.197706
+
+Plot series and prediction with 95% confidence interval:
+
 >>> model.plot(ts, periods = 2, confidence_interval = 0.95)
 
 .. image:: ./images/HW.png

@@ -33,6 +33,12 @@ HoltWinters(alpha = 0.08779225079496673, beta = -0.03280832897112478, gamma = 0.
                  ci_inf       ci_sup       series
 1972-10-01  6817.142357  6851.141877  6841.767847
 1972-11-01  9729.312585  9763.392881  9754.197706
+>>> model.plot(ts, periods = 2, confidence_interval = 0.95)
+
+.. image:: ./images/HW.png
+  :width: 400
+  :alt: AR 1
+  :align: center
 
 None parameters will be optimized even if other parameters are set:
 
@@ -47,6 +53,12 @@ HoltWinters(alpha = 0.9, beta = 0.04986683901737994, gamma = 0.2825125430030021,
                  ci_inf       ci_sup       series
 1972-10-01  6903.954800  7075.239583  7012.853656
 1972-11-01  9648.596015  9897.577641  9836.879742
+>>> model.plot(ts, periods = 2, confidence_interval = 0.95)
+
+.. image:: ./images/HW_alpha.png
+  :width: 400
+  :alt: AR 1
+  :align: center
 
 Parameters can also be False if they do not want to be found:
 
@@ -61,6 +73,12 @@ HoltWinters(alpha = 0.9, beta = 0.1, gamma = False, seasonal = additive)
                  ci_inf       ci_sup       series
 1972-10-01  4814.564979  5812.226356  5495.803368
 1972-11-01  4731.113279  6040.021961  5572.626448
+>>> model.plot(ts, periods = 2, confidence_interval = 0.95)
+
+.. image:: ./images/HW_False.png
+  :width: 400
+  :alt: AR 1
+  :align: center
 
 """
 

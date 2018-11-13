@@ -16,6 +16,7 @@ All parameters can be optimized by choosing seasonal type: additive or
 multiplicative. Additive seasonal is set by default.
 
 Load time series:
+
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 
 Define Holt Winters model:

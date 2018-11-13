@@ -63,3 +63,12 @@ HoltWinters(alpha = 0.9, beta = 0.1, gamma = False, seasonal = additive)
 1972-11-01  4731.113279  6040.021961  5572.626448
 
 """
+
+from hardPredictions.base_model import base_model
+
+import numpy
+import scipy
+import pandas
+import matplotlib
+from hardPredictions.extras import *
+from sklearn.utils import resample

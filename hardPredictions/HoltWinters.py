@@ -35,7 +35,7 @@ Return fitted series using model parameters:
 
 >>> fitted_model = model.predict(ts)
 
-Forecast series 2 periods ahead without confidence intervals:
+Forecast series 2 periods ahead without confidence interval:
 
 >>> prediction = model.forecast(ts, periods = 2)
 >>> prediction
@@ -43,7 +43,7 @@ Forecast series 2 periods ahead without confidence intervals:
 1972-10-01     NaN     NaN  6841.767847
 1972-11-01     NaN     NaN  9754.197706
 
-Forecast series 2 periods ahead with confidence intervals:
+Forecast series 2 periods ahead with confidence interval:
 
 >>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
 >>> prediction

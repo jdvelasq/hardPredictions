@@ -4,3 +4,4 @@ from .extras import *
 from .base_model import *
 from .AR import *
 from .HoltWinters import *
+from .MA import *

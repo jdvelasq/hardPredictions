@@ -514,7 +514,7 @@ Name: Perrin, dtype: float64
 
 """
 
-from hardPredictions.extras import *
+from extras import *
 
 import pandas
 import numpy
@@ -557,7 +557,7 @@ class transformer():
 
     def __repr__(self):
         return 'transformer(trans = ' + str(self.trans) + ', trend = ' + str(self.trend) + ', seasonal = ' + str(self.seasonal) +')'
-
+        
 
     def fit_transform(self, ts):
         """ Return the transformed series
@@ -571,7 +571,7 @@ class transformer():
         # Get frequency integer
         self.intfrq = get_frequency(ts)
 
-        # Transform
+        # Transform 
         if (self.trans == 'log'):
             ts_trans = numpy.log(ts)
         elif (self.trans == 'log10'):
@@ -725,7 +725,7 @@ class transformer():
         else:
             ts_deseasonal = ts
 
-        # Restore trending
+        # Restore trending 
         if (self.trend == 'linear'):
             X = ts.index.factorize()[0].reshape(-1,1)
             trending = self.fitting.predict(X)

@@ -8,7 +8,7 @@ Methods:
 
 """
 
-from hardPredictions.hardPredictions import series_viewer
+from hardPredictions import series_viewer
 import sklearn
 
 class base_model():
@@ -26,9 +26,9 @@ class base_model():
             raise ValueError('Method "fit" has not been defined')
         if (not "forecast" in dir(self)):
             raise ValueError('Method "forecast" has not been defined')    
-  
-
-    def calc_error(self, ts, error_function = None):
+        
+    
+    def calc_error(self, ts, error_function = None, ignore_first = 0):
         """ Estimates error according to SciKit's regression metrics
         
         Args:
@@ -38,8 +38,8 @@ class base_model():
                 None, error_function is Sci-Kit learn's mean squared error
         
         """
-        y_estimated = self.predict(ts)
-        y_real = ts
+        y_estimated = self.predict(ts)[ignore_first:]
+        y_real = ts[ignore_first:]
         
         if (error_function == None):
             error = sklearn.metrics.mean_squared_error(y_real, y_estimated)
@@ -62,15 +62,15 @@ class base_model():
         return error
 
     
-    def filter_ts(self, ts):
+    def filter_ts(self, ts, ignore_first = 0):
         """ Returns model's residuals
         
         Args:
             ts: Time series to estimate residuals
             
         """
-        prediction = self.predict(ts)
-        residuals = ts.subtract(prediction)
+        prediction = self.predict(ts)[ignore_first:]
+        residuals = ts[ignore_first:].subtract(prediction)
         return residuals            
    
     

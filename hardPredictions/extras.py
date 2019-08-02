@@ -5,6 +5,20 @@ hardPredictions
 """
 
 import pandas
+import math
+
+
+def aic(k, error):
+    """ Akaike Information Criteria """
+        
+    AIC = 2*k + 2*math.log(error)        
+    return AIC
+
+def bic(n, k, error):
+    """ Bayesian Information Criteria """
+        
+    BIC = n*math.log(error/n) + k*math.log(n)       
+    return BIC        
 
 
 def get_frequency(ts):

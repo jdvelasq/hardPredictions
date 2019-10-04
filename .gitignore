@@ -104,7 +104,6 @@ venv.bak/
 
 # Docs
 _build
-_static
 _templates
 
 # Sphinx documentation

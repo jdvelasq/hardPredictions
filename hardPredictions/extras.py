@@ -24,14 +24,16 @@ def bic(n, k, error):
 def get_frequency(ts):
     """ Find a series' frequency integer
         
-    >>> ts = pandas.Series.from_csv('champagne_short.csv', index_col = 0, header = 0)
+    >>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
     >>> int_frq = get_frequency(ts)
     >>> int_frq
     12
         
     """
-    
-    frq = pandas.infer_freq(ts.index)
+    try:
+        frq = pandas.infer_freq(ts.index)
+    except:
+        frq = 'D'  
     int_frq = len(pandas.date_range(pandas.datetime(2017, 1, 1), pandas.datetime(2017, 12, 31), freq = frq))
     return int_frq
 

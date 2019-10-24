@@ -3,9 +3,8 @@
 hardPredictions Pipeline
 
 """
-import AR
+
 import transformer
-import HoltWinters
 
 class Pipeline():
     

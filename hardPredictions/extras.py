@@ -33,7 +33,7 @@ def get_frequency(ts):
     try:
         frq = pandas.infer_freq(ts.index)
     except:
-        frq = 'D'  
+        frq = 'A'  
     int_frq = len(pandas.date_range(pandas.datetime(2017, 1, 1), pandas.datetime(2017, 12, 31), freq = frq))
     return int_frq
 

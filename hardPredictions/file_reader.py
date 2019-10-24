@@ -30,7 +30,11 @@ class file_reader():
             elif extension == 'txt':
                 x_series = pandas.Series.from_csv(files[i], index_col = 0, header = 0)
                 series.append(x_series)
+            elif extension == '*':
+                x_series = pandas.Series.from_csv(files[i], index_col = 0, header = 0)
+                series.append(x_series)
             else:
+                #json
                 raise ValueError('Extension not recognized')
         return series
         

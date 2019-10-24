@@ -3,13 +3,18 @@ Base Model
 Base structure for creation of new models
 
 Methods:
-    calc_error: Estimates error accordin to SciKit's regression metrics
+    calc_error: Estimates error according to SciKit's regression metrics
     filter_ts: Returns model's residuals
 
 """
 
 from hardPredictions import series_viewer
+
+import pandas
+import numpy
 import sklearn
+import matplotlib
+from extras import add_next_date
 
 class base_model():
     
@@ -44,20 +49,7 @@ class base_model():
         if (error_function == None):
             error = sklearn.metrics.mean_squared_error(y_real, y_estimated)
         else:
-            error = error_function(y_real, y_estimated)
-        #elif (error_type == 'mean_absolute_error'):
-        #    error = sklearn.metrics.mean_absolute_error(y_real, y_estimated)
-        #elif (error_type == 'mean_squared_log_error'):
-        #    error = sklearn.metrics.mean_squared_log_error(y_real, y_estimated)
-        #elif (error_type == 'median_absolute_error'):
-        #    error = sklearn.metrics.median_absolute_error(y_real, y_estimated)
-        #elif (error_type == 'r2_score'):
-        #    error = sklearn.metrics.r2_score(y_real, y_estimated)
-        #elif (error_type == 'explained_variance_score'):
-        #    error = sklearn.metrics.explained_variance_score(y_real, y_estimated)
-        #else:
-        #    message_error_type = 'Invalid error type: ' + error_type
-        #    raise ValueError(message_error_type)        
+            error = error_function(y_real, y_estimated)      
         
         return error
 
@@ -98,4 +90,102 @@ class base_model():
         self.residuals.histogram()
     
     def normality(self):
-        self.residuals.normality()   
+        self.residuals.normality()
+        
+    def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 1000):
+        values = self.filter_ts(ts, self.p).values
+        results = list()
+        for i in range(iterations):
+
+            for j in range(periods):
+                train = sklearn.utils.resample(values, n_samples = 1)
+
+                if j == 0:
+                    y = ts
+                else:
+                    y = add_next_date(y, next_value_bootstrap)
+
+                next_value = self.__forward__(y)
+                next_value_bootstrap = next_value + train[0]
+                result_complete = add_next_date(y, next_value_bootstrap)
+                result = result_complete[-periods:]
+
+            results.append(result)
+
+        results = pandas.DataFrame(results)
+        ci_inf = results.quantile(1-confidence_interval)
+        ci_sup = results.quantile(confidence_interval)
+        ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
+
+        return ci
+
+
+    def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300):
+        last = ts[-1:]
+        fitted_ts = self.predict(ts)
+        fitted_ts = fitted_ts[self.p:]
+        if periods == False:
+            pass
+        else:
+            forecast_ts = self.forecast(ts, periods, confidence_interval, iterations)
+            ci_inf = last.append(forecast_ts['ci_inf'])
+            ci_sup = last.append(forecast_ts['ci_sup'])
+            tseries = last.append(forecast_ts['series'])
+        
+        if periods == False:
+            matplotlib.pyplot.plot(ts, 'k-')
+            matplotlib.pyplot.plot(fitted_ts, 'b-')
+            matplotlib.pyplot.legend(['Real', 'Fitted'])
+        else:
+            matplotlib.pyplot.plot(ts, 'k-')
+            matplotlib.pyplot.plot(fitted_ts, 'c-')
+            matplotlib.pyplot.plot(tseries, 'b-')
+            matplotlib.pyplot.plot(ci_inf, 'r--')
+            matplotlib.pyplot.plot(ci_sup, 'r--')
+            matplotlib.pyplot.axvline(x = ts[-1:].index, color = 'k', linestyle = '--')
+        
+            if confidence_interval != None:
+                matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast', 'CI', 'CI'])
+            else:
+                matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])
+
+    
+    def cross_validation(self, ts, n_splits, error_function = None):
+        X = numpy.array(self.__get_X__(ts))
+        y = numpy.array(ts.values.tolist())
+        y_index = numpy.array(ts.index)
+        tscv = sklearn.model_selection.TimeSeriesSplit(n_splits = n_splits)
+        splits = tscv.split(X)
+
+        error_list = list()
+        for train_index, test_index in splits:
+            y_train, y_test = y[train_index], y[test_index]
+            y_train_index, y_test_index = y_index[train_index], y_index[test_index]
+
+            y_train = pandas.Series((v for v in y_train), index = y_train_index)
+            y_test = pandas.Series((v for v in y_test), index = y_test_index)
+            error = self.calc_error(y_test, error_function)
+            error_list.append(error)
+
+        return error_list
+
+
+    def get_predict_ci(self, ts, confidence_interval = 0.95, iterations = 1000):
+        values = self.filter_ts(ts).values
+        serie = self.predict(ts).values
+        results = list()
+        for i in range(iterations):
+            result = list()
+            for j in range(len(serie)):
+                train = sklearn.utils.resample(values, n_samples = 1)
+                new_value = train[0] + serie[j]
+                result.append(new_value)
+
+            results.append(result)
+
+        results = pandas.DataFrame(results)
+        minim = results.quantile(1-confidence_interval)
+        maxim = results.quantile(confidence_interval)
+        final_result = pandas.DataFrame([minim, maxim])
+
+        return final_result

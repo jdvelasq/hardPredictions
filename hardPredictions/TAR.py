@@ -23,11 +23,7 @@ from AR import AR
 import numpy
 import scipy
 import pandas
-import matplotlib
 from extras import add_next_date
-from sklearn import linear_model
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.utils import resample
 
 class TAR(base_model):
     """ 
@@ -110,32 +106,6 @@ class TAR(base_model):
 
         return self
     
-    def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 1000):
-        values = self.filter_ts(ts).values
-        results = list()
-        for i in range(iterations):
-
-            for j in range(periods):
-                train = resample(values, n_samples = 1)
-
-                if j == 0:
-                    y = ts
-                else:
-                    y = add_next_date(y, next_value_bootstrap)
-
-                next_value = self.__forward__(y)
-                next_value_bootstrap = next_value + train[0]
-                result_complete = add_next_date(y, next_value_bootstrap)
-                result = result_complete[-periods:]
-
-            results.append(result)
-
-        results = pandas.DataFrame(results)
-        ci_inf = results.quantile(1-confidence_interval)
-        ci_sup = results.quantile(confidence_interval)
-        ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
-
-        return ci
 
     def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
         """ Predicts future values in a given period
@@ -172,72 +142,3 @@ class TAR(base_model):
         result = ci.append(prediction)
 
         return result.transpose()
-    
-    def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300):
-        last = ts[-1:]
-        fitted_ts = self.predict(ts)
-        if periods == False:
-            pass
-        else:
-            forecast_ts = self.forecast(ts, periods, confidence_interval, iterations)
-            ci_inf = last.append(forecast_ts['ci_inf'])
-            ci_sup = last.append(forecast_ts['ci_sup'])
-            tseries = last.append(forecast_ts['series'])
-        
-        if periods == False:
-            matplotlib.pyplot.plot(ts, 'k-')
-            matplotlib.pyplot.plot(fitted_ts, 'b-')
-            matplotlib.pyplot.legend(['Real', 'Fitted'])
-        else:
-            matplotlib.pyplot.plot(ts, 'k-')
-            matplotlib.pyplot.plot(fitted_ts, 'c-')
-            matplotlib.pyplot.plot(tseries, 'b-')
-            matplotlib.pyplot.plot(ci_inf, 'r--')
-            matplotlib.pyplot.plot(ci_sup, 'r--')
-            matplotlib.pyplot.axvline(x = ts[-1:].index, color = 'k', linestyle = '--')
-        
-            if confidence_interval != None:
-                matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast', 'CI', 'CI'])
-            else:
-                matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])
-
-    def cross_validation(self, ts, n_splits, error_function = None):
-        X = numpy.array(self.__get_X__(ts))
-        y = numpy.array(ts.values.tolist())
-        y_index = numpy.array(ts.index)
-        tscv = TimeSeriesSplit(n_splits = n_splits)
-        splits = tscv.split(X)
-
-        error_list = list()
-        for train_index, test_index in splits:
-            y_train, y_test = y[train_index], y[test_index]
-            y_train_index, y_test_index = y_index[train_index], y_index[test_index]
-
-            y_train = pandas.Series((v for v in y_train), index = y_train_index)
-            y_test = pandas.Series((v for v in y_test), index = y_test_index)
-            #self.fit(y_train)
-            error = self.calc_error(y_test, error_function)
-            error_list.append(error)
-
-        return error_list
-
-
-    def get_predict_ci(self, ts, confidence_interval = 0.95, iterations = 1000):
-        values = self.filter_ts(ts).values
-        serie = self.predict(ts).values
-        results = list()
-        for i in range(iterations):
-            result = list()
-            for j in range(len(serie)):
-                train = resample(values, n_samples = 1)
-                new_value = train[0] + serie[j]
-                result.append(new_value)
-
-            results.append(result)
-
-        results = pandas.DataFrame(results)
-        minim = results.quantile(1-confidence_interval)
-        maxim = results.quantile(confidence_interval)
-        final_result = pandas.DataFrame([minim, maxim])
-
-        return final_result

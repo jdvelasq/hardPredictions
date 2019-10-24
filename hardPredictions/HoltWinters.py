@@ -69,10 +69,8 @@ from base_model import base_model
 import numpy
 import scipy
 import pandas
-import matplotlib
-from extras import *
-from sklearn import linear_model
 from sklearn.utils import resample
+from extras import *
 
 class HoltWinters(base_model):
     """ """
@@ -432,31 +430,3 @@ class HoltWinters(base_model):
         result = ci.append(prediction)
 
         return result.transpose()
-    
-    def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300):
-        last = ts[-1:]
-        fitted_ts = self.predict(ts)
-        if periods == False:
-            pass
-        else:
-            forecast_ts = self.forecast(ts, periods, confidence_interval, iterations)
-            ci_inf = last.append(forecast_ts['ci_inf'])
-            ci_sup = last.append(forecast_ts['ci_sup'])
-            tseries = last.append(forecast_ts['series'])
-
-        if periods == False:
-            matplotlib.pyplot.plot(ts, 'k-')
-            matplotlib.pyplot.plot(fitted_ts, 'b-')
-            matplotlib.pyplot.legend(['Real', 'Fitted'])
-        else:
-            matplotlib.pyplot.plot(ts, 'k-')
-            matplotlib.pyplot.plot(fitted_ts, 'c-')
-            matplotlib.pyplot.plot(tseries, 'b-')
-            matplotlib.pyplot.plot(ci_inf, 'r--')
-            matplotlib.pyplot.plot(ci_sup, 'r--')
-            matplotlib.pyplot.axvline(x = ts[-1:].index, color = 'k', linestyle = '--')
-
-            if confidence_interval != None:
-                matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast', 'CI', 'CI'])
-            else:
-                matplotlib.pyplot.legend(['Real', 'Fitted', 'Forecast'])

@@ -67,13 +67,13 @@ Classes
 
 """
 
-from base_model import base_model
-
 import numpy
 import scipy
 import pandas
-from extras import add_next_date
 from sklearn import linear_model
+
+from hardPredictions.extras import add_next_date
+from hardPredictions.base_model import base_model
 
 class AR(base_model):
     """ Autoregressive model

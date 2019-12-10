@@ -4,7 +4,7 @@ hardPredictions Pipeline
 
 """
 
-import transformer
+import hardPredictions.transformer
 
 class Pipeline():
     

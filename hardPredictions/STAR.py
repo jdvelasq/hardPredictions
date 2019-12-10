@@ -23,7 +23,7 @@ import numpy
 import scipy
 import pandas
 import math
-from extras import add_next_date
+from hardPredictions.extras import add_next_date
 
 class STAR(base_model):
     """ 

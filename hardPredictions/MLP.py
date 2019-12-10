@@ -15,12 +15,12 @@ Classes
 
 """
 
-from base_model import base_model
+from hardPredictions.base_model import base_model
 
 import numpy
 import scipy
 import pandas
-from extras import add_next_date
+from hardPredictions.extras import add_next_date
 from sklearn import neural_network
 
 class MLP(base_model):

@@ -21,7 +21,7 @@ from base_model import base_model
 import numpy
 import scipy
 import pandas
-from extras import add_next_date
+from hardPredictions.extras import add_next_date
 
 class ARIMA(base_model):
     """ Moving-average model

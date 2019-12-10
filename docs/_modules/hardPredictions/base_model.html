@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>hardPredictions.base_model &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hardPredictions.base_model</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Base Model</span>
+<span class="sd">===============================================================================</span>
+
+<span class="sd">Base structure for creation of new models</span>
+
+<span class="sd">Methods:</span>
+<span class="sd">    calc_error: Estimates error according to SciKit&#39;s regression metrics</span>
+<span class="sd">    filter_ts: Returns model&#39;s residuals</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+
+<span class="kn">from</span> <span class="nn">hardPredictions.extras</span> <span class="kn">import</span> <span class="n">add_next_date</span>
+<span class="kn">from</span> <span class="nn">hardPredictions.hardPredictions</span> <span class="kn">import</span> <span class="n">series_viewer</span>
+
+<div class="viewcode-block" id="base_model"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model">[docs]</a><span class="k">class</span> <span class="nc">base_model</span><span class="p">():</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="kc">None</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+        
+<div class="viewcode-block" id="base_model.test"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.test">[docs]</a>    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Raises error if there are not any of the necessary methods defined &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="s2">&quot;predict&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Method &quot;predict&quot; has not been defined&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Method &quot;fit&quot; has not been defined&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="s2">&quot;forecast&quot;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Method &quot;forecast&quot; has not been defined&#39;</span><span class="p">)</span>    </div>
+        
+    
+<div class="viewcode-block" id="base_model.calc_error"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.calc_error">[docs]</a>    <span class="k">def</span> <span class="nf">calc_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">error_function</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ignore_first</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Estimates error according to SciKit&#39;s regression metrics</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ts:</span>
+<span class="sd">                Time series to estimate the model</span>
+<span class="sd">            error_function (None or error function): </span>
+<span class="sd">                Error function whose</span>
+<span class="sd">                parameters are real time series and estimated time series. If</span>
+<span class="sd">                None, error_function is Sci-Kit learn&#39;s mean squared error</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">y_estimated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ts</span><span class="p">)[</span><span class="n">ignore_first</span><span class="p">:]</span>
+        <span class="n">y_real</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">ignore_first</span><span class="p">:]</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">error_function</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_real</span><span class="p">,</span> <span class="n">y_estimated</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">error_function</span><span class="p">(</span><span class="n">y_real</span><span class="p">,</span> <span class="n">y_estimated</span><span class="p">)</span>      
+        
+        <span class="k">return</span> <span class="n">error</span></div>
+
+    
+<div class="viewcode-block" id="base_model.filter_ts"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.filter_ts">[docs]</a>    <span class="k">def</span> <span class="nf">filter_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">ignore_first</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns model&#39;s residuals</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ts: Time series to estimate residuals</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ts</span><span class="p">)[</span><span class="n">ignore_first</span><span class="p">:]</span>
+        <span class="n">residuals</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">ignore_first</span><span class="p">:]</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">residuals</span>            </div>
+   
+    
+<div class="viewcode-block" id="base_model.set_residuals"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.set_residuals">[docs]</a>    <span class="k">def</span> <span class="nf">set_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">residuals</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="n">series_viewer</span><span class="p">(</span><span class="n">residuals</span><span class="p">)</span>    </div>
+        
+    
+    <span class="sd">&quot;&quot;&quot; Residuals analysis &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="base_model.time_plot"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.time_plot">[docs]</a>    <span class="k">def</span> <span class="nf">time_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">time_plot</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="base_model.ACF_plot"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.ACF_plot">[docs]</a>    <span class="k">def</span> <span class="nf">ACF_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">ACF_plot</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="base_model.PACF_plot"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.PACF_plot">[docs]</a>    <span class="k">def</span> <span class="nf">PACF_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">PACF_plot</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="base_model.qq_plot"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.qq_plot">[docs]</a>    <span class="k">def</span> <span class="nf">qq_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">qq_plot</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="base_model.density_plot"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.density_plot">[docs]</a>    <span class="k">def</span> <span class="nf">density_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">density_plot</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="base_model.histogram"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.histogram">[docs]</a>    <span class="k">def</span> <span class="nf">histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">histogram</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="base_model.normality"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.normality">[docs]</a>    <span class="k">def</span> <span class="nf">normality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">normality</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="base_model.simulate"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">periods</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">confidence_interval</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_ts</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
+                <span class="n">train</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">ts</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">add_next_date</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">next_value_bootstrap</span><span class="p">)</span>
+
+                <span class="n">next_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__forward__</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+                <span class="n">next_value_bootstrap</span> <span class="o">=</span> <span class="n">next_value</span> <span class="o">+</span> <span class="n">train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">result_complete</span> <span class="o">=</span> <span class="n">add_next_date</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">next_value_bootstrap</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">result_complete</span><span class="p">[</span><span class="o">-</span><span class="n">periods</span><span class="p">:]</span>
+
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="n">ci_inf</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">confidence_interval</span><span class="p">)</span>
+        <span class="n">ci_sup</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">confidence_interval</span><span class="p">)</span>
+        <span class="n">ci</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">ci_inf</span><span class="p">,</span> <span class="n">ci_sup</span><span class="p">],</span> <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ci_inf&#39;</span><span class="p">,</span> <span class="s1">&#39;ci_sup&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">ci</span></div>
+
+
+<div class="viewcode-block" id="base_model.plot"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">periods</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">confidence_interval</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">300</span><span class="p">):</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">fitted_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="n">fitted_ts</span> <span class="o">=</span> <span class="n">fitted_ts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="n">periods</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">forecast_ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">confidence_interval</span><span class="p">,</span> <span class="n">iterations</span><span class="p">)</span>
+            <span class="n">ci_inf</span> <span class="o">=</span> <span class="n">last</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">forecast_ts</span><span class="p">[</span><span class="s1">&#39;ci_inf&#39;</span><span class="p">])</span>
+            <span class="n">ci_sup</span> <span class="o">=</span> <span class="n">last</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">forecast_ts</span><span class="p">[</span><span class="s1">&#39;ci_sup&#39;</span><span class="p">])</span>
+            <span class="n">tseries</span> <span class="o">=</span> <span class="n">last</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">forecast_ts</span><span class="p">[</span><span class="s1">&#39;series&#39;</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="n">periods</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="s1">&#39;k-&#39;</span><span class="p">)</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fitted_ts</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Real&#39;</span><span class="p">,</span> <span class="s1">&#39;Fitted&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="s1">&#39;k-&#39;</span><span class="p">)</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fitted_ts</span><span class="p">,</span> <span class="s1">&#39;c-&#39;</span><span class="p">)</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tseries</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">)</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ci_inf</span><span class="p">,</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ci_sup</span><span class="p">,</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
+            <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+        
+            <span class="k">if</span> <span class="n">confidence_interval</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Real&#39;</span><span class="p">,</span> <span class="s1">&#39;Fitted&#39;</span><span class="p">,</span> <span class="s1">&#39;Forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;CI&#39;</span><span class="p">,</span> <span class="s1">&#39;CI&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">matplotlib</span><span class="o">.</span><span class="n">pyplot</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Real&#39;</span><span class="p">,</span> <span class="s1">&#39;Fitted&#39;</span><span class="p">,</span> <span class="s1">&#39;Forecast&#39;</span><span class="p">])</span></div>
+
+    
+<div class="viewcode-block" id="base_model.cross_validation"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.cross_validation">[docs]</a>    <span class="k">def</span> <span class="nf">cross_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">,</span> <span class="n">error_function</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">y_index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">tscv</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">model_selection</span><span class="o">.</span><span class="n">TimeSeriesSplit</span><span class="p">(</span><span class="n">n_splits</span> <span class="o">=</span> <span class="n">n_splits</span><span class="p">)</span>
+        <span class="n">splits</span> <span class="o">=</span> <span class="n">tscv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="n">error_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">train_index</span><span class="p">,</span> <span class="n">test_index</span> <span class="ow">in</span> <span class="n">splits</span><span class="p">:</span>
+            <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
+            <span class="n">y_train_index</span><span class="p">,</span> <span class="n">y_test_index</span> <span class="o">=</span> <span class="n">y_index</span><span class="p">[</span><span class="n">train_index</span><span class="p">],</span> <span class="n">y_index</span><span class="p">[</span><span class="n">test_index</span><span class="p">]</span>
+
+            <span class="n">y_train</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">y_train</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">y_train_index</span><span class="p">)</span>
+            <span class="n">y_test</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">y_test</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">y_test_index</span><span class="p">)</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">error_function</span><span class="p">)</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">error_list</span></div>
+
+
+<div class="viewcode-block" id="base_model.get_predict_ci"><a class="viewcode-back" href="../../base_model.html#hardPredictions.base_model.base_model.get_predict_ci">[docs]</a>    <span class="k">def</span> <span class="nf">get_predict_ci</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">confidence_interval</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_ts</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">serie</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">serie</span><span class="p">)):</span>
+                <span class="n">train</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">new_value</span> <span class="o">=</span> <span class="n">train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">serie</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
+
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="n">minim</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">confidence_interval</span><span class="p">)</span>
+        <span class="n">maxim</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">confidence_interval</span><span class="p">)</span>
+        <span class="n">final_result</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">minim</span><span class="p">,</span> <span class="n">maxim</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">final_result</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Juan David Velasquez &amp; Maria Alejandra Arango.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

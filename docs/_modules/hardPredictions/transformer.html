@@ -1,0 +1,860 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>hardPredictions.transformer &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hardPredictions.transformer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">Transformer: time series&#39; transformation module</span>
+<span class="sd">===============================================================================</span>
+
+
+<span class="sd">Overview</span>
+<span class="sd">-------------------------------------------------------------------------------</span>
+<span class="sd">This module contains time series&#39; transformation methods (log, log10, sqrt,</span>
+<span class="sd">cbrt, boxcox), trending (linear, cuadratic, cubic, diff1, diff2) and seasonal</span>
+<span class="sd">(poly2, diff) removal methods.</span>
+
+<span class="sd">Examples</span>
+<span class="sd">-------------------------------------------------------------------------------</span>
+
+<span class="sd">Transform</span>
+<span class="sd">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trans = &#39;log&#39;)</span>
+<span class="sd">&gt;&gt;&gt; mytransform</span>
+<span class="sd">transformer(trans = log, trend = None, seasonal = None)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = mytransform.fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    7.942718</span>
+<span class="sd">1964-02-01    7.890583</span>
+<span class="sd">1964-03-01    7.921173</span>
+<span class="sd">1964-04-01    7.908755</span>
+<span class="sd">1964-05-01    7.988204</span>
+<span class="sd">1964-06-01    8.018296</span>
+<span class="sd">1964-07-01    7.732808</span>
+<span class="sd">1964-08-01    7.701652</span>
+<span class="sd">1964-09-01    7.980024</span>
+<span class="sd">1964-10-01    8.366603</span>
+<span class="sd">1964-11-01    8.659387</span>
+<span class="sd">1964-12-01    8.897272</span>
+<span class="sd">Name: Perrin, dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(trans = &#39;log10&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    3.449478</span>
+<span class="sd">1964-02-01    3.426836</span>
+<span class="sd">1964-03-01    3.440122</span>
+<span class="sd">1964-04-01    3.434729</span>
+<span class="sd">1964-05-01    3.469233</span>
+<span class="sd">1964-06-01    3.482302</span>
+<span class="sd">1964-07-01    3.358316</span>
+<span class="sd">1964-08-01    3.344785</span>
+<span class="sd">1964-09-01    3.465680</span>
+<span class="sd">1964-10-01    3.633569</span>
+<span class="sd">1964-11-01    3.760724</span>
+<span class="sd">1964-12-01    3.864036</span>
+<span class="sd">Name: Perrin, dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(trans = &#39;sqrt&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    53.056574</span>
+<span class="sd">1964-02-01    51.691392</span>
+<span class="sd">1964-03-01    52.488094</span>
+<span class="sd">1964-04-01    52.163205</span>
+<span class="sd">1964-05-01    54.277067</span>
+<span class="sd">1964-06-01    55.099909</span>
+<span class="sd">1964-07-01    47.770284</span>
+<span class="sd">1964-08-01    47.031904</span>
+<span class="sd">1964-09-01    54.055527</span>
+<span class="sd">1964-10-01    65.582010</span>
+<span class="sd">1964-11-01    75.921012</span>
+<span class="sd">1964-12-01    85.510233</span>
+<span class="sd">Name: Perrin, dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(trans = &#39;cbrt&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    14.119722</span>
+<span class="sd">1964-02-01    13.876464</span>
+<span class="sd">1964-03-01    14.018683</span>
+<span class="sd">1964-04-01    13.960775</span>
+<span class="sd">1964-05-01    14.335436</span>
+<span class="sd">1964-06-01    14.479956</span>
+<span class="sd">1964-07-01    13.165536</span>
+<span class="sd">1964-08-01    13.029519</span>
+<span class="sd">1964-09-01    14.296402</span>
+<span class="sd">1964-10-01    16.262594</span>
+<span class="sd">1964-11-01    17.929767</span>
+<span class="sd">1964-12-01    19.409398</span>
+<span class="sd">Name: Perrin, dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(trans = &#39;boxcox&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    0.504795</span>
+<span class="sd">1964-02-01    0.504795</span>
+<span class="sd">1964-03-01    0.504795</span>
+<span class="sd">1964-04-01    0.504795</span>
+<span class="sd">1964-05-01    0.504795</span>
+<span class="sd">1964-06-01    0.504795</span>
+<span class="sd">1964-07-01    0.504795</span>
+<span class="sd">1964-08-01    0.504795</span>
+<span class="sd">1964-09-01    0.504795</span>
+<span class="sd">1964-10-01    0.504795</span>
+<span class="sd">1964-11-01    0.504795</span>
+<span class="sd">1964-12-01    0.504795</span>
+<span class="sd">Name: Perrin, dtype: float64</span>
+
+
+<span class="sd">Removing trend</span>
+<span class="sd">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(trend = &#39;linear&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01     993.871795</span>
+<span class="sd">1964-02-01     549.592075</span>
+<span class="sd">1964-03-01     331.312354</span>
+<span class="sd">1964-04-01      -3.967366</span>
+<span class="sd">1964-05-01     -80.247086</span>
+<span class="sd">1964-06-01    -291.526807</span>
+<span class="sd">1964-07-01   -1346.806527</span>
+<span class="sd">1964-08-01   -1718.086247</span>
+<span class="sd">1964-09-01   -1309.365967</span>
+<span class="sd">1964-10-01    -231.645688</span>
+<span class="sd">1964-11-01     930.074592</span>
+<span class="sd">1964-12-01    2176.794872</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(trend = &#39;cuadratic&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01   -578.005495</span>
+<span class="sd">1964-02-01   -164.897602</span>
+<span class="sd">1964-03-01    302.732767</span>
+<span class="sd">1964-04-01    481.885614</span>
+<span class="sd">1964-05-01    748.560939</span>
+<span class="sd">1964-06-01    708.758741</span>
+<span class="sd">1964-07-01   -346.520979</span>
+<span class="sd">1964-08-01   -889.278222</span>
+<span class="sd">1964-09-01   -823.512987</span>
+<span class="sd">1964-10-01   -260.225275</span>
+<span class="sd">1964-11-01    215.584915</span>
+<span class="sd">1964-12-01    604.917582</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(trend = &#39;cubic&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    196.725275</span>
+<span class="sd">1964-02-01   -235.327672</span>
+<span class="sd">1964-03-01   -190.277722</span>
+<span class="sd">1964-04-01   -105.031635</span>
+<span class="sd">1964-05-01    302.503830</span>
+<span class="sd">1964-06-01    544.421911</span>
+<span class="sd">1964-07-01   -182.184149</span>
+<span class="sd">1964-08-01   -443.221112</span>
+<span class="sd">1964-09-01   -236.595738</span>
+<span class="sd">1964-10-01    232.785215</span>
+<span class="sd">1964-11-01    286.014985</span>
+<span class="sd">1964-12-01   -169.813187</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(trend = &#39;diff1&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01       0</span>
+<span class="sd">1964-02-01    -143</span>
+<span class="sd">1964-03-01      83</span>
+<span class="sd">1964-04-01     -34</span>
+<span class="sd">1964-05-01     225</span>
+<span class="sd">1964-06-01      90</span>
+<span class="sd">1964-07-01    -754</span>
+<span class="sd">1964-08-01     -70</span>
+<span class="sd">1964-09-01     710</span>
+<span class="sd">1964-10-01    1379</span>
+<span class="sd">1964-11-01    1463</span>
+<span class="sd">1964-12-01    1548</span>
+<span class="sd">dtype: int64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(trend = &#39;diff2&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01       0</span>
+<span class="sd">1964-02-01       0</span>
+<span class="sd">1964-03-01     -60</span>
+<span class="sd">1964-04-01      49</span>
+<span class="sd">1964-05-01     191</span>
+<span class="sd">1964-06-01     315</span>
+<span class="sd">1964-07-01    -664</span>
+<span class="sd">1964-08-01    -824</span>
+<span class="sd">1964-09-01     640</span>
+<span class="sd">1964-10-01    2089</span>
+<span class="sd">1964-11-01    2842</span>
+<span class="sd">1964-12-01    3011</span>
+<span class="sd">dtype: int64</span>
+
+
+<span class="sd">Removing seasonality</span>
+<span class="sd">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(seasonal = &#39;poly2&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01   -578.005495</span>
+<span class="sd">1964-02-01   -164.897602</span>
+<span class="sd">1964-03-01    302.732767</span>
+<span class="sd">1964-04-01    481.885614</span>
+<span class="sd">1964-05-01    748.560939</span>
+<span class="sd">1964-06-01    708.758741</span>
+<span class="sd">1964-07-01   -346.520979</span>
+<span class="sd">1964-08-01   -889.278222</span>
+<span class="sd">1964-09-01   -823.512987</span>
+<span class="sd">1964-10-01   -260.225275</span>
+<span class="sd">1964-11-01    215.584915</span>
+<span class="sd">1964-12-01    604.917582</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts = transformer(seasonal = &#39;diff&#39;).fit_transform(ts = ts)</span>
+<span class="sd">&gt;&gt;&gt; transformed_ts</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    0</span>
+<span class="sd">1964-02-01    0</span>
+<span class="sd">1964-03-01    0</span>
+<span class="sd">1964-04-01    0</span>
+<span class="sd">1964-05-01    0</span>
+<span class="sd">1964-06-01    0</span>
+<span class="sd">1964-07-01    0</span>
+<span class="sd">1964-08-01    0</span>
+<span class="sd">1964-09-01    0</span>
+<span class="sd">1964-10-01    0</span>
+<span class="sd">1964-11-01    0</span>
+<span class="sd">1964-12-01    0</span>
+<span class="sd">dtype: int64</span>
+
+<span class="sd">Restore seasonality</span>
+<span class="sd">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(seasonal = &#39;poly2&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.0</span>
+<span class="sd">1964-02-01    2672.0</span>
+<span class="sd">1964-03-01    2755.0</span>
+<span class="sd">1964-04-01    2721.0</span>
+<span class="sd">1964-05-01    2946.0</span>
+<span class="sd">1964-06-01    3036.0</span>
+<span class="sd">1964-07-01    2282.0</span>
+<span class="sd">1964-08-01    2212.0</span>
+<span class="sd">1964-09-01    2922.0</span>
+<span class="sd">1964-10-01    4301.0</span>
+<span class="sd">1964-11-01    5764.0</span>
+<span class="sd">1964-12-01    7312.0</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(seasonal = &#39;diff&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815</span>
+<span class="sd">1964-02-01    2672</span>
+<span class="sd">1964-03-01    2755</span>
+<span class="sd">1964-04-01    2721</span>
+<span class="sd">1964-05-01    2946</span>
+<span class="sd">1964-06-01    3036</span>
+<span class="sd">1964-07-01    2282</span>
+<span class="sd">1964-08-01    2212</span>
+<span class="sd">1964-09-01    2922</span>
+<span class="sd">1964-10-01    4301</span>
+<span class="sd">1964-11-01    5764</span>
+<span class="sd">1964-12-01    7312</span>
+<span class="sd">dtype: int64</span>
+
+<span class="sd">Restore trending</span>
+<span class="sd">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trend = &#39;linear&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.0</span>
+<span class="sd">1964-02-01    2672.0</span>
+<span class="sd">1964-03-01    2755.0</span>
+<span class="sd">1964-04-01    2721.0</span>
+<span class="sd">1964-05-01    2946.0</span>
+<span class="sd">1964-06-01    3036.0</span>
+<span class="sd">1964-07-01    2282.0</span>
+<span class="sd">1964-08-01    2212.0</span>
+<span class="sd">1964-09-01    2922.0</span>
+<span class="sd">1964-10-01    4301.0</span>
+<span class="sd">1964-11-01    5764.0</span>
+<span class="sd">1964-12-01    7312.0</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trend = &#39;cuadratic&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.0</span>
+<span class="sd">1964-02-01    2672.0</span>
+<span class="sd">1964-03-01    2755.0</span>
+<span class="sd">1964-04-01    2721.0</span>
+<span class="sd">1964-05-01    2946.0</span>
+<span class="sd">1964-06-01    3036.0</span>
+<span class="sd">1964-07-01    2282.0</span>
+<span class="sd">1964-08-01    2212.0</span>
+<span class="sd">1964-09-01    2922.0</span>
+<span class="sd">1964-10-01    4301.0</span>
+<span class="sd">1964-11-01    5764.0</span>
+<span class="sd">1964-12-01    7312.0</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trend = &#39;cuadratic&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.0</span>
+<span class="sd">1964-02-01    2672.0</span>
+<span class="sd">1964-03-01    2755.0</span>
+<span class="sd">1964-04-01    2721.0</span>
+<span class="sd">1964-05-01    2946.0</span>
+<span class="sd">1964-06-01    3036.0</span>
+<span class="sd">1964-07-01    2282.0</span>
+<span class="sd">1964-08-01    2212.0</span>
+<span class="sd">1964-09-01    2922.0</span>
+<span class="sd">1964-10-01    4301.0</span>
+<span class="sd">1964-11-01    5764.0</span>
+<span class="sd">1964-12-01    7312.0</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trend = &#39;cubic&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.0</span>
+<span class="sd">1964-02-01    2672.0</span>
+<span class="sd">1964-03-01    2755.0</span>
+<span class="sd">1964-04-01    2721.0</span>
+<span class="sd">1964-05-01    2946.0</span>
+<span class="sd">1964-06-01    3036.0</span>
+<span class="sd">1964-07-01    2282.0</span>
+<span class="sd">1964-08-01    2212.0</span>
+<span class="sd">1964-09-01    2922.0</span>
+<span class="sd">1964-10-01    4301.0</span>
+<span class="sd">1964-11-01    5764.0</span>
+<span class="sd">1964-12-01    7312.0</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trend = &#39;diff1&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815</span>
+<span class="sd">1964-02-01    2672</span>
+<span class="sd">1964-03-01    2755</span>
+<span class="sd">1964-04-01    2721</span>
+<span class="sd">1964-05-01    2946</span>
+<span class="sd">1964-06-01    3036</span>
+<span class="sd">1964-07-01    2282</span>
+<span class="sd">1964-08-01    2212</span>
+<span class="sd">1964-09-01    2922</span>
+<span class="sd">1964-10-01    4301</span>
+<span class="sd">1964-11-01    5764</span>
+<span class="sd">1964-12-01    7312</span>
+<span class="sd">dtype: int64</span>
+
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trend = &#39;diff2&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815</span>
+<span class="sd">1964-02-01    2672</span>
+<span class="sd">1964-03-01    2755</span>
+<span class="sd">1964-04-01    2721</span>
+<span class="sd">1964-05-01    2946</span>
+<span class="sd">1964-06-01    3036</span>
+<span class="sd">1964-07-01    2282</span>
+<span class="sd">1964-08-01    2212</span>
+<span class="sd">1964-09-01    2922</span>
+<span class="sd">1964-10-01    4301</span>
+<span class="sd">1964-11-01    5764</span>
+<span class="sd">1964-12-01    7312</span>
+<span class="sd">dtype: int64</span>
+
+<span class="sd">Restore transformation</span>
+<span class="sd">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trans = &#39;log&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.0</span>
+<span class="sd">1964-02-01    2672.0</span>
+<span class="sd">1964-03-01    2755.0</span>
+<span class="sd">1964-04-01    2721.0</span>
+<span class="sd">1964-05-01    2946.0</span>
+<span class="sd">1964-06-01    3036.0</span>
+<span class="sd">1964-07-01    2282.0</span>
+<span class="sd">1964-08-01    2212.0</span>
+<span class="sd">1964-09-01    2922.0</span>
+<span class="sd">1964-10-01    4301.0</span>
+<span class="sd">1964-11-01    5764.0</span>
+<span class="sd">1964-12-01    7312.0</span>
+<span class="sd">Name: Perrin, dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trans = &#39;log10&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.0</span>
+<span class="sd">1964-02-01    2672.0</span>
+<span class="sd">1964-03-01    2755.0</span>
+<span class="sd">1964-04-01    2721.0</span>
+<span class="sd">1964-05-01    2946.0</span>
+<span class="sd">1964-06-01    3036.0</span>
+<span class="sd">1964-07-01    2282.0</span>
+<span class="sd">1964-08-01    2212.0</span>
+<span class="sd">1964-09-01    2922.0</span>
+<span class="sd">1964-10-01    4301.0</span>
+<span class="sd">1964-11-01    5764.0</span>
+<span class="sd">1964-12-01    7312.0</span>
+<span class="sd">Name: Perrin, dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trans = &#39;sqrt&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.0</span>
+<span class="sd">1964-02-01    2672.0</span>
+<span class="sd">1964-03-01    2755.0</span>
+<span class="sd">1964-04-01    2721.0</span>
+<span class="sd">1964-05-01    2946.0</span>
+<span class="sd">1964-06-01    3036.0</span>
+<span class="sd">1964-07-01    2282.0</span>
+<span class="sd">1964-08-01    2212.0</span>
+<span class="sd">1964-09-01    2922.0</span>
+<span class="sd">1964-10-01    4301.0</span>
+<span class="sd">1964-11-01    5764.0</span>
+<span class="sd">1964-12-01    7312.0</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trans = &#39;cbrt&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.0</span>
+<span class="sd">1964-02-01    2672.0</span>
+<span class="sd">1964-03-01    2755.0</span>
+<span class="sd">1964-04-01    2721.0</span>
+<span class="sd">1964-05-01    2946.0</span>
+<span class="sd">1964-06-01    3036.0</span>
+<span class="sd">1964-07-01    2282.0</span>
+<span class="sd">1964-08-01    2212.0</span>
+<span class="sd">1964-09-01    2922.0</span>
+<span class="sd">1964-10-01    4301.0</span>
+<span class="sd">1964-11-01    5764.0</span>
+<span class="sd">1964-12-01    7312.0</span>
+<span class="sd">dtype: float64</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; mytransform = transformer(trans = &#39;boxcox&#39;)</span>
+<span class="sd">&gt;&gt;&gt; transformed = mytransform.fit_transform(ts)</span>
+<span class="sd">&gt;&gt;&gt; original = mytransform.restore(transformed)</span>
+<span class="sd">&gt;&gt;&gt; original</span>
+<span class="sd">Month</span>
+<span class="sd">1964-01-01    2815.000000</span>
+<span class="sd">1964-02-01    2671.999999</span>
+<span class="sd">1964-03-01    2754.999999</span>
+<span class="sd">1964-04-01    2721.000001</span>
+<span class="sd">1964-05-01    2946.000000</span>
+<span class="sd">1964-06-01    3036.000001</span>
+<span class="sd">1964-07-01    2282.000000</span>
+<span class="sd">1964-08-01    2212.000001</span>
+<span class="sd">1964-09-01    2921.999999</span>
+<span class="sd">1964-10-01    4300.999998</span>
+<span class="sd">1964-11-01    5763.999989</span>
+<span class="sd">1964-12-01    7311.999999</span>
+<span class="sd">Name: Perrin, dtype: float64</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">hardPredictions.extras</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
+
+<div class="viewcode-block" id="transformer"><a class="viewcode-back" href="../../transformer.html#hardPredictions.transformer.transformer">[docs]</a><span class="k">class</span> <span class="nc">transformer</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Class to transform the series</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        trans (log, log10, sqrt, cbrt, boxcox): Transformation to apply</span>
+<span class="sd">        trend (linear, cuadratic, cubic, diff1, diff2): Trend to apply</span>
+<span class="sd">        seasonal (poly2, diff): Seasonality to apply</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trans</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">trend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">seasonal</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">=</span> <span class="n">trans</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">=</span> <span class="n">trend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span> <span class="o">=</span> <span class="n">seasonal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ts</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="sd">&quot;&quot;&quot; Frequency integer of the transformed time series &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="sd">&quot;&quot;&quot; Time series after transformation and restore &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="sd">&quot;&quot;&quot; Transformation values to restore series &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitting</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diff</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="sd">&quot;&quot;&quot; Box Cox transformation lambda (if necessary) &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmbda</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;transformer(trans = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, trend = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, seasonal = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
+        
+
+<div class="viewcode-block" id="transformer.fit_transform"><a class="viewcode-back" href="../../transformer.html#hardPredictions.transformer.transformer.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the transformed series</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ts: Time series to apply transformation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span>
+
+        <span class="c1"># Get frequency integer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span> <span class="o">=</span> <span class="n">get_frequency</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+
+        <span class="c1"># Transform </span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">):</span>
+            <span class="n">ts_trans</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;log10&#39;</span><span class="p">):</span>
+            <span class="n">ts_trans</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;sqrt&#39;</span><span class="p">):</span>
+            <span class="n">ts_trans</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;cbrt&#39;</span><span class="p">):</span>
+            <span class="n">ts_trans</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">cbrt</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;boxcox&#39;</span><span class="p">):</span>
+            <span class="n">bc</span><span class="p">,</span> <span class="n">lmb</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">boxcox</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lmbda</span> <span class="o">=</span> <span class="n">lmb</span>
+            <span class="n">ts_trans</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">bc</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">ts_trans</span> <span class="o">=</span> <span class="n">ts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message_trans</span> <span class="o">=</span> <span class="s1">&#39;Invalid transformation value: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message_trans</span><span class="p">)</span>
+
+
+        <span class="c1"># Removing trend</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">ts_trans</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">factorize</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts_trans</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">linear_model</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">()</span>
+            <span class="n">fitting</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fitting</span> <span class="o">=</span> <span class="n">fitting</span>
+            <span class="n">trend</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">fitting</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">ts_trend</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">trend</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;cuadratic&#39;</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">ts_trans</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">factorize</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts_trans</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+            <span class="n">X_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">()</span>
+            <span class="n">fitting</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fitting</span> <span class="o">=</span> <span class="n">fitting</span>
+            <span class="n">trend</span> <span class="o">=</span> <span class="n">fitting</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+            <span class="n">ts_trend</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">trend</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;cubic&#39;</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">ts_trans</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">factorize</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts_trans</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+            <span class="n">X_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">()</span>
+            <span class="n">fitting</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fitting</span> <span class="o">=</span> <span class="n">fitting</span>
+            <span class="n">trend</span> <span class="o">=</span> <span class="n">fitting</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+            <span class="n">ts_trend</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">trend</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;diff1&#39;</span><span class="p">):</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts_trans</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diff</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">trend</span> <span class="o">=</span> <span class="n">diff</span>
+            <span class="n">detrended</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">trend</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_trans</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">ts_trend</span> <span class="o">=</span> <span class="n">detrended</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;diff2&#39;</span><span class="p">):</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts_trans</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diff</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span>
+                <span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">trend</span> <span class="o">=</span> <span class="n">diff</span>
+            <span class="n">detrended</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">trend</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_trans</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">ts_trend</span> <span class="o">=</span> <span class="n">detrended</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">ts_trend</span> <span class="o">=</span> <span class="n">ts_trans</span>
+            <span class="n">trend</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts_trans</span><span class="p">))]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message_trend</span> <span class="o">=</span> <span class="s1">&#39;Invalid trending value: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">trend</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message_trend</span><span class="p">)</span>
+
+        <span class="c1"># Removing seasonality</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span> <span class="o">==</span> <span class="s1">&#39;poly2&#39;</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">ts_trend</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">factorize</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts_trend</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">PolynomialFeatures</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+            <span class="n">X_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">()</span>
+            <span class="n">fitting</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">seasonality</span> <span class="o">=</span> <span class="n">fitting</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+            <span class="n">deseasonal</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">seasonality</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_trend</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">ts_seasonal</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">deseasonal</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span> <span class="o">==</span> <span class="s1">&#39;diff&#39;</span><span class="p">):</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts_trend</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diff</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span><span class="p">):</span>
+                <span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span><span class="p">]</span>
+                <span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">seasonality</span> <span class="o">=</span> <span class="n">diff</span>
+            <span class="n">deseasonal</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">seasonality</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_trend</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">ts_seasonal</span> <span class="o">=</span> <span class="n">deseasonal</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">ts_seasonal</span> <span class="o">=</span> <span class="n">ts_trend</span>
+            <span class="n">seasonality</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts_trend</span><span class="p">))]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message_seasonal</span> <span class="o">=</span> <span class="s1">&#39;Invalid seasonal value: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message_seasonal</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span> <span class="o">==</span> <span class="s1">&#39;poly2&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;cuadratic&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;cubic&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fitting</span> <span class="o">=</span> <span class="n">fitting</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="n">ts_seasonal</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span></div>
+
+
+<div class="viewcode-block" id="transformer.restore"><a class="viewcode-back" href="../../transformer.html#hardPredictions.transformer.transformer.restore">[docs]</a>    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Restore series to its original values</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ts: Time series to restore</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Restore seasonality</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span> <span class="o">==</span> <span class="s1">&#39;poly2&#39;</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">factorize</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span>
+            <span class="n">X_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">seasonality</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitting</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+            <span class="n">ts_deseasonal</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">seasonality</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">))]</span>
+            <span class="n">ts_deseasonal</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ts_deseasonal</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span> <span class="o">==</span> <span class="s1">&#39;diff&#39;</span><span class="p">):</span>
+            <span class="n">len_forecast</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+            <span class="n">ts_deseasonal</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span><span class="p">):</span>
+                <span class="n">ts_deseasonal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">ts_deseasonal</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">intfrq</span><span class="p">]</span>
+                <span class="n">ts_deseasonal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">ts_deseasonal</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ts_deseasonal</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">ts_deseasonal</span> <span class="o">=</span> <span class="n">ts_deseasonal</span><span class="p">[</span><span class="o">-</span><span class="n">len_forecast</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ts_deseasonal</span> <span class="o">=</span> <span class="n">ts</span>
+
+        <span class="c1"># Restore trending </span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">factorize</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">trending</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitting</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">ts_detrend</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts_deseasonal</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">trending</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts_deseasonal</span><span class="p">))]</span>
+            <span class="n">ts_detrend</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ts_detrend</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_deseasonal</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;cuadratic&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;cubic&#39;</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">factorize</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">X_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">trending</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitting</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_</span><span class="p">)</span>
+            <span class="n">ts_detrend</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts_deseasonal</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">trending</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts_deseasonal</span><span class="p">))]</span>
+            <span class="n">ts_detrend</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ts_detrend</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_deseasonal</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;diff1&#39;</span><span class="p">):</span>
+            <span class="n">ts_detrend</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">ts_detrend</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">ts_deseasonal</span><span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">ts_deseasonal</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">ts_detrend</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">ts_detrend</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">ts_detrend</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ts_detrend</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_deseasonal</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">==</span> <span class="s1">&#39;diff2&#39;</span><span class="p">):</span>
+            <span class="n">ts_detrend</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">ts_detrend</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">ts_detrend</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diff</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">ts_deseasonal</span><span class="p">)):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">ts_deseasonal</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">ts_detrend</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">ts_detrend</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">ts_detrend</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ts_detrend</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_deseasonal</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ts_detrend</span> <span class="o">=</span> <span class="n">ts_deseasonal</span>
+
+        <span class="c1"># Restore transformation</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">):</span>
+            <span class="n">ts_detrans</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">ts_detrend</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;log10&#39;</span><span class="p">):</span>
+            <span class="n">ts_detrans</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">exp10</span><span class="p">(</span><span class="n">ts_detrend</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;sqrt&#39;</span><span class="p">):</span>
+            <span class="n">ts_detrans</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts_detrend</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts_detrend</span><span class="p">))]</span>
+            <span class="n">ts_detrans</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ts_detrans</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_detrend</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;cbrt&#39;</span><span class="p">):</span>
+            <span class="n">ts_detrans</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts_detrend</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts_detrend</span><span class="p">))]</span>
+            <span class="n">ts_detrans</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ts_detrans</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts_detrend</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span> <span class="o">==</span> <span class="s1">&#39;boxcox&#39;</span><span class="p">):</span>
+            <span class="n">ts_detrans</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">inv_boxcox</span><span class="p">(</span><span class="n">ts_detrend</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmbda</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ts_detrans</span> <span class="o">=</span> <span class="n">ts_detrend</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">original</span> <span class="o">=</span> <span class="n">ts_detrans</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Juan David Velasquez &amp; Maria Alejandra Arango.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

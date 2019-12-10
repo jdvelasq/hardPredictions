@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>hardPredictions.hardPredictions &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hardPredictions.hardPredictions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">hardPredictions</span>
+<span class="sd">A library in Python for time series forecasting</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">statsmodels</span>
+<span class="kn">import</span> <span class="nn">tabulate</span>
+
+
+<span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">statsmodels</span> <span class="kn">import</span> <span class="n">api</span>
+    
+        
+<span class="sd">&quot;&quot;&quot; Time series&#39; and model&#39;s diagnostics &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="series_viewer"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer">[docs]</a><span class="k">class</span> <span class="nc">series_viewer</span><span class="p">():</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span>
+    
+<div class="viewcode-block" id="series_viewer.time_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.time_plot">[docs]</a>    <span class="k">def</span> <span class="nf">time_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">tp</span></div>
+        
+<div class="viewcode-block" id="series_viewer.ACF_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.ACF_plot">[docs]</a>    <span class="k">def</span> <span class="nf">ACF_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">acf</span> <span class="o">=</span> <span class="n">statsmodels</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">tsaplots</span><span class="o">.</span><span class="n">plot_acf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">acf</span></div>
+        
+<div class="viewcode-block" id="series_viewer.PACF_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.PACF_plot">[docs]</a>    <span class="k">def</span> <span class="nf">PACF_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">pacf</span> <span class="o">=</span> <span class="n">statsmodels</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">tsaplots</span><span class="o">.</span><span class="n">plot_pacf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pacf</span></div>
+        
+<div class="viewcode-block" id="series_viewer.qq_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.qq_plot">[docs]</a>    <span class="k">def</span> <span class="nf">qq_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">qq_plot</span> <span class="o">=</span> <span class="n">statsmodels</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">gofplots</span><span class="o">.</span><span class="n">qqplot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">qq_plot</span></div>
+    
+<div class="viewcode-block" id="series_viewer.density_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.density_plot">[docs]</a>    <span class="k">def</span> <span class="nf">density_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">den_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">den_plot</span></div>
+    
+    <span class="sd">&quot;&quot;&quot; Histogram of frequencies &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="series_viewer.histogram"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.histogram">[docs]</a>    <span class="k">def</span> <span class="nf">histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">hist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="o">.</span><span class="n">hist</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">hist</span></div>
+    
+    <span class="sd">&quot;&quot;&quot; Jarque Bera normality test &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="series_viewer.normality"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.normality">[docs]</a>    <span class="k">def</span> <span class="nf">normality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">jb</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">jarque_bera</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
+        <span class="n">jb_value</span> <span class="o">=</span> <span class="n">jb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">p_value</span> <span class="o">=</span> <span class="n">jb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">tabulate</span><span class="p">([[</span><span class="s1">&#39;Test statistics value&#39;</span><span class="p">,</span> <span class="n">jb_value</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;p value&#39;</span><span class="p">,</span> <span class="n">p_value</span><span class="p">]],</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Jarque Bera normality test&#39;</span><span class="p">]))</span>     </div></div>
+        
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Juan David Velasquez &amp; Maria Alejandra Arango.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>&lt;no title&gt; &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <title>Base Model &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -26,6 +26,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="extras.html" title="Extra Functions"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -40,7 +43,115 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  
+  <span class="target" id="module-hardPredictions.base_model"></span><div class="section" id="base-model">
+<h1>Base Model<a class="headerlink" href="#base-model" title="Permalink to this headline">¶</a></h1>
+<p>Base structure for creation of new models</p>
+<dl class="simple">
+<dt>Methods:</dt><dd><p>calc_error: Estimates error according to SciKit’s regression metrics
+filter_ts: Returns model’s residuals</p>
+</dd>
+</dl>
+<dl class="class">
+<dt id="hardPredictions.base_model.base_model">
+<em class="property">class </em><code class="sig-prename descclassname">hardPredictions.base_model.</code><code class="sig-name descname">base_model</code><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.ACF_plot">
+<code class="sig-name descname">ACF_plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.ACF_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.ACF_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.PACF_plot">
+<code class="sig-name descname">PACF_plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.PACF_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.PACF_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.calc_error">
+<code class="sig-name descname">calc_error</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">error_function=None</em>, <em class="sig-param">ignore_first=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.calc_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.calc_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimates error according to SciKit’s regression metrics</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>ts:</dt><dd><p>Time series to estimate the model</p>
+</dd>
+<dt>error_function (None or error function): </dt><dd><p>Error function whose
+parameters are real time series and estimated time series. If
+None, error_function is Sci-Kit learn’s mean squared error</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.cross_validation">
+<code class="sig-name descname">cross_validation</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">n_splits</em>, <em class="sig-param">error_function=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.cross_validation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.cross_validation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.density_plot">
+<code class="sig-name descname">density_plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.density_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.density_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.filter_ts">
+<code class="sig-name descname">filter_ts</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">ignore_first=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.filter_ts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.filter_ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns model’s residuals</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ts: Time series to estimate residuals</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.get_predict_ci">
+<code class="sig-name descname">get_predict_ci</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">confidence_interval=0.95</em>, <em class="sig-param">iterations=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.get_predict_ci"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.get_predict_ci" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.histogram">
+<code class="sig-name descname">histogram</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.histogram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.normality">
+<code class="sig-name descname">normality</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.normality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.normality" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods=5</em>, <em class="sig-param">confidence_interval=None</em>, <em class="sig-param">iterations=300</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.qq_plot">
+<code class="sig-name descname">qq_plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.qq_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.qq_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.set_residuals">
+<code class="sig-name descname">set_residuals</code><span class="sig-paren">(</span><em class="sig-param">residuals</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.set_residuals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.set_residuals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.simulate">
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods=5</em>, <em class="sig-param">confidence_interval=0.95</em>, <em class="sig-param">iterations=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.simulate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.test">
+<code class="sig-name descname">test</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises error if there are not any of the necessary methods defined</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.base_model.base_model.time_plot">
+<code class="sig-name descname">time_plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/base_model.html#base_model.time_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.base_model.base_model.time_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
 
           </div>
         </div>
@@ -81,6 +192,9 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="extras.html" title="Extra Functions"
              >next</a> |</li>
         <li class="right" >
@@ -91,7 +205,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Juan David Velasquez &amp; Maria Alejandra Arango.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
     </div>
   </body>
 </html>

@@ -46,13 +46,16 @@ MA(q = 3, intercept = 0.7576070305877793, theta = [0.47415837 0.96800789 0.50682
 
 """
 
-from base_model import base_model
+
 
 import numpy
 import scipy
 import pandas
-from extras import add_next_date
 from sklearn import linear_model
+
+from hardPredictions.base_model import base_model
+from hardPredictions.extras import add_next_date
+
 
 class MA(base_model):
     """ Moving-average model

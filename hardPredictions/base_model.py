@@ -1,5 +1,7 @@
 """
 Base Model
+===============================================================================
+
 Base structure for creation of new models
 
 Methods:
@@ -8,13 +10,15 @@ Methods:
 
 """
 
-from hardPredictions import series_viewer
+
 
 import pandas
 import numpy
 import sklearn
 import matplotlib
-from extras import add_next_date
+
+from hardPredictions.extras import add_next_date
+from hardPredictions.hardPredictions import series_viewer
 
 class base_model():
     
@@ -34,11 +38,13 @@ class base_model():
         
     
     def calc_error(self, ts, error_function = None, ignore_first = 0):
-        """ Estimates error according to SciKit's regression metrics
+        """Estimates error according to SciKit's regression metrics
         
         Args:
-            ts: Time series to estimate the model
-            error_function (None or error function): Error function whose
+            ts:
+                Time series to estimate the model
+            error_function (None or error function): 
+                Error function whose
                 parameters are real time series and estimated time series. If
                 None, error_function is Sci-Kit learn's mean squared error
         

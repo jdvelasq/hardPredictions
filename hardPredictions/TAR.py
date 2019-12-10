@@ -16,14 +16,14 @@ Examples
 
 """
 
-from base_model import base_model
+from hardPredictions.base_model import base_model
 
 from AR import AR
 
 import numpy
 import scipy
 import pandas
-from extras import add_next_date
+from hardPredictions.extras import add_next_date
 
 class TAR(base_model):
     """ 

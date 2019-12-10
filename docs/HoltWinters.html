@@ -16,8 +16,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="MA.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="AR.html" /> 
+    <link rel="next" title="MA Model" href="MA.html" />
+    <link rel="prev" title="AR Model" href="AR.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -26,10 +26,13 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="MA.html" title="&lt;no title&gt;"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MA.html" title="MA Model"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="AR.html" title="&lt;no title&gt;"
+          <a href="AR.html" title="AR Model"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
       </ul>
@@ -40,8 +43,120 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="holt-winters-model">
-<h1>Holt Winters Model<a class="headerlink" href="#holt-winters-model" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-hardPredictions.HoltWinters">
+<span id="holt-winters-model"></span><h1>Holt Winters Model<a class="headerlink" href="#module-hardPredictions.HoltWinters" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2>Holt Winters Model<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h3>
+<p>This module contains Holt Winters or Exponential Smoothing model.</p>
+</div>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>All parameters can be optimized by choosing seasonal type: additive or 
+multiplicative. Additive seasonal is set by default.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">HoltWinters</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
+<span class="go">HoltWinters(alpha = None, beta = None, gamma = None, seasonal = additive)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
+<span class="go">HoltWinters(alpha = 0.9431148766692634, beta = -0.01672977657608948, gamma = 1.1316906369406132, seasonal = additive)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fitted_model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">periods</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span>
+<span class="go">            ci_inf  ci_sup       series</span>
+<span class="go">1972-10-01     NaN     NaN  6956.026617</span>
+<span class="go">1972-11-01     NaN     NaN  9781.377960</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">periods</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">confidence_interval</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span>
+<span class="go">                 ci_inf       ci_sup       series</span>
+<span class="go">1972-10-01  6926.882859  6972.451355  6956.026617</span>
+<span class="go">1972-11-01  9736.753331  9800.036027  9781.377960</span>
+</pre></div>
+</div>
+<p>None parameters will be optimized even if other parameters are set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">HoltWinters</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
+<span class="go">HoltWinters(alpha = 0.9, beta = None, gamma = None, seasonal = additive)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
+<span class="go">HoltWinters(alpha = 0.9, beta = 0.03907917462126841, gamma = 0.4460278959365619, seasonal = additive)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">periods</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">confidence_interval</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span>
+<span class="go">                 ci_inf       ci_sup       series</span>
+<span class="go">1972-10-01  6886.289320  7023.164500  6979.791228</span>
+<span class="go">1972-11-01  9647.482355  9859.399028  9815.530180</span>
+</pre></div>
+</div>
+<p>Parameters can also be False if they do not want to be found:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">HoltWinters</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.9</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">gamma</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
+<span class="go">HoltWinters(alpha = 0.9, beta = 0.1, gamma = False, seasonal = additive)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span>
+<span class="go">HoltWinters(alpha = 0.9, beta = 0.1, gamma = False, seasonal = additive)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">periods</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">confidence_interval</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prediction</span>
+<span class="go">                 ci_inf       ci_sup       series</span>
+<span class="go">1972-10-01  4845.924337  5785.073295  5495.803368</span>
+<span class="go">1972-11-01  4655.213339  5976.207380  5572.626448   </span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="hardPredictions.HoltWinters.HoltWinters">
+<em class="property">class </em><code class="sig-prename descclassname">hardPredictions.HoltWinters.</code><code class="sig-name descname">HoltWinters</code><span class="sig-paren">(</span><em class="sig-param">alpha=None</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">gamma=None</em>, <em class="sig-param">seasonal='additive'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_model.html#hardPredictions.base_model.base_model" title="hardPredictions.base_model.base_model"><code class="xref py py-class docutils literal notranslate"><span class="pre">hardPredictions.base_model.base_model</span></code></a></p>
+<dl class="method">
+<dt id="hardPredictions.HoltWinters.HoltWinters.additive">
+<code class="sig-name descname">additive</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">forecast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.additive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.additive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.HoltWinters.HoltWinters.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">error_function=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hardPredictions.HoltWinters.HoltWinters.fit_model">
+<code class="sig-name descname">fit_model</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.fit_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks parameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.HoltWinters.HoltWinters.forecast">
+<code class="sig-name descname">forecast</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods</em>, <em class="sig-param">confidence_interval=None</em>, <em class="sig-param">iterations=300</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.forecast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.forecast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.HoltWinters.HoltWinters.multiplicative">
+<code class="sig-name descname">multiplicative</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">forecast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.multiplicative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.multiplicative" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.HoltWinters.HoltWinters.params2vector">
+<code class="sig-name descname">params2vector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.params2vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.params2vector" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.HoltWinters.HoltWinters.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.HoltWinters.HoltWinters.simulate">
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods=5</em>, <em class="sig-param">confidence_interval=0.95</em>, <em class="sig-param">iterations=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.simulate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.HoltWinters.HoltWinters.vector2params">
+<code class="sig-name descname">vector2params</code><span class="sig-paren">(</span><em class="sig-param">vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.vector2params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.vector2params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
 </div>
 
 
@@ -50,12 +165,24 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Holt Winters Model</a><ul>
+<li><a class="reference internal" href="#id1">Holt Winters Model</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="AR.html"
-                        title="previous chapter">&lt;no title&gt;</a></p>
+                        title="previous chapter">AR Model</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="MA.html"
-                        title="next chapter">&lt;no title&gt;</a></p>
+                        title="next chapter">MA Model</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -84,17 +211,20 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="MA.html" title="&lt;no title&gt;"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="MA.html" title="MA Model"
              >next</a> |</li>
         <li class="right" >
-          <a href="AR.html" title="&lt;no title&gt;"
+          <a href="AR.html" title="AR Model"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Juan David Velasquez &amp; Maria Alejandra Arango.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
     </div>
   </body>
 </html>

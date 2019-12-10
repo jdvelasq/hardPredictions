@@ -64,13 +64,14 @@ HoltWinters(alpha = 0.9, beta = 0.1, gamma = False, seasonal = additive)
 
 """
 
-from base_model import base_model
-
 import numpy
 import scipy
 import pandas
 from sklearn.utils import resample
-from extras import *
+
+from hardPredictions.base_model import base_model
+from hardPredictions.extras import *
+
 
 class HoltWinters(base_model):
     """ """

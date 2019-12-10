@@ -16,7 +16,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="AR.html" />
+    <link rel="next" title="AR Model" href="AR.html" />
     <link rel="prev" title="Extra Functions" href="extras.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -26,7 +26,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="AR.html" title="&lt;no title&gt;"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="AR.html" title="AR Model"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="extras.html" title="Extra Functions"
@@ -40,8 +43,599 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="time-series-transformation-module">
-<h1>Time series transformation module<a class="headerlink" href="#time-series-transformation-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-hardPredictions.transformer">
+<span id="time-series-transformation-module"></span><h1>Time series transformation module<a class="headerlink" href="#module-hardPredictions.transformer" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="transformer-time-series-transformation-module">
+<h2>Transformer: time series’ transformation module<a class="headerlink" href="#transformer-time-series-transformation-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h3>
+<p>This module contains time series’ transformation methods (log, log10, sqrt,
+cbrt, boxcox), trending (linear, cuadratic, cubic, diff1, diff2) and seasonal
+(poly2, diff) removal methods.</p>
+</div>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="transform">
+<h4>Transform<a class="headerlink" href="#transform" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span>
+<span class="go">transformer(trans = log, trend = None, seasonal = None)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    7.942718</span>
+<span class="go">1964-02-01    7.890583</span>
+<span class="go">1964-03-01    7.921173</span>
+<span class="go">1964-04-01    7.908755</span>
+<span class="go">1964-05-01    7.988204</span>
+<span class="go">1964-06-01    8.018296</span>
+<span class="go">1964-07-01    7.732808</span>
+<span class="go">1964-08-01    7.701652</span>
+<span class="go">1964-09-01    7.980024</span>
+<span class="go">1964-10-01    8.366603</span>
+<span class="go">1964-11-01    8.659387</span>
+<span class="go">1964-12-01    8.897272</span>
+<span class="go">Name: Perrin, dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;log10&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    3.449478</span>
+<span class="go">1964-02-01    3.426836</span>
+<span class="go">1964-03-01    3.440122</span>
+<span class="go">1964-04-01    3.434729</span>
+<span class="go">1964-05-01    3.469233</span>
+<span class="go">1964-06-01    3.482302</span>
+<span class="go">1964-07-01    3.358316</span>
+<span class="go">1964-08-01    3.344785</span>
+<span class="go">1964-09-01    3.465680</span>
+<span class="go">1964-10-01    3.633569</span>
+<span class="go">1964-11-01    3.760724</span>
+<span class="go">1964-12-01    3.864036</span>
+<span class="go">Name: Perrin, dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;sqrt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    53.056574</span>
+<span class="go">1964-02-01    51.691392</span>
+<span class="go">1964-03-01    52.488094</span>
+<span class="go">1964-04-01    52.163205</span>
+<span class="go">1964-05-01    54.277067</span>
+<span class="go">1964-06-01    55.099909</span>
+<span class="go">1964-07-01    47.770284</span>
+<span class="go">1964-08-01    47.031904</span>
+<span class="go">1964-09-01    54.055527</span>
+<span class="go">1964-10-01    65.582010</span>
+<span class="go">1964-11-01    75.921012</span>
+<span class="go">1964-12-01    85.510233</span>
+<span class="go">Name: Perrin, dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;cbrt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    14.119722</span>
+<span class="go">1964-02-01    13.876464</span>
+<span class="go">1964-03-01    14.018683</span>
+<span class="go">1964-04-01    13.960775</span>
+<span class="go">1964-05-01    14.335436</span>
+<span class="go">1964-06-01    14.479956</span>
+<span class="go">1964-07-01    13.165536</span>
+<span class="go">1964-08-01    13.029519</span>
+<span class="go">1964-09-01    14.296402</span>
+<span class="go">1964-10-01    16.262594</span>
+<span class="go">1964-11-01    17.929767</span>
+<span class="go">1964-12-01    19.409398</span>
+<span class="go">Name: Perrin, dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;boxcox&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    0.504795</span>
+<span class="go">1964-02-01    0.504795</span>
+<span class="go">1964-03-01    0.504795</span>
+<span class="go">1964-04-01    0.504795</span>
+<span class="go">1964-05-01    0.504795</span>
+<span class="go">1964-06-01    0.504795</span>
+<span class="go">1964-07-01    0.504795</span>
+<span class="go">1964-08-01    0.504795</span>
+<span class="go">1964-09-01    0.504795</span>
+<span class="go">1964-10-01    0.504795</span>
+<span class="go">1964-11-01    0.504795</span>
+<span class="go">1964-12-01    0.504795</span>
+<span class="go">Name: Perrin, dtype: float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="removing-trend">
+<h4>Removing trend<a class="headerlink" href="#removing-trend" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01     993.871795</span>
+<span class="go">1964-02-01     549.592075</span>
+<span class="go">1964-03-01     331.312354</span>
+<span class="go">1964-04-01      -3.967366</span>
+<span class="go">1964-05-01     -80.247086</span>
+<span class="go">1964-06-01    -291.526807</span>
+<span class="go">1964-07-01   -1346.806527</span>
+<span class="go">1964-08-01   -1718.086247</span>
+<span class="go">1964-09-01   -1309.365967</span>
+<span class="go">1964-10-01    -231.645688</span>
+<span class="go">1964-11-01     930.074592</span>
+<span class="go">1964-12-01    2176.794872</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;cuadratic&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01   -578.005495</span>
+<span class="go">1964-02-01   -164.897602</span>
+<span class="go">1964-03-01    302.732767</span>
+<span class="go">1964-04-01    481.885614</span>
+<span class="go">1964-05-01    748.560939</span>
+<span class="go">1964-06-01    708.758741</span>
+<span class="go">1964-07-01   -346.520979</span>
+<span class="go">1964-08-01   -889.278222</span>
+<span class="go">1964-09-01   -823.512987</span>
+<span class="go">1964-10-01   -260.225275</span>
+<span class="go">1964-11-01    215.584915</span>
+<span class="go">1964-12-01    604.917582</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;cubic&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    196.725275</span>
+<span class="go">1964-02-01   -235.327672</span>
+<span class="go">1964-03-01   -190.277722</span>
+<span class="go">1964-04-01   -105.031635</span>
+<span class="go">1964-05-01    302.503830</span>
+<span class="go">1964-06-01    544.421911</span>
+<span class="go">1964-07-01   -182.184149</span>
+<span class="go">1964-08-01   -443.221112</span>
+<span class="go">1964-09-01   -236.595738</span>
+<span class="go">1964-10-01    232.785215</span>
+<span class="go">1964-11-01    286.014985</span>
+<span class="go">1964-12-01   -169.813187</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;diff1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01       0</span>
+<span class="go">1964-02-01    -143</span>
+<span class="go">1964-03-01      83</span>
+<span class="go">1964-04-01     -34</span>
+<span class="go">1964-05-01     225</span>
+<span class="go">1964-06-01      90</span>
+<span class="go">1964-07-01    -754</span>
+<span class="go">1964-08-01     -70</span>
+<span class="go">1964-09-01     710</span>
+<span class="go">1964-10-01    1379</span>
+<span class="go">1964-11-01    1463</span>
+<span class="go">1964-12-01    1548</span>
+<span class="go">dtype: int64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;diff2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01       0</span>
+<span class="go">1964-02-01       0</span>
+<span class="go">1964-03-01     -60</span>
+<span class="go">1964-04-01      49</span>
+<span class="go">1964-05-01     191</span>
+<span class="go">1964-06-01     315</span>
+<span class="go">1964-07-01    -664</span>
+<span class="go">1964-08-01    -824</span>
+<span class="go">1964-09-01     640</span>
+<span class="go">1964-10-01    2089</span>
+<span class="go">1964-11-01    2842</span>
+<span class="go">1964-12-01    3011</span>
+<span class="go">dtype: int64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="removing-seasonality">
+<h4>Removing seasonality<a class="headerlink" href="#removing-seasonality" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">seasonal</span> <span class="o">=</span> <span class="s1">&#39;poly2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01   -578.005495</span>
+<span class="go">1964-02-01   -164.897602</span>
+<span class="go">1964-03-01    302.732767</span>
+<span class="go">1964-04-01    481.885614</span>
+<span class="go">1964-05-01    748.560939</span>
+<span class="go">1964-06-01    708.758741</span>
+<span class="go">1964-07-01   -346.520979</span>
+<span class="go">1964-08-01   -889.278222</span>
+<span class="go">1964-09-01   -823.512987</span>
+<span class="go">1964-10-01   -260.225275</span>
+<span class="go">1964-11-01    215.584915</span>
+<span class="go">1964-12-01    604.917582</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">seasonal</span> <span class="o">=</span> <span class="s1">&#39;diff&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed_ts</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    0</span>
+<span class="go">1964-02-01    0</span>
+<span class="go">1964-03-01    0</span>
+<span class="go">1964-04-01    0</span>
+<span class="go">1964-05-01    0</span>
+<span class="go">1964-06-01    0</span>
+<span class="go">1964-07-01    0</span>
+<span class="go">1964-08-01    0</span>
+<span class="go">1964-09-01    0</span>
+<span class="go">1964-10-01    0</span>
+<span class="go">1964-11-01    0</span>
+<span class="go">1964-12-01    0</span>
+<span class="go">dtype: int64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="restore-seasonality">
+<h4>Restore seasonality<a class="headerlink" href="#restore-seasonality" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">seasonal</span> <span class="o">=</span> <span class="s1">&#39;poly2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.0</span>
+<span class="go">1964-02-01    2672.0</span>
+<span class="go">1964-03-01    2755.0</span>
+<span class="go">1964-04-01    2721.0</span>
+<span class="go">1964-05-01    2946.0</span>
+<span class="go">1964-06-01    3036.0</span>
+<span class="go">1964-07-01    2282.0</span>
+<span class="go">1964-08-01    2212.0</span>
+<span class="go">1964-09-01    2922.0</span>
+<span class="go">1964-10-01    4301.0</span>
+<span class="go">1964-11-01    5764.0</span>
+<span class="go">1964-12-01    7312.0</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">seasonal</span> <span class="o">=</span> <span class="s1">&#39;diff&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815</span>
+<span class="go">1964-02-01    2672</span>
+<span class="go">1964-03-01    2755</span>
+<span class="go">1964-04-01    2721</span>
+<span class="go">1964-05-01    2946</span>
+<span class="go">1964-06-01    3036</span>
+<span class="go">1964-07-01    2282</span>
+<span class="go">1964-08-01    2212</span>
+<span class="go">1964-09-01    2922</span>
+<span class="go">1964-10-01    4301</span>
+<span class="go">1964-11-01    5764</span>
+<span class="go">1964-12-01    7312</span>
+<span class="go">dtype: int64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="restore-trending">
+<h4>Restore trending<a class="headerlink" href="#restore-trending" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.0</span>
+<span class="go">1964-02-01    2672.0</span>
+<span class="go">1964-03-01    2755.0</span>
+<span class="go">1964-04-01    2721.0</span>
+<span class="go">1964-05-01    2946.0</span>
+<span class="go">1964-06-01    3036.0</span>
+<span class="go">1964-07-01    2282.0</span>
+<span class="go">1964-08-01    2212.0</span>
+<span class="go">1964-09-01    2922.0</span>
+<span class="go">1964-10-01    4301.0</span>
+<span class="go">1964-11-01    5764.0</span>
+<span class="go">1964-12-01    7312.0</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;cuadratic&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.0</span>
+<span class="go">1964-02-01    2672.0</span>
+<span class="go">1964-03-01    2755.0</span>
+<span class="go">1964-04-01    2721.0</span>
+<span class="go">1964-05-01    2946.0</span>
+<span class="go">1964-06-01    3036.0</span>
+<span class="go">1964-07-01    2282.0</span>
+<span class="go">1964-08-01    2212.0</span>
+<span class="go">1964-09-01    2922.0</span>
+<span class="go">1964-10-01    4301.0</span>
+<span class="go">1964-11-01    5764.0</span>
+<span class="go">1964-12-01    7312.0</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;cuadratic&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.0</span>
+<span class="go">1964-02-01    2672.0</span>
+<span class="go">1964-03-01    2755.0</span>
+<span class="go">1964-04-01    2721.0</span>
+<span class="go">1964-05-01    2946.0</span>
+<span class="go">1964-06-01    3036.0</span>
+<span class="go">1964-07-01    2282.0</span>
+<span class="go">1964-08-01    2212.0</span>
+<span class="go">1964-09-01    2922.0</span>
+<span class="go">1964-10-01    4301.0</span>
+<span class="go">1964-11-01    5764.0</span>
+<span class="go">1964-12-01    7312.0</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.0</span>
+<span class="go">1964-02-01    2672.0</span>
+<span class="go">1964-03-01    2755.0</span>
+<span class="go">1964-04-01    2721.0</span>
+<span class="go">1964-05-01    2946.0</span>
+<span class="go">1964-06-01    3036.0</span>
+<span class="go">1964-07-01    2282.0</span>
+<span class="go">1964-08-01    2212.0</span>
+<span class="go">1964-09-01    2922.0</span>
+<span class="go">1964-10-01    4301.0</span>
+<span class="go">1964-11-01    5764.0</span>
+<span class="go">1964-12-01    7312.0</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;diff1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815</span>
+<span class="go">1964-02-01    2672</span>
+<span class="go">1964-03-01    2755</span>
+<span class="go">1964-04-01    2721</span>
+<span class="go">1964-05-01    2946</span>
+<span class="go">1964-06-01    3036</span>
+<span class="go">1964-07-01    2282</span>
+<span class="go">1964-08-01    2212</span>
+<span class="go">1964-09-01    2922</span>
+<span class="go">1964-10-01    4301</span>
+<span class="go">1964-11-01    5764</span>
+<span class="go">1964-12-01    7312</span>
+<span class="go">dtype: int64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trend</span> <span class="o">=</span> <span class="s1">&#39;diff2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815</span>
+<span class="go">1964-02-01    2672</span>
+<span class="go">1964-03-01    2755</span>
+<span class="go">1964-04-01    2721</span>
+<span class="go">1964-05-01    2946</span>
+<span class="go">1964-06-01    3036</span>
+<span class="go">1964-07-01    2282</span>
+<span class="go">1964-08-01    2212</span>
+<span class="go">1964-09-01    2922</span>
+<span class="go">1964-10-01    4301</span>
+<span class="go">1964-11-01    5764</span>
+<span class="go">1964-12-01    7312</span>
+<span class="go">dtype: int64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="restore-transformation">
+<h4>Restore transformation<a class="headerlink" href="#restore-transformation" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.0</span>
+<span class="go">1964-02-01    2672.0</span>
+<span class="go">1964-03-01    2755.0</span>
+<span class="go">1964-04-01    2721.0</span>
+<span class="go">1964-05-01    2946.0</span>
+<span class="go">1964-06-01    3036.0</span>
+<span class="go">1964-07-01    2282.0</span>
+<span class="go">1964-08-01    2212.0</span>
+<span class="go">1964-09-01    2922.0</span>
+<span class="go">1964-10-01    4301.0</span>
+<span class="go">1964-11-01    5764.0</span>
+<span class="go">1964-12-01    7312.0</span>
+<span class="go">Name: Perrin, dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;log10&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.0</span>
+<span class="go">1964-02-01    2672.0</span>
+<span class="go">1964-03-01    2755.0</span>
+<span class="go">1964-04-01    2721.0</span>
+<span class="go">1964-05-01    2946.0</span>
+<span class="go">1964-06-01    3036.0</span>
+<span class="go">1964-07-01    2282.0</span>
+<span class="go">1964-08-01    2212.0</span>
+<span class="go">1964-09-01    2922.0</span>
+<span class="go">1964-10-01    4301.0</span>
+<span class="go">1964-11-01    5764.0</span>
+<span class="go">1964-12-01    7312.0</span>
+<span class="go">Name: Perrin, dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;sqrt&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.0</span>
+<span class="go">1964-02-01    2672.0</span>
+<span class="go">1964-03-01    2755.0</span>
+<span class="go">1964-04-01    2721.0</span>
+<span class="go">1964-05-01    2946.0</span>
+<span class="go">1964-06-01    3036.0</span>
+<span class="go">1964-07-01    2282.0</span>
+<span class="go">1964-08-01    2212.0</span>
+<span class="go">1964-09-01    2922.0</span>
+<span class="go">1964-10-01    4301.0</span>
+<span class="go">1964-11-01    5764.0</span>
+<span class="go">1964-12-01    7312.0</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;cbrt&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.0</span>
+<span class="go">1964-02-01    2672.0</span>
+<span class="go">1964-03-01    2755.0</span>
+<span class="go">1964-04-01    2721.0</span>
+<span class="go">1964-05-01    2946.0</span>
+<span class="go">1964-06-01    3036.0</span>
+<span class="go">1964-07-01    2282.0</span>
+<span class="go">1964-08-01    2212.0</span>
+<span class="go">1964-09-01    2922.0</span>
+<span class="go">1964-10-01    4301.0</span>
+<span class="go">1964-11-01    5764.0</span>
+<span class="go">1964-12-01    7312.0</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;../datasets/champagne_short.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mytransform</span> <span class="o">=</span> <span class="n">transformer</span><span class="p">(</span><span class="n">trans</span> <span class="o">=</span> <span class="s1">&#39;boxcox&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transformed</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">mytransform</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">transformed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">Month</span>
+<span class="go">1964-01-01    2815.000000</span>
+<span class="go">1964-02-01    2671.999999</span>
+<span class="go">1964-03-01    2754.999999</span>
+<span class="go">1964-04-01    2721.000001</span>
+<span class="go">1964-05-01    2946.000000</span>
+<span class="go">1964-06-01    3036.000001</span>
+<span class="go">1964-07-01    2282.000000</span>
+<span class="go">1964-08-01    2212.000001</span>
+<span class="go">1964-09-01    2921.999999</span>
+<span class="go">1964-10-01    4300.999998</span>
+<span class="go">1964-11-01    5763.999989</span>
+<span class="go">1964-12-01    7311.999999</span>
+<span class="go">Name: Perrin, dtype: float64</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="hardPredictions.transformer.transformer">
+<em class="property">class </em><code class="sig-prename descclassname">hardPredictions.transformer.</code><code class="sig-name descname">transformer</code><span class="sig-paren">(</span><em class="sig-param">trans=None</em>, <em class="sig-param">trend=None</em>, <em class="sig-param">seasonal=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/transformer.html#transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.transformer.transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to transform the series</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>trans (log, log10, sqrt, cbrt, boxcox): Transformation to apply
+trend (linear, cuadratic, cubic, diff1, diff2): Trend to apply
+seasonal (poly2, diff): Seasonality to apply</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="hardPredictions.transformer.transformer.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/transformer.html#transformer.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.transformer.transformer.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the transformed series</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ts: Time series to apply transformation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hardPredictions.transformer.transformer.intfrq">
+<code class="sig-name descname">intfrq</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.transformer.transformer.intfrq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time series after transformation and restore</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hardPredictions.transformer.transformer.model">
+<code class="sig-name descname">model</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.transformer.transformer.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Box Cox transformation lambda (if necessary)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hardPredictions.transformer.transformer.original">
+<code class="sig-name descname">original</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.transformer.transformer.original" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transformation values to restore series</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hardPredictions.transformer.transformer.restore">
+<code class="sig-name descname">restore</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/transformer.html#transformer.restore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.transformer.transformer.restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restore series to its original values</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ts: Time series to restore</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hardPredictions.transformer.transformer.ts">
+<code class="sig-name descname">ts</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.transformer.transformer.ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Frequency integer of the transformed time series</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
 </div>
 
 
@@ -50,12 +644,32 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Time series transformation module</a><ul>
+<li><a class="reference internal" href="#transformer-time-series-transformation-module">Transformer: time series’ transformation module</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#transform">Transform</a></li>
+<li><a class="reference internal" href="#removing-trend">Removing trend</a></li>
+<li><a class="reference internal" href="#removing-seasonality">Removing seasonality</a></li>
+<li><a class="reference internal" href="#restore-seasonality">Restore seasonality</a></li>
+<li><a class="reference internal" href="#restore-trending">Restore trending</a></li>
+<li><a class="reference internal" href="#restore-transformation">Restore transformation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="extras.html"
                         title="previous chapter">Extra Functions</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="AR.html"
-                        title="next chapter">&lt;no title&gt;</a></p>
+                        title="next chapter">AR Model</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -84,7 +698,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="AR.html" title="&lt;no title&gt;"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="AR.html" title="AR Model"
              >next</a> |</li>
         <li class="right" >
           <a href="extras.html" title="Extra Functions"
@@ -94,7 +711,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2018, Juan David Velasquez &amp; Maria Alejandra Arango.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
     </div>
   </body>
 </html>

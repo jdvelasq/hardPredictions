@@ -1,0 +1,651 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>hardPredictions.MA &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hardPredictions.MA</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">MA Model</span>
+<span class="sd">===============================================================================</span>
+
+<span class="sd">Overview</span>
+<span class="sd">-------------------------------------------------------------------------------</span>
+
+<span class="sd">This module contains MA models using four diferent parameter optimization</span>
+<span class="sd">methods: SciPy&#39;s minimization, SciKit&#39;s Ridge linear model, SciKit&#39;s Lasso</span>
+<span class="sd">linear model and SciKit&#39;s Elastic Net linear model.</span>
+
+<span class="sd">Examples</span>
+<span class="sd">-------------------------------------------------------------------------------</span>
+
+<span class="sd">MA model using SciPy&#39;s minimization:</span>
+
+<span class="sd">&gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne.csv&#39;, index_col = 0, header = 0)</span>
+<span class="sd">&gt;&gt;&gt; model = MA(q = 3)</span>
+<span class="sd">&gt;&gt;&gt; model</span>
+<span class="sd">MA(q = 3, intercept = None, theta = None)</span>
+<span class="sd">&gt;&gt;&gt; model = model.fit(ts)</span>
+<span class="sd">&gt;&gt;&gt; model</span>
+<span class="sd">MA(q = 3, intercept = 0.7576070305877793, theta = [0.47415837 0.96800789 0.50682355])</span>
+<span class="sd">&gt;&gt;&gt; prediction = model.forecast(ts, periods = 3)</span>
+<span class="sd">&gt;&gt;&gt; prediction</span>
+<span class="sd">            ci_inf  ci_sup       series</span>
+<span class="sd">1972-10-01     NaN     NaN  3644.781559</span>
+<span class="sd">1972-11-01     NaN     NaN  4762.075950</span>
+<span class="sd">1972-12-01     NaN     NaN  4204.870830</span>
+<span class="sd">&gt;&gt;&gt; prediction = model.forecast(ts, periods = 3, confidence_interval = 0.95)</span>
+<span class="sd">&gt;&gt;&gt; prediction</span>
+<span class="sd">                 ci_inf       ci_sup       series</span>
+<span class="sd">1972-10-01  -254.905599  6322.683321  3645.819521</span>
+<span class="sd">1972-11-01   464.706361  7951.797533  4762.630139</span>
+<span class="sd">1972-12-01 -1114.609601  8133.907219  4205.907253</span>
+<span class="sd">&gt;&gt;&gt; model.plot(ts, periods = 3, confidence_interval = 0.95)</span>
+
+<span class="sd">.. image:: ./images/ma_1.png</span>
+<span class="sd">  :width: 400</span>
+<span class="sd">  :alt: MA 3</span>
+<span class="sd">  :align: center</span>
+<span class="sd">  </span>
+
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
+
+<span class="kn">from</span> <span class="nn">hardPredictions.base_model</span> <span class="kn">import</span> <span class="n">base_model</span>
+<span class="kn">from</span> <span class="nn">hardPredictions.extras</span> <span class="kn">import</span> <span class="n">add_next_date</span>
+
+
+<div class="viewcode-block" id="MA"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA">[docs]</a><span class="k">class</span> <span class="nc">MA</span><span class="p">(</span><span class="n">base_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Moving-average model</span>
+<span class="sd">    </span>
+<span class="sd">    Parameter optimization method: scipy&#39;s minimization</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        q (int): order.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        MA model structure of order q.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span>
+        
+        <span class="k">if</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">intercept</span>
+            
+        <span class="k">if</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
+            
+        <span class="k">if</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;complete&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;optim_intercept&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;no_intercept&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;optim_params&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;no_optim&#39;</span>
+            
+        
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;MA(q = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, intercept = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, theta = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
+        
+
+<div class="viewcode-block" id="MA.params2vector"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.params2vector">[docs]</a>    <span class="k">def</span> <span class="nf">params2vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Parameters to vector</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            None.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Vector parameters of length q+1 to use in optimization.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)):</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">params</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_intercept&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;optim_params&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)):</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">params</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;optim_intercept&#39;</span><span class="p">:</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">params</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_optim&#39;</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+        
+
+<div class="viewcode-block" id="MA.vector2params"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.vector2params">[docs]</a>    <span class="k">def</span> <span class="nf">vector2params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Vector to parameters</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            vector (list): vector of length q+1 to convert into parameters of </span>
+<span class="sd">            the model.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            self</span>
+
+<span class="sd">        &quot;&quot;&quot;</span> 
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_intercept&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;optim_params&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">vector</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;optim_intercept&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_optim&#39;</span><span class="p">:</span>
+            <span class="k">pass</span>
+            
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    <span class="k">def</span> <span class="nf">__get_X__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span>
+                    <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">value_0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="n">value_1</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">value_0</span> <span class="o">+</span> <span class="n">value_1</span>
+                    <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">X</span>
+    
+    <span class="k">def</span> <span class="nf">__forward__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lon</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">:</span>
+             <span class="n">y_last</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">lon</span><span class="p">]</span>
+             <span class="n">ts_last</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">lon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+             <span class="n">mean_ts</span> <span class="o">=</span> <span class="n">ts_last</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>                    
+             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">+</span> <span class="n">mean_ts</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y_last</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">lon</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_last</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">lon</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">:</span><span class="n">lon</span><span class="p">]</span>
+            <span class="n">ts_last</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">lon</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">lon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">mean_ts</span> <span class="o">=</span> <span class="n">ts_last</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> 
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">+</span> <span class="n">mean_ts</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y_last</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="MA.predict"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Fits a time series using self model parameters</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ts (pandas.Series): Time series to fit.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Fitted time series.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lon</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="c1">#y = ts</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lon</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">lon</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">:</span>
+                    <span class="n">y_last</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">lon</span><span class="p">]</span>
+                    <span class="n">ts_last</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">lon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">mean_ts</span> <span class="o">=</span> <span class="n">ts_last</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>                    
+                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">+</span> <span class="n">mean_ts</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y_last</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">lon</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y_last</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">lon</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">:</span><span class="n">lon</span><span class="p">]</span>
+                    <span class="n">ts_last</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">lon</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">lon</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">mean_ts</span> <span class="o">=</span> <span class="n">ts_last</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> 
+                    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">+</span> <span class="n">mean_ts</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y_last</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+            <span class="n">prediction</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">prediction</span><span class="p">),</span> <span class="n">index</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">prediction</span></div>
+
+
+<div class="viewcode-block" id="MA.fit"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">error_function</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Finds optimal parameters using a given optimization function</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ts (pandas.Series): Time series to fit.</span>
+<span class="sd">            error_function (function): Function to estimates error.</span>
+<span class="sd">            </span>
+<span class="sd">        Return:</span>
+<span class="sd">            self</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_optim&#39;</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vector2params</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_error</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">error_function</span><span class="p">)</span>
+
+            <span class="n">x0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params2vector</span><span class="p">()</span>
+            <span class="n">optim_params</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vector2params</span><span class="p">(</span><span class="n">vector</span> <span class="o">=</span> <span class="n">optim_params</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="MA.forecast"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.forecast">[docs]</a>    <span class="k">def</span> <span class="nf">forecast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">confidence_interval</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">300</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Predicts future values in a given period</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            ts (pandas.Series): Time series to predict.</span>
+<span class="sd">            periods (int): Number of periods ahead to predict.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Time series of predicted values.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">ts</span>
+
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__forward__</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">add_next_date</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">confidence_interval</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">ci_zero</span> <span class="o">=</span> <span class="n">ts</span>
+                <span class="n">ci_zero</span> <span class="o">=</span> <span class="n">add_next_date</span><span class="p">(</span><span class="n">ci_zero</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            
+            <span class="n">ci_inf</span> <span class="o">=</span> <span class="n">ci_zero</span><span class="p">[</span><span class="o">-</span><span class="n">periods</span><span class="p">:]</span>
+            <span class="n">ci_sup</span> <span class="o">=</span> <span class="n">ci_zero</span><span class="p">[</span><span class="o">-</span><span class="n">periods</span><span class="p">:]</span>
+            <span class="n">ci</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">ci_inf</span><span class="p">,</span> <span class="n">ci_sup</span><span class="p">],</span> <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ci_inf&#39;</span><span class="p">,</span> <span class="s1">&#39;ci_sup&#39;</span><span class="p">])</span>            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ci</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">confidence_interval</span><span class="p">,</span> <span class="n">iterations</span><span class="p">)</span>
+            
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="n">periods</span><span class="p">:]</span>
+        <span class="n">prediction</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;series&#39;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span></div></div>
+    
+
+<div class="viewcode-block" id="MA_Ridge"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_Ridge">[docs]</a><span class="k">class</span> <span class="nc">MA_Ridge</span><span class="p">(</span><span class="n">MA</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Parameter optimization method: SciKit&#39;s Ridge linear model &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">copy_X</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span> <span class="o">=</span> <span class="n">copy_X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span> <span class="o">=</span> <span class="n">fit_intercept</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span> <span class="o">=</span> <span class="n">normalize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="n">solver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span>
+        
+        <span class="k">if</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">intercept</span>
+            
+        <span class="k">if</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
+        
+        <span class="k">if</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;complete&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;optim_intercept&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;no_intercept&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;optim_params&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;no_optim&#39;</span>
+    
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;MA_Ridge(q = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, intercept = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, theta = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
+        
+
+<div class="viewcode-block" id="MA_Ridge.fit"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_Ridge.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
+             <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+             <span class="n">y</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+             <span class="n">ridge_model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">copy_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span><span class="p">,</span>
+                                              <span class="n">fit_intercept</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span><span class="p">,</span>
+                                              <span class="n">max_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
+                                              <span class="n">normalize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">,</span>
+                                              <span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                                              <span class="n">solver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span>
+             <span class="n">ridge_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+             <span class="n">optim_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+             <span class="n">optim_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ridge_model</span><span class="o">.</span><span class="n">intercept_</span><span class="p">)</span>
+             <span class="n">optim_params</span> <span class="o">=</span> <span class="n">optim_params</span> <span class="o">+</span> <span class="n">ridge_model</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">vector2params</span><span class="p">(</span><span class="n">vector</span> <span class="o">=</span> <span class="n">optim_params</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_intercept&#39;</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">ridge_model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">copy_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span><span class="p">,</span>
+                                             <span class="n">fit_intercept</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                                             <span class="n">max_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
+                                             <span class="n">normalize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">,</span>
+                                             <span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                                             <span class="n">solver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span>
+            <span class="n">ridge_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">optim_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">optim_params</span> <span class="o">=</span> <span class="n">optim_params</span> <span class="o">+</span> <span class="n">ridge_model</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vector2params</span><span class="p">(</span><span class="n">vector</span> <span class="o">=</span> <span class="n">optim_params</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_optim&#39;</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;Can&#39;t apply Lasso regression using given parameters&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span> 
+        
+        <span class="k">return</span> <span class="bp">self</span>   </div></div>
+
+<div class="viewcode-block" id="MA_Lasso"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_Lasso">[docs]</a><span class="k">class</span> <span class="nc">MA_Lasso</span><span class="p">(</span><span class="n">MA</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Parameter optimization method: SciKit&#39;s Lasso linear model &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">copy_X</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                 <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">precompute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">selection</span><span class="o">=</span><span class="s1">&#39;cyclic&#39;</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span> <span class="o">=</span> <span class="n">copy_X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span> <span class="o">=</span> <span class="n">fit_intercept</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span> <span class="o">=</span> <span class="n">normalize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positive</span> <span class="o">=</span> <span class="n">positive</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span> <span class="o">=</span> <span class="n">precompute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="n">selection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warm_start</span> <span class="o">=</span> <span class="n">warm_start</span>
+        
+        <span class="k">if</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">intercept</span>
+            
+        <span class="k">if</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
+        
+        <span class="k">if</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;complete&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;optim_intercept&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;no_intercept&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;optim_params&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;no_optim&#39;</span>
+    
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;MA_Lasso(q = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, intercept = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, theta = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
+        
+
+<div class="viewcode-block" id="MA_Lasso.fit"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_Lasso.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">lasso_model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">copy_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span><span class="p">,</span>
+                                             <span class="n">fit_intercept</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span><span class="p">,</span>
+                                             <span class="n">max_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
+                                             <span class="n">normalize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">,</span>
+                                             <span class="n">positive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive</span><span class="p">,</span>
+                                             <span class="n">precompute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span><span class="p">,</span>
+                                             <span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                                             <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span>
+                                             <span class="n">warm_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warm_start</span><span class="p">)</span>
+            <span class="n">lasso_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">optim_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">optim_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lasso_model</span><span class="o">.</span><span class="n">intercept_</span><span class="p">)</span>
+            <span class="n">optim_params</span> <span class="o">=</span> <span class="n">optim_params</span> <span class="o">+</span> <span class="n">lasso_model</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vector2params</span><span class="p">(</span><span class="n">vector</span> <span class="o">=</span> <span class="n">optim_params</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_intercept&#39;</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">lasso_model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">copy_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span><span class="p">,</span>
+                                             <span class="n">fit_intercept</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                                             <span class="n">max_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
+                                             <span class="n">normalize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">,</span>
+                                             <span class="n">positive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive</span><span class="p">,</span>
+                                             <span class="n">precompute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span><span class="p">,</span>
+                                             <span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                                             <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span>
+                                             <span class="n">warm_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warm_start</span><span class="p">)</span>
+            <span class="n">lasso_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">optim_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">optim_params</span> <span class="o">=</span> <span class="n">optim_params</span> <span class="o">+</span> <span class="n">lasso_model</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vector2params</span><span class="p">(</span><span class="n">vector</span> <span class="o">=</span> <span class="n">optim_params</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_optim&#39;</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;Can&#39;t apply Lasso regression using given parameters&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span> 
+        
+        <span class="k">return</span> <span class="bp">self</span>        </div></div>
+
+
+
+<div class="viewcode-block" id="MA_ElasticNet"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_ElasticNet">[docs]</a><span class="k">class</span> <span class="nc">MA_ElasticNet</span><span class="p">(</span><span class="n">MA</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Parameter optimization method: SciKit&#39;s Elastic Net linear model &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">copy_X</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">l1_ratio</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                 <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">precompute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">selection</span><span class="o">=</span><span class="s1">&#39;cyclic&#39;</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span> <span class="o">=</span> <span class="n">copy_X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span> <span class="o">=</span> <span class="n">fit_intercept</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l1_ratio</span> <span class="o">=</span> <span class="n">l1_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span> <span class="o">=</span> <span class="n">normalize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positive</span> <span class="o">=</span> <span class="n">positive</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span> <span class="o">=</span> <span class="n">precompute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="n">selection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warm_start</span> <span class="o">=</span> <span class="n">warm_start</span>
+        
+        <span class="k">if</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta0</span> <span class="o">=</span> <span class="n">intercept</span>
+            
+        <span class="k">if</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
+        
+        <span class="k">if</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;complete&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;optim_intercept&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">==</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;no_intercept&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;optim_params&#39;</span>
+        <span class="k">elif</span> <span class="n">intercept</span> <span class="o">!=</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">theta</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">=</span> <span class="s1">&#39;no_optim&#39;</span>
+    
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;MA_ElasticNet(q = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, intercept = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, theta = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
+        
+    
+<div class="viewcode-block" id="MA_ElasticNet.fit"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_ElasticNet.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
+             <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+             <span class="n">y</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+             <span class="n">lasso_model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">ElasticNet</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">copy_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span><span class="p">,</span>
+                                                   <span class="n">fit_intercept</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span><span class="p">,</span>
+                                                   <span class="n">l1_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">l1_ratio</span><span class="p">,</span>
+                                                   <span class="n">max_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
+                                                   <span class="n">normalize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">,</span>
+                                                   <span class="n">positive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive</span><span class="p">,</span>
+                                                   <span class="n">precompute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span><span class="p">,</span>
+                                                   <span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                                                   <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span>
+                                                   <span class="n">warm_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warm_start</span><span class="p">)</span>
+             <span class="n">lasso_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+             <span class="n">optim_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+             <span class="n">optim_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lasso_model</span><span class="o">.</span><span class="n">intercept_</span><span class="p">)</span>
+             <span class="n">optim_params</span> <span class="o">=</span> <span class="n">optim_params</span> <span class="o">+</span> <span class="n">lasso_model</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">vector2params</span><span class="p">(</span><span class="n">vector</span> <span class="o">=</span> <span class="n">optim_params</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_intercept&#39;</span><span class="p">:</span>
+             <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+             <span class="n">y</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+             <span class="n">lasso_model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">ElasticNet</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">copy_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span><span class="p">,</span>
+                                                   <span class="n">fit_intercept</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                                                   <span class="n">l1_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">l1_ratio</span><span class="p">,</span>
+                                                   <span class="n">max_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
+                                                   <span class="n">normalize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">,</span>
+                                                   <span class="n">positive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive</span><span class="p">,</span>
+                                                   <span class="n">precompute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span><span class="p">,</span>
+                                                   <span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                                                   <span class="n">selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span>
+                                                   <span class="n">warm_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warm_start</span><span class="p">)</span>
+             <span class="n">lasso_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+             <span class="n">optim_params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+             <span class="n">optim_params</span> <span class="o">=</span> <span class="n">optim_params</span> <span class="o">+</span> <span class="n">lasso_model</span><span class="o">.</span><span class="n">coef_</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">vector2params</span><span class="p">(</span><span class="n">vector</span> <span class="o">=</span> <span class="n">optim_params</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;no_optim&#39;</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="s2">&quot;Can&#39;t apply Elastic Net regression using given parameters&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span> 
+        
+        <span class="k">return</span> <span class="bp">self</span>  </div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Juan David Velasquez &amp; Maria Alejandra Arango.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.1.
+    </div>
+  </body>
+</html>

@@ -514,7 +514,7 @@ Name: Perrin, dtype: float64
 
 """
 
-from hardPredictions.extras import *
+from extras import *
 
 import pandas
 import numpy

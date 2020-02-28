@@ -15,15 +15,24 @@ Examples
 
 AR model using SciPy's minimization:
 
+Get predicted values as a DataFrame:
+    
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
 >>> prediction = model.forecast(ts, periods = 2)
->>> prediction
-1972-10-01    6100.380339
-1972-11-01    5637.974302
-dtype: float64
+>>> prediction # doctest: +ELLIPSIS
+            ci_inf  ci_sup       series
+1972-10-01     NaN     NaN  6100...
+1972-11-01     NaN     NaN  5637...
+
+If confidence intervals are calculated with 95% level and 300 iterations:
+>>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
+>>> prediction # doctest: +ELLIPSIS
+                 ci_inf        ci_sup       series
+1972-10-01  ...  ...  6100...
+1972-11-01  ...  ...  5637...
 
 AR model using SciKit's Ridge linear model:
     
@@ -32,10 +41,10 @@ AR model using SciKit's Ridge linear model:
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
 >>> prediction = model.forecast(ts, periods = 2)
->>> prediction
-1972-10-01    6056.234637
-1972-11-01    5514.641861
-dtype: float64
+>>> prediction # doctest: +ELLIPSIS
+            ci_inf  ci_sup       series
+1972-10-01     NaN     NaN  6056...
+1972-11-01     NaN     NaN  5514...
 
 AR model using SciKit's Lasso linear model:
     
@@ -44,10 +53,10 @@ AR model using SciKit's Lasso linear model:
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
 >>> prediction = model.forecast(ts, periods = 2)
->>> prediction
-1972-10-01    6056.234513
-1972-11-01    5514.641777
-dtype: float64
+>>> prediction # doctest: +ELLIPSIS
+            ci_inf  ci_sup       series
+1972-10-01     NaN     NaN  6056...
+1972-11-01     NaN     NaN  5514...
 
 AR model using SciKit's Elastic Net linear model:
     
@@ -56,10 +65,12 @@ AR model using SciKit's Elastic Net linear model:
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
 >>> prediction = model.forecast(ts, periods = 2)
->>> prediction
-1972-10-01    6056.233741
-1972-11-01    5514.641325
-dtype: float64       
+>>> prediction # doctest: +ELLIPSIS
+            ci_inf  ci_sup       series
+1972-10-01     NaN     NaN  6056...
+1972-11-01     NaN     NaN  5514...
+
+AR SciKit's models receives same parameters as regression models. 
 
 
 Classes
@@ -67,13 +78,13 @@ Classes
 
 """
 
+from base_model import base_model
+
 import numpy
 import scipy
 import pandas
+from extras import add_next_date
 from sklearn import linear_model
-
-from hardPredictions.extras import add_next_date
-from hardPredictions.base_model import base_model
 
 class AR(base_model):
     """ Autoregressive model
@@ -81,10 +92,12 @@ class AR(base_model):
     Parameter optimization method: scipy's minimization
 
     Args:
-        p (int): order.
+        p (int): order
+        intercept (boolean or double): False for set intercept to 0 or double 
+        phi (array): array of p-length for set parameters without optimization
 
     Returns:
-        AR model structure of order p.
+        AR model structure of order p
 
     """
 
@@ -126,10 +139,10 @@ class AR(base_model):
         """ Parameters to vector
         
         Args:
-            None.
+            None
             
         Returns:
-            Vector parameters of length p+1 to use in optimization.
+            Vector parameters of length p+1 to use in optimization
 
         """        
         params = list()
@@ -159,7 +172,7 @@ class AR(base_model):
         
         Args:
             vector (list): vector of length p+1 to convert into parameters of 
-            the model.
+            the model
             
         Returns:
             self
@@ -213,10 +226,10 @@ class AR(base_model):
         """ Fits a time series using self model parameters
         
         Args:
-            ts (pandas.Series): Time series to fit.
-        
+            ts (pandas.Series): Time series to fit
+    
         Returns:
-            Fitted time series.
+            Fitted time series
             
         """
         y = ts
@@ -236,8 +249,8 @@ class AR(base_model):
         """ Finds optimal parameters using a given optimization function
         
         Args:
-            ts (pandas.Series): Time series to fit.
-            error_function (function): Function to estimates error.
+            ts (pandas.Series): Time series to fit
+            error_function (function): Function to estimates error
             
         Return:
             self
@@ -262,11 +275,14 @@ class AR(base_model):
         """ Predicts future values in a given period
         
         Args:
-            ts (pandas.Series): Time series to predict.
-            periods (int): Number of periods ahead to predict.
+            ts (pandas.Series): Time series to predict
+            periods (int): Number of periods ahead to predict
+            confidence_interval (double): Confidence interval level
+            iterations (int): Number of iterations
             
         Returns:
-            Time series of predicted values.
+            Dataframe of confidence intervals and time series of predicted 
+            values: (ci_inf, ci_sup, series) 
         
         """
         for i in range(periods):
@@ -584,3 +600,7 @@ class AR_ElasticNet(AR):
             raise ValueError(error_message) 
         
         return self  
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

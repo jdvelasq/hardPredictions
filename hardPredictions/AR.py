@@ -19,20 +19,26 @@ Get predicted values as a DataFrame:
     
 >>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR(p = 3)
+>>> model
+AR(p = 3, intercept = None, phi = None)
+
 >>> model = model.fit(ts)
+>>> model # doctest: +ELLIPSIS
+AR(p = 3, intercept = ..., phi = [-0.0... -0.1...  0.5...])
+
 >>> fitted_model = model.predict(ts)
 >>> prediction = model.forecast(ts, periods = 2)
 >>> prediction # doctest: +ELLIPSIS
             ci_inf  ci_sup       series
-1972-10-01     NaN     NaN  6100...
-1972-11-01     NaN     NaN  5637...
+1972-10-01     NaN     NaN  610...
+1972-11-01     NaN     NaN  563...
 
 If confidence intervals are calculated with 95% level and 300 iterations:
 >>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
 >>> prediction # doctest: +ELLIPSIS
                  ci_inf        ci_sup       series
-1972-10-01  ...  ...  6100...
-1972-11-01  ...  ...  5637...
+1972-10-01  ...  ...  610...
+1972-11-01  ...  ...  563...
 
 AR model using SciKit's Ridge linear model:
     

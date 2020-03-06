@@ -64,17 +64,27 @@ HoltWinters(alpha = 0.9, beta = 0.1, gamma = False, seasonal = additive)
 
 """
 
+from base_model import base_model
+
 import numpy
 import scipy
 import pandas
 from sklearn.utils import resample
-
-from hardPredictions.base_model import base_model
-from hardPredictions.extras import *
-
+from extras import *
 
 class HoltWinters(base_model):
-    """ """
+    """ Holt Winters Model
+    
+    Args:
+        alpha (double or boolean): alpha parameter of Holt Winters model
+        beta (double or boolean): beta parameter of Holt Winters model. If set 
+        to False, the function will do exponential smoothing
+        gamma (double or boolean): gamma parameter used for the seasonal 
+        component. If set to False, an non-seasonal model is fitted
+        seasonal (str): String to select an 'additive' (the default) or 
+        'multiplicative' seasonal model
+    
+    """
     
     def __init__(self, alpha=None, beta=None, gamma=None, seasonal='additive'):
             
@@ -431,3 +441,7 @@ class HoltWinters(base_model):
         result = ci.append(prediction)
 
         return result.transpose()
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

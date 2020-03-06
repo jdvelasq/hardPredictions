@@ -1,7 +1,5 @@
 """
 Base Model
-===============================================================================
-
 Base structure for creation of new models
 
 Methods:
@@ -10,15 +8,13 @@ Methods:
 
 """
 
-
+from hardPredictions import series_viewer
 
 import pandas
 import numpy
 import sklearn
 import matplotlib
-
-from hardPredictions.extras import add_next_date
-from hardPredictions.hardPredictions import series_viewer
+from extras import add_next_date
 
 class base_model():
     
@@ -38,13 +34,11 @@ class base_model():
         
     
     def calc_error(self, ts, error_function = None, ignore_first = 0):
-        """Estimates error according to SciKit's regression metrics
+        """ Estimates error according to SciKit's regression metrics
         
         Args:
-            ts:
-                Time series to estimate the model
-            error_function (None or error function): 
-                Error function whose
+            ts: Time series to estimate the model
+            error_function (None or error function): Error function whose
                 parameters are real time series and estimated time series. If
                 None, error_function is Sci-Kit learn's mean squared error
         
@@ -98,7 +92,7 @@ class base_model():
     def normality(self):
         self.residuals.normality()
         
-    def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 1000):
+    def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 500):
         values = self.filter_ts(ts, self.p).values
         results = list()
         for i in range(iterations):
@@ -111,7 +105,7 @@ class base_model():
                 else:
                     y = add_next_date(y, next_value_bootstrap)
 
-                next_value = self.__forward__(y)
+                next_value = self.forecast(y, 1).series
                 next_value_bootstrap = next_value + train[0]
                 result_complete = add_next_date(y, next_value_bootstrap)
                 result = result_complete[-periods:]
@@ -124,6 +118,41 @@ class base_model():
         ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
 
         return ci
+    
+    def simulate_bootstrap(self, ts, ts_test, confidence_interval = 0.95, iterations = 300):
+        periods = len(ts_test)
+        values = self.filter_ts(ts, self.p).values
+        #results = list()
+        errors = list()
+        for i in range(iterations):
+
+            for j in range(periods):
+                train = sklearn.utils.resample(values, n_samples = 1)
+
+                if j == 0:
+                    y = ts
+                else:
+                    y = add_next_date(y, next_value_bootstrap)
+
+                next_value = self.forecast(y, 1).series
+                next_value_bootstrap = next_value + train[0]
+                result_complete = add_next_date(y, next_value_bootstrap)
+                result = result_complete[-periods:]
+            
+            error = sklearn.metrics.mean_squared_error(ts_test, result)
+
+            #results.append(result)
+            errors.append(error)
+            
+        mean_error = numpy.mean(errors)      
+        
+
+        #results = pandas.DataFrame(results)
+        #ci_inf = results.quantile(1-confidence_interval)
+        #ci_sup = results.quantile(confidence_interval)
+        #ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
+
+        return mean_error
 
 
     def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300):

@@ -141,6 +141,17 @@ class HoltWinters(base_model):
 
         
     def params2vector(self):
+        
+        """ Parameters to vector
+        
+        Args:
+            None
+            
+        Returns:
+            Vector parameters of length 1 to 3 according to selected ones
+
+        """
+        
         params = list()
         if self.fit_model == 'alpha':
             params.append(self.alpha)
@@ -165,6 +176,16 @@ class HoltWinters(base_model):
         return params
     
     def vector2params(self, vector):
+        """ Vector to parameters
+        
+        Args:
+            vector (list): vector of length 1 to 3 to convert into parameters 
+            of the model
+            
+        Returns:
+            self
+
+        """ 
         if self.fit_model == 'alpha':
             self.alpha = vector[0]
         elif self.fit_model == 'alpha_beta':
@@ -318,7 +339,16 @@ class HoltWinters(base_model):
         return result       
 
     
-    def predict(self, ts):        
+    def predict(self, ts): 
+        """ Fits a time series using self model parameters
+        
+        Args:
+            ts (pandas.Series): Time series to fit
+    
+        Returns:
+            Fitted time series
+            
+        """
         if self.alpha != None and self.beta == False and self.gamma == False:
             result = self._alpha(ts)
         
@@ -343,7 +373,16 @@ class HoltWinters(base_model):
         return prediction 
     
     def fit(self, ts, error_function = None):
+        """ Finds optimal parameters using a given optimization function
         
+        Args:
+            ts (pandas.Series): Time series to fit
+            error_function (function): Function to estimates error
+            
+        Return:
+            self
+        
+        """        
         if self.fit_model == 'no fit':
             pass
         else:
@@ -404,6 +443,19 @@ class HoltWinters(base_model):
 
     
     def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
+        """ Predicts future values in a given period
+        
+        Args:
+            ts (pandas.Series): Time series to predict
+            periods (int): Number of periods ahead to predict
+            confidence_interval (double): Confidence interval level
+            iterations (int): Number of iterations
+            
+        Returns:
+            Dataframe of confidence intervals and time series of predicted 
+            values: (ci_inf, ci_sup, series) 
+        
+        """
         
         for i in range(periods):
             if i == 0:

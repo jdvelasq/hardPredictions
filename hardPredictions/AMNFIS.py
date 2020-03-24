@@ -6,8 +6,21 @@ Adaptive Multidimensional Neuro-Fuzzy Inference System
 Overview
 -------------------------------------------------------------------------------
 
- 
+This module contains an adaptive multidimensional neuro-fuzzy inference system
+(AMNFIS), developed originally for processes control. This model was taken from
+paper "Adaptive Multidimensional Neuro-Fuzzy  Inference System for Time Series 
+Prediction" (J.D. Velásquez) in IEEE LATIN AMERICA TRANSACTIONS, VOL. 13, 
+NO. 8, AUG. 2015.
 
+
+Examples
+-------------------------------------------------------------------------------
+
+>>> ts = pandas.Series.from_csv('../datasets/WWWusage.csv', index_col = 0, header = 0)
+>>> model = AMNFIS(p = 4, c = 4)
+>>> model.fit(ts)
+AMNFIS(p = 4, c = 4)
+>>> 
 
 Classes
 -------------------------------------------------------------------------------
@@ -21,17 +34,23 @@ import scipy
 import pandas
 import random
 import math
+from sklearn import *
 from extras import add_next_date
 
 class AMNFIS(base_model):
     """ AMNFIS model
 
     Args:
-        c (int): number of centers.
-        p (int): order of AR models.
+        p (int): order of AR models
+        c (int): number of centers
+        optim_type (str): character string of 'complete' if all paremeters are 
+        wanted or or 'no_optim' to take given parameters
+        phi0 (None or double): None to find it or double to set it
+        phi (None or array): array of p-length for set parameters without 
+        optimization
 
     Returns:
-        AMNFIS structure with c AR models of order p.
+        AMNFIS structure with c AR models of order p
 
     """
 
@@ -67,9 +86,10 @@ class AMNFIS(base_model):
         """ Parameters to vector
         
         Args:
-            None.
+            None
             
         Returns:
+            Vector parameters of length (c+1)*p to use in optimization
            
 
         """        
@@ -88,6 +108,8 @@ class AMNFIS(base_model):
         """ Vector to parameters
         
         Args:
+            vector (array): Vector parameters of length (c+1)*p to convert into 
+            parameters of the model
             
         Returns:
             self
@@ -152,10 +174,10 @@ class AMNFIS(base_model):
         """ Fits a time series using self model parameters
         
         Args:
-            ts (pandas.Series): Time series to fit.
+            ts (pandas.Series): Time series to fit
         
         Returns:
-            Fitted time series.
+            Fitted time series
             
         """
         y = ts
@@ -175,8 +197,8 @@ class AMNFIS(base_model):
         """ Finds optimal parameters using a given optimization function
         
         Args:
-            ts (pandas.Series): Time series to fit.
-            error_function (function): Function to estimates error.
+            ts (pandas.Series): Time series to fit
+            error_function (function): Function to estimates error
             
         Return:
             self
@@ -213,9 +235,12 @@ class AMNFIS(base_model):
         Args:
             ts (pandas.Series): Time series to predict.
             periods (int): Number of periods ahead to predict.
+            confidence_interval (double): Confidence interval level
+            iterations (int): Number of iterations
             
         Returns:
-            Time series of predicted values.
+            Dataframe of confidence intervals and time series of predicted 
+            values: (ci_inf, ci_sup, series) 
         
         """
         for i in range(periods):

@@ -113,17 +113,12 @@ class AR(base_model):
         else:
             self.p = p
         
-        if intercept == None:
-            self.phi0 = None
-        elif intercept == False:
+        if intercept == False:
             self.phi0 = 0
         else:
             self.phi0 = intercept
             
-        if phi == None:
-            self.phi = None
-        else:
-            self.phi = phi
+        self.phi = phi
             
         if intercept == None and phi == None:
             self.optim_type = 'complete'

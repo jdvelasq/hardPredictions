@@ -155,10 +155,20 @@ class base_model():
         return mean_error
 
 
-    def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300):
+    def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300, ignore_first = None):
         last = ts[-1:]
         fitted_ts = self.predict(ts)
-        fitted_ts = fitted_ts[self.p:]
+        
+        if ignore_first != None:
+            ignore = ignore_first
+        else:
+            try:
+                ignore = self.p
+            except:
+                ignore = 0
+        
+        fitted_ts_plot = fitted_ts[ignore:]
+        
         if periods == False:
             pass
         else:
@@ -169,11 +179,11 @@ class base_model():
         
         if periods == False:
             matplotlib.pyplot.plot(ts, 'k-')
-            matplotlib.pyplot.plot(fitted_ts, 'b-')
+            matplotlib.pyplot.plot(fitted_ts_plot, 'b-')
             matplotlib.pyplot.legend(['Real', 'Fitted'])
         else:
             matplotlib.pyplot.plot(ts, 'k-')
-            matplotlib.pyplot.plot(fitted_ts, 'c-')
+            matplotlib.pyplot.plot(fitted_ts_plot, 'c-')
             matplotlib.pyplot.plot(tseries, 'b-')
             matplotlib.pyplot.plot(ci_inf, 'r--')
             matplotlib.pyplot.plot(ci_sup, 'r--')

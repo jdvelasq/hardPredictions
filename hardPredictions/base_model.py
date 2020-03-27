@@ -33,7 +33,7 @@ class base_model():
             raise ValueError('Method "forecast" has not been defined')    
         
     
-    def calc_error(self, ts, error_function = None, ignore_first = 0):
+    def calc_error(self, ts, error_function = None, ignore_first = None):
         """ Estimates error according to SciKit's regression metrics
         
         Args:
@@ -43,8 +43,16 @@ class base_model():
                 None, error_function is Sci-Kit learn's mean squared error
         
         """
-        y_estimated = self.predict(ts)[ignore_first:]
-        y_real = ts[ignore_first:]
+        if ignore_first != None:
+            ignore = ignore_first
+        else:
+            try:
+                ignore = self.p
+            except:
+                ignore = 0
+                
+        y_estimated = self.predict(ts)[ignore:]
+        y_real = ts[ignore:]
         
         if (error_function == None):
             error = sklearn.metrics.mean_squared_error(y_real, y_estimated)
@@ -156,8 +164,10 @@ class base_model():
 
 
     def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300, ignore_first = None):
-        last = ts[-1:]
+        
         fitted_ts = self.predict(ts)
+        fitted_ts.index = ts.index
+        last = ts[-1:]
         
         if ignore_first != None:
             ignore = ignore_first
@@ -177,13 +187,13 @@ class base_model():
             ci_sup = last.append(forecast_ts['ci_sup'])
             tseries = last.append(forecast_ts['series'])
         
-        if periods == False:
-            matplotlib.pyplot.plot(ts, 'k-')
+        if periods == False:            
             matplotlib.pyplot.plot(fitted_ts_plot, 'b-')
+            matplotlib.pyplot.plot(ts, 'k-')
             matplotlib.pyplot.legend(['Real', 'Fitted'])
         else:
-            matplotlib.pyplot.plot(ts, 'k-')
             matplotlib.pyplot.plot(fitted_ts_plot, 'c-')
+            matplotlib.pyplot.plot(ts, 'k-')            
             matplotlib.pyplot.plot(tseries, 'b-')
             matplotlib.pyplot.plot(ci_inf, 'r--')
             matplotlib.pyplot.plot(ci_sup, 'r--')

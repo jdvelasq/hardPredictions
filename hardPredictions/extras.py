@@ -61,8 +61,10 @@ def add_next_date(ts, value):
         value: Value to add
     
     """
-    
-    next_date = pandas.date_range(ts.index[-1], periods=2, freq=get_pandas_frequency(ts))
+    if type(ts.index) == pandas.core.indexes.numeric.Int64Index:
+        next_date = [ts.index[-1], ts.index[-1] + 1]
+    else:
+        next_date = pandas.date_range(ts.index[-1], periods=2, freq=get_pandas_frequency(ts))
     next_ts = pandas.Series(value, index = next_date)
     next_ts = next_ts.drop(next_ts.index[0])
     ts_forecast = ts.append(next_ts)

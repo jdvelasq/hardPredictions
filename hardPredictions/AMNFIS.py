@@ -20,7 +20,15 @@ Examples
 >>> model = AMNFIS(p = 4, c = 4)
 >>> model.fit(ts)
 AMNFIS(p = 4, c = 4)
->>> 
+>>> prediction = model.forecast(ts, periods = 5)
+>>> prediction # doctest: +ELLIPSIS
+            ci_inf  ci_sup      series
+1971-12-31     NaN     NaN  219.9...
+1972-12-31     NaN     NaN  219.0...
+1973-12-31     NaN     NaN  216.8...
+1974-12-31     NaN     NaN  214.7...
+1975-12-31     NaN     NaN  214.0...
+
 
 Classes
 -------------------------------------------------------------------------------
@@ -71,7 +79,7 @@ class AMNFIS(base_model):
         self.w = list()
         
         if self.phi0 == None:
-            self.phi0 = numpy.random.rand(self.p)
+            self.phi0 = numpy.random.rand(self.c)
         if self.phi == None:
             self.phi = numpy.random.rand(self.c, self.p)
             
@@ -94,9 +102,9 @@ class AMNFIS(base_model):
 
         """        
         params = list()        
-        if self.optim_type == 'complete':
-            params.append(self.phi0)
+        if self.optim_type == 'complete':            
             for i in range(self.c):
+                params.append(self.phi0[i])
                 params.append(self.phi[i])
             result = numpy.hstack(params)
             return result
@@ -117,9 +125,12 @@ class AMNFIS(base_model):
         """ 
         
         if self.optim_type == 'complete':
-            new_vector = numpy.reshape(vector, (self.c+1, self.p))
-            self.phi0 = new_vector[0]
-            self.phi = new_vector[1:]
+            new_vector = numpy.reshape(vector, (self.c, self.p+1))
+            phi0 = list()
+            for i in range(self.c):
+                phi0.append(new_vector[i,0])
+            self.phi0 = phi0
+            self.phi = new_vector[:,1:]
         elif self.optim_type == 'no_optim':
             pass
             
@@ -204,6 +215,9 @@ class AMNFIS(base_model):
             self
         
         """
+        
+        #if not isinstance(ts, pandas.Series):
+        #    ts = 
         
         if self.optim_type == 'no_optim':
             pass

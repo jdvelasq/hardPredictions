@@ -21,7 +21,8 @@ from base_model import base_model
 import numpy
 import scipy
 import pandas
-from hardPredictions.extras import add_next_date
+from sklearn import *
+from extras import add_next_date
 
 class ARIMA(base_model):
     """ Moving-average model
@@ -160,18 +161,18 @@ class ARIMA(base_model):
             y = self.y   
         
         lon = len(y)
-        lon_ts = len(ts)
+        lon_ts = len(ts.values)
         
         if lon_ts <= self.d:
             diff = 0
         else:
-            diff = ts[-1] - ts[-self.d]
+            diff = ts.values[-1] - ts.values[-self.d]
             
         if lon_ts <= self.p:
-            ts_last = ts[0:lon]
+            ts_last = ts.values[0:lon]
             p_sum = numpy.dot(ts_last, self.phi[0:lon])
         else:
-            ts_last = ts[lon-self.p:lon]
+            ts_last = ts.values[lon-self.p:lon]
             p_sum = numpy.dot(ts_last, self.phi)
         if lon <= self.q:
             y_last = y[0:lon]                  

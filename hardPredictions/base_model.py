@@ -187,13 +187,13 @@ class base_model():
             ci_sup = last.append(forecast_ts['ci_sup'])
             tseries = last.append(forecast_ts['series'])
         
-        if periods == False:            
-            matplotlib.pyplot.plot(fitted_ts_plot, 'b-')
+        if periods == False:
             matplotlib.pyplot.plot(ts, 'k-')
+            matplotlib.pyplot.plot(fitted_ts_plot, 'b-')
             matplotlib.pyplot.legend(['Real', 'Fitted'])
         else:
-            matplotlib.pyplot.plot(fitted_ts_plot, 'c-')
-            matplotlib.pyplot.plot(ts, 'k-')            
+            matplotlib.pyplot.plot(ts, 'k-')  
+            matplotlib.pyplot.plot(fitted_ts_plot, 'c-')                      
             matplotlib.pyplot.plot(tseries, 'b-')
             matplotlib.pyplot.plot(ci_inf, 'r--')
             matplotlib.pyplot.plot(ci_sup, 'r--')

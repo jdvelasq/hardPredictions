@@ -15,11 +15,13 @@ import numpy
 import sklearn
 import matplotlib
 from extras import add_next_date
+from sklearn import preprocessing
 
 class base_model():
     
     def __init__(self):
-        self.residuals = None        
+        self.residuals = None   
+        self.scaler = None
         self.test()
         
     def test(self):
@@ -244,3 +246,24 @@ class base_model():
         final_result = pandas.DataFrame([minim, maxim])
 
         return final_result
+    
+    def normalize(self, ts):        
+        
+        if self.scaler == None:
+            scaler = preprocessing.MinMaxScaler()
+            values = ts.values.reshape((len(ts.values), 1))
+            scaler.fit(values)
+            self.scaler = scaler
+        else:
+            values = ts.values.reshape((len(ts.values), 1))
+            scaler = self.scaler
+        normalized = scaler.transform(values)
+        norm_series = pandas.Series((v[0] for v in normalized), index = ts.index)
+        
+        return norm_series
+    
+    def des_normalize(self, ts):
+        values = ts.values.reshape((len(ts.values), 1))
+        des_norm = self.scaler.inverse_transform(values)
+        des_norm_series = pandas.Series((v[0] for v in des_norm), index = ts.index)
+        return des_norm_series

@@ -15,12 +15,13 @@ Classes
 
 """
 
-from hardPredictions.base_model import base_model
+from base_model import base_model
 
 import numpy
 import scipy
 import pandas
-from hardPredictions.extras import add_next_date
+import sklearn
+from extras import add_next_date
 from sklearn import neural_network
 
 class MLP(base_model):
@@ -29,14 +30,17 @@ class MLP(base_model):
     Parameter optimization method: scipy's minimization
 
     Args:
-        p (int): order.
+        p (int): order
+        optim_type (str): 'auto' for alpha and hidden_layer_sizes selection or 
+            'use_parameters' to use set parameters
+        **kwargs : sklearn.neural_network.MLPRegressor parameters
 
     Returns:
-        MLP model structure of order p.
+        MLP model structure of p lags and MLPRegressor model parameters
 
     """
 
-    def __init__(self, p=None, hidden_layer_sizes=(100, ), activation='relu', solver='adam', alpha=0.0001, batch_size='auto', learning_rate='constant', learning_rate_init=0.001, power_t=0.5, max_iter=200, shuffle=True, random_state=None, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True, early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08, n_iter_no_change=10):
+    def __init__(self, p=None, optim_type='auto', hidden_layer_sizes=(100, ), activation='relu', solver='adam', alpha=0.0001, batch_size='auto', learning_rate='constant', learning_rate_init=0.001, power_t=0.5, max_iter=200, shuffle=True, random_state=None, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True, early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08, n_iter_no_change=10):
         if p == None:
             raise ValueError('Please insert parameter p')
         else:
@@ -67,7 +71,7 @@ class MLP(base_model):
         
         self.model = None
         
-        self.optim_type = 'complete'
+        self.optim_type = optim_type
         
         
     def __repr__(self):
@@ -75,7 +79,10 @@ class MLP(base_model):
         
 
     def __get_X__(self, ts):
-        y = ts.values
+        try:
+            y = ts.values
+        except:
+            y = ts
         X = list()
         for i in range(len(ts)):
             if i <= self.p:
@@ -102,42 +109,60 @@ class MLP(base_model):
         """ Fits a time series using self model parameters
         
         Args:
-            ts (pandas.Series): Time series to fit.
+            ts (pandas.Series): Time series to fit
         
         Returns:
             Fitted time series.
             
         """
-
         Xtest = self.__get_X__(ts)
         prediction = self.model.predict(Xtest)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
     
 
-
     def fit(self, ts, error_function = None):
         """ Finds optimal parameters using a given optimization function
         
         Args:
-            ts (pandas.Series): Time series to fit.
-            error_function (function): Function to estimates error.
+            ts (pandas.Series): Time series to fit
+            error_function (function): Function to estimates error
             
         Return:
             self
         
         """
         
-        if self.optim_type == 'complete':
+        if self.optim_type == 'auto':
              X = self.__get_X__(ts)
-             y = ts.values.tolist()
+             y = ts
+             opterror = None
+             optmodel = None
+             for alpha in numpy.arange(0.0000001,0.001,0.00001):
+                 for neu in numpy.arange(1,self.p+10,1):
+                     model = neural_network.MLPRegressor(hidden_layer_sizes=(neu, ), activation=self.activation, solver=self.solver, alpha=alpha, batch_size=self.batch_size, learning_rate=self.learning_rate, learning_rate_init=self.learning_rate_init, power_t=self.power_t, max_iter=5000, shuffle=self.shuffle, random_state=self.random_state, tol=self.tol, verbose=self.verbose, warm_start=self.warm_start, momentum=self.momentum, nesterovs_momentum=self.nesterovs_momentum, early_stopping=self.early_stopping, validation_fraction=self.validation_fraction, beta_1=self.beta_1, beta_2=self.beta_2, epsilon=self.epsilon)
+                     model.fit(X, y)
+                     prediction = model.predict(X)
+                     predicted = pandas.Series((v for v in prediction), index = y.index)
+                     if (error_function == None):
+                         error = sklearn.metrics.mean_squared_error(y[self.p:], predicted[self.p:])
+                     else:
+                         error = error_function(y[self.p:], predicted[self.p:])
+                     if opterror is None or opterror > error:
+                         opterror = error
+                         optmodel = model
+                         print('alpha = ' + str(alpha), 'hidden_layer_sizes = (' + str(neu) + ', )', 'error = ' + str(opterror))                    
+             self.model = optmodel
+        elif self.optim_type == 'use_parameters':
+             X = self.__get_X__(ts)
+             y = ts
              mlp_model = neural_network.MLPRegressor(hidden_layer_sizes=self.hidden_layer_sizes, activation=self.activation, solver=self.solver, alpha=self.alpha, batch_size=self.batch_size, learning_rate=self.learning_rate, learning_rate_init=self.learning_rate_init, power_t=self.power_t, max_iter=self.max_iter, shuffle=self.shuffle, random_state=self.random_state, tol=self.tol, verbose=self.verbose, warm_start=self.warm_start, momentum=self.momentum, nesterovs_momentum=self.nesterovs_momentum, early_stopping=self.early_stopping, validation_fraction=self.validation_fraction, beta_1=self.beta_1, beta_2=self.beta_2, epsilon=self.epsilon)
              mlp_model.fit(X, y)
-             self.model = mlp_model      
+             self.model = mlp_model  
         elif self.optim_type == 'no_optim':
             pass
         else:
-            error_message = "Can't apply Lasso regression using given parameters"
+            error_message = "Can't apply MLPRegressor using given parameters"
             raise ValueError(error_message)
             
         return self
@@ -146,13 +171,16 @@ class MLP(base_model):
         """ Predicts future values in a given period
         
         Args:
-            ts (pandas.Series): Time series to predict.
-            periods (int): Number of periods ahead to predict.
+            ts (pandas.Series): Time series to predict
+            periods (int): Number of periods ahead to predict
+            confidence_interval (double): Confidence interval level (0 to 1)
+            iterations (int): Number of iterations
             
         Returns:
             Time series of predicted values.
         
         """
+        
         for i in range(periods):
             if i == 0:
                 y = ts
@@ -174,6 +202,8 @@ class MLP(base_model):
             
         prediction = y[-periods:]
         prediction.name = 'series'
-        result = ci.append(prediction)
+        pre_result = ci.append(prediction)
+        
+        result = pre_result.transpose()
 
-        return result.transpose()
+        return result

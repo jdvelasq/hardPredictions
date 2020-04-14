@@ -57,19 +57,19 @@ class ARIMA(base_model):
             self.q = q
         
         if intercept == None:
-            self.intercept = None
+            self.intercept = numpy.random.rand(1)[0]
         elif intercept == False:
             self.intercept = 0
         else:
             self.intercept = intercept
         
         if phi == None:
-            self.phi = None
+            self.phi = numpy.random.rand(self.p)
         else:
             self.phi = phi
             
         if theta == None:
-            self.theta = None
+            self.theta = numpy.random.rand(self.q)
         else:
             self.theta = theta
             
@@ -102,12 +102,6 @@ class ARIMA(base_model):
 
         """        
         params = list()
-        if self.intercept == None:
-            self.intercept = numpy.random.rand(1)[0]
-        if self.phi == None:
-            self.phi = numpy.random.rand(self.p)
-        if self.theta == None:
-            self.theta = numpy.random.rand(self.q)
         
         if self.optim_type == 'complete':
             params.append(self.intercept)
@@ -154,34 +148,57 @@ class ARIMA(base_model):
         return self
 
     def __forward__(self, ts):
-        if self.y == None:
-            lon = len(ts.values)
-            y = numpy.random.randn(lon)
-        else:
-            y = self.y   
-        
-        lon = len(y)
+
         lon_ts = len(ts.values)
         
-        if lon_ts <= self.d:
+        if self.d == 0:
             diff = 0
+        elif lon_ts <= self.d:
+            diff = ts.values[-1]
         else:
             diff = ts.values[-1] - ts.values[-self.d]
             
-        if lon_ts <= self.p:
-            ts_last = ts.values[0:lon]
-            p_sum = numpy.dot(ts_last, self.phi[0:lon])
+        if self.p == 0:
+            p_sum = 0
+        elif lon_ts <= self.p:
+            ts_last = ts.values[0:lon_ts]
+            p_sum = self.intercept + numpy.dot(ts_last, self.phi[0:lon_ts])
         else:
-            ts_last = ts.values[lon-self.p:lon]
-            p_sum = numpy.dot(ts_last, self.phi)
-        if lon <= self.q:
-            y_last = y[0:lon]                  
-            q_sum = numpy.dot(y_last, self.theta[0:lon])
+            ts_last = ts.values[lon_ts-self.p:lon_ts]
+            p_sum = self.intercept + numpy.dot(ts_last, self.phi)
+        
+        if self.q == 0:
+            q_sum = 0
         else:
-            y_last = y[lon-self.q:lon]
-            q_sum = numpy.dot(y_last, self.theta)        
-
-        result = -diff + self.intercept + p_sum + q_sum
+            history = list()
+            predictions = list()
+            for t in numpy.arange(0,lon_ts,1):
+                length = len(history)
+            
+                if length <= self.q:
+                    yhat = numpy.mean(ts.values[0:t])
+                else:
+                    ts_last = history[length-self.q:length]
+                    predicted = predictions[length-self.q:length]
+                    mean_predicted = numpy.mean(ts_last)
+                    new_predicted = self.intercept + numpy.dot(numpy.subtract(ts_last, predicted), self.theta)
+                    yhat = mean_predicted + new_predicted
+            
+                predictions.append(yhat)
+                history.append(ts.values[t])
+        
+            if lon_ts == 1:
+                q_sum = ts.values[0]
+            elif lon_ts <= self.q:
+                q_sum = numpy.mean(history[0:lon_ts])
+            else:
+                ts_last = history[lon_ts-self.q:lon_ts]
+                predicted = predictions[lon_ts-self.q:lon_ts]
+                mean_predicted = numpy.mean(ts_last)
+                new_predicted = self.intercept + numpy.dot(numpy.subtract(ts_last, predicted), self.theta)
+                q_sum = mean_predicted + new_predicted    
+            
+        result = -diff + p_sum + q_sum
 
         return result
 
@@ -199,7 +216,7 @@ class ARIMA(base_model):
         prediction = list()
         for i in range(len(ts)):
             if i == 0:
-                result = self.intercept
+                result = ts[0]
             else:
                 result = self.__forward__(ts[0:i])
             prediction.append(result)

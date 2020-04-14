@@ -46,16 +46,13 @@ MA(q = 3, intercept = 0.7576070305877793, theta = [0.47415837 0.96800789 0.50682
 
 """
 
-
+from base_model import base_model
 
 import numpy
 import scipy
 import pandas
+from extras import add_next_date
 from sklearn import linear_model
-
-from hardPredictions.base_model import base_model
-from hardPredictions.extras import add_next_date
-
 
 class MA(base_model):
     """ Moving-average model
@@ -71,18 +68,18 @@ class MA(base_model):
     """
 
     def __init__(self, q=None, intercept=None, theta=None):
-        self.y = None
+
         self.q = q
         
         if intercept == None:
-            self.theta0 = None
+            self.theta0 = numpy.random.rand(1)[0]
         elif intercept == False:
             self.theta0 = 0
         else:
             self.theta0 = intercept
             
         if theta == None:
-            self.theta = None
+            self.theta = numpy.random.rand(self.q)
         else:
             self.theta = theta
             
@@ -113,10 +110,6 @@ class MA(base_model):
 
         """        
         params = list()
-        if self.theta0 == None:
-            self.theta0 = numpy.random.rand(1)[0]
-        if self.theta == None:
-            self.theta = numpy.random.rand(self.q)
         
         if self.optim_type == 'complete':
             params.append(self.theta0)
@@ -181,22 +174,36 @@ class MA(base_model):
         return X
     
     def __forward__(self, ts):
-        if self.y == None:
-            lon = len(ts.values)
-            y = numpy.random.randn(lon)
+
+        lon = len(ts)
+        history = list()
+        predictions = list()
+        
+        for t in numpy.arange(0,lon,1):
+            length = len(history)
+            
+            if length <= self.q:
+                yhat = numpy.mean(ts.values[0:t])
+            else:
+                ts_last = history[length-self.q:length]
+                predicted = predictions[length-self.q:length]
+                mean_predicted = numpy.mean(ts_last)
+                new_predicted = self.theta0 + numpy.dot(numpy.subtract(ts_last, predicted), self.theta)
+                yhat = mean_predicted + new_predicted
+            
+            predictions.append(yhat)
+            history.append(ts.values[t])
+        
+        if lon == 1:
+            result = ts[0]
+        elif lon <= self.q:
+            result = numpy.mean(history[0:lon])
         else:
-            y = self.y
-        lon = len(y)
-        if lon <= self.q:
-             y_last = y[0:lon]
-             ts_last = ts[0:lon+1]
-             mean_ts = ts_last.mean()                    
-             result = self.theta0 + mean_ts + numpy.dot(y_last, self.theta[0:lon])
-        else:
-            y_last = y[lon-self.q:lon]
-            ts_last = ts[lon-self.q+1:lon+1]
-            mean_ts = ts_last.mean() 
-            result = self.theta0 + mean_ts + numpy.dot(y_last, self.theta)
+            ts_last = history[lon-self.q:lon]
+            predicted = predictions[lon-self.q:lon]
+            mean_predicted = numpy.mean(ts_last)
+            new_predicted = self.theta0 + numpy.dot(numpy.subtract(ts_last, predicted), self.theta)
+            result = mean_predicted + new_predicted
 
         return result
 
@@ -210,28 +217,9 @@ class MA(base_model):
             Fitted time series.
             
         """
-        if self.y == None:
-            lon = len(ts.values)
-            y = numpy.random.randn(lon)
-        else:
-            y = self.y
-        #y = ts
         prediction = list()
-        for i in range(len(y)):
-            if i == 0:
-                result = self.theta0
-            else:
-                lon = len(prediction)
-                if lon <= self.q:
-                    y_last = y[0:lon]
-                    ts_last = ts[0:lon+1]
-                    mean_ts = ts_last.mean()                    
-                    result = self.theta0 + mean_ts + numpy.dot(y_last, self.theta[0:lon])
-                else:
-                    y_last = y[lon-self.q:lon]
-                    ts_last = ts[lon-self.q+1:lon+1]
-                    mean_ts = ts_last.mean() 
-                    result = self.theta0 + mean_ts + numpy.dot(y_last, self.theta)
+        for i in range(len(ts)):
+            result = self.__forward__(ts[0:i])
             prediction.append(result)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction

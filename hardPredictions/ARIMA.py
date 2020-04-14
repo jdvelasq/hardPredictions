@@ -154,7 +154,7 @@ class ARIMA(base_model):
         if self.d == 0:
             diff = 0
         elif lon_ts <= self.d:
-            diff = ts.values[-1]
+            diff = 0
         else:
             diff = ts.values[-1] - ts.values[-self.d]
             
@@ -216,7 +216,10 @@ class ARIMA(base_model):
         prediction = list()
         for i in range(len(ts)):
             if i == 0:
-                result = ts[0]
+                try:
+                    result = ts[0]
+                except:
+                    result = 0
             else:
                 result = self.__forward__(ts[0:i])
             prediction.append(result)

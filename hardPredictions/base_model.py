@@ -49,9 +49,12 @@ class base_model():
             ignore = ignore_first
         else:
             try:
-                ignore = self.p
+                ignore = self.q
             except:
-                ignore = 0
+                try:
+                    ignore = self.p
+                except:
+                    ignore = 0
                 
         y_estimated = self.predict(ts)[ignore:]
         y_real = ts[ignore:]
@@ -175,9 +178,12 @@ class base_model():
             ignore = ignore_first
         else:
             try:
-                ignore = self.p
+                ignore = self.q
             except:
-                ignore = 0
+                try:
+                    ignore = self.p
+                except:
+                    ignore = 0
         
         fitted_ts_plot = fitted_ts[ignore:]
         

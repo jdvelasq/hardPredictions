@@ -163,27 +163,50 @@ class ARMA(base_model):
         return self
 
     def __forward__(self, ts):
-        if self.y == None:
-            lon = len(ts.values)
-            y = numpy.random.randn(lon)
+        
+        lon_ts = len(ts.values)
+            
+        if self.p == 0:
+            p_sum = 0
+        elif lon_ts <= self.p:
+            ts_last = ts.values[0:lon_ts]
+            p_sum = self.intercept + numpy.dot(ts_last, self.phi[0:lon_ts])
         else:
-            y = self.y
-        lon = len(y)
-        lon_ts = len(ts)
-        if lon_ts <= self.p:
-            ts_last = ts.values[0:lon]
-            p_sum = numpy.dot(ts_last, self.phi[0:lon])
+            ts_last = ts.values[lon_ts-self.p:lon_ts]
+            p_sum = self.intercept + numpy.dot(ts_last, self.phi)
+        
+        if self.q == 0:
+            q_sum = 0
         else:
-            ts_last = ts.values[lon-self.p:lon]
-            p_sum = numpy.dot(ts_last, self.phi)
-        if lon <= self.q:
-            y_last = y[0:lon]                  
-            q_sum = numpy.dot(y_last, self.theta[0:lon])
-        else:
-            y_last = y[lon-self.q:lon]
-            q_sum = numpy.dot(y_last, self.theta)        
-
-        result = self.intercept + p_sum + q_sum
+            history = list()
+            predictions = list()
+            for t in numpy.arange(0,lon_ts,1):
+                length = len(history)
+            
+                if length <= self.q:
+                    yhat = numpy.mean(ts.values[0:t])
+                else:
+                    ts_last = history[length-self.q:length]
+                    predicted = predictions[length-self.q:length]
+                    mean_predicted = numpy.mean(ts_last)
+                    new_predicted = self.intercept + numpy.dot(numpy.subtract(ts_last, predicted), self.theta)
+                    yhat = mean_predicted + new_predicted
+            
+                predictions.append(yhat)
+                history.append(ts.values[t])
+        
+            if lon_ts == 1:
+                q_sum = ts.values[0]
+            elif lon_ts <= self.q:
+                q_sum = numpy.mean(history[0:lon_ts])
+            else:
+                ts_last = history[lon_ts-self.q:lon_ts]
+                predicted = predictions[lon_ts-self.q:lon_ts]
+                mean_predicted = numpy.mean(ts_last)
+                new_predicted = self.intercept + numpy.dot(numpy.subtract(ts_last, predicted), self.theta)
+                q_sum = mean_predicted + new_predicted    
+            
+        result = p_sum + q_sum
 
         return result
 

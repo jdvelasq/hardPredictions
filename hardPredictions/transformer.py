@@ -16,7 +16,7 @@ Examples
 Transform
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trans = 'log')
 >>> mytransform
 transformer(trans = log, trend = None, seasonal = None)
@@ -37,7 +37,7 @@ Month
 1964-12-01    8.897272
 Name: Perrin, dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(trans = 'log10').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -55,7 +55,7 @@ Month
 1964-12-01    3.864036
 Name: Perrin, dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(trans = 'sqrt').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -73,7 +73,7 @@ Month
 1964-12-01    85.510233
 Name: Perrin, dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(trans = 'cbrt').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -91,7 +91,7 @@ Month
 1964-12-01    19.409398
 Name: Perrin, dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(trans = 'boxcox').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -113,7 +113,7 @@ Name: Perrin, dtype: float64
 Removing trend
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(trend = 'linear').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -131,7 +131,7 @@ Month
 1964-12-01    2176.794872
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(trend = 'cuadratic').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -149,7 +149,7 @@ Month
 1964-12-01    604.917582
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(trend = 'cubic').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -167,7 +167,7 @@ Month
 1964-12-01   -169.813187
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(trend = 'diff1').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -185,7 +185,7 @@ Month
 1964-12-01    1548
 dtype: int64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(trend = 'diff2').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -207,7 +207,7 @@ dtype: int64
 Removing seasonality
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(seasonal = 'poly2').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -225,7 +225,7 @@ Month
 1964-12-01    604.917582
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> transformed_ts = transformer(seasonal = 'diff').fit_transform(ts = ts)
 >>> transformed_ts
 Month
@@ -246,10 +246,10 @@ dtype: int64
 Restore seasonality
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(seasonal = 'poly2')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.0
@@ -266,10 +266,10 @@ Month
 1964-12-01    7312.0
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(seasonal = 'diff')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815
@@ -286,12 +286,12 @@ Month
 1964-12-01    7312
 dtype: int64
 
-Restore trending
+inverse_transform trending
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trend = 'linear')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.0
@@ -308,10 +308,10 @@ Month
 1964-12-01    7312.0
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trend = 'cuadratic')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.0
@@ -328,10 +328,10 @@ Month
 1964-12-01    7312.0
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trend = 'cuadratic')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.0
@@ -348,10 +348,10 @@ Month
 1964-12-01    7312.0
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trend = 'cubic')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.0
@@ -368,10 +368,10 @@ Month
 1964-12-01    7312.0
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trend = 'diff1')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815
@@ -389,10 +389,10 @@ Month
 dtype: int64
 
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trend = 'diff2')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815
@@ -409,13 +409,13 @@ Month
 1964-12-01    7312
 dtype: int64
 
-Restore transformation
+inverse_transform transformation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trans = 'log')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.0
@@ -432,10 +432,10 @@ Month
 1964-12-01    7312.0
 Name: Perrin, dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trans = 'log10')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.0
@@ -452,10 +452,10 @@ Month
 1964-12-01    7312.0
 Name: Perrin, dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trans = 'sqrt')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.0
@@ -472,10 +472,10 @@ Month
 1964-12-01    7312.0
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trans = 'cbrt')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.0
@@ -492,10 +492,10 @@ Month
 1964-12-01    7312.0
 dtype: float64
 
->>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
 >>> mytransform = transformer(trans = 'boxcox')
 >>> transformed = mytransform.fit_transform(ts)
->>> original = mytransform.restore(transformed)
+>>> original = mytransform.inverse_transform(transformed)
 >>> original
 Month
 1964-01-01    2815.000000
@@ -542,11 +542,11 @@ class transformer():
         """ Frequency integer of the transformed time series """
         self.intfrq = None
 
-        """ Time series after transformation and restore """
+        """ Time series after transformation and inverse_transform """
         self.residuals = None
         self.original = None
 
-        """ Transformation values to restore series """
+        """ Transformation values to inverse_transform series """
         self.fitting = None
         self.diff = None
         self.model = None
@@ -696,14 +696,14 @@ class transformer():
         return self.residuals
 
 
-    def restore(self, ts):
-        """ Restore series to its original values
+    def inverse_transform(self, ts):
+        """ inverse_transform series to its original values
 
         Args:
-            ts: Time series to restore
+            ts: Time series to inverse_transform
         """
 
-        # Restore seasonality
+        # inverse_transform seasonality
         if (self.seasonal == 'poly2'):
             X = ts.index.factorize()[0].reshape(-1,1)
             X = X%self.intfrq
@@ -725,7 +725,7 @@ class transformer():
         else:
             ts_deseasonal = ts
 
-        # Restore trending 
+        # inverse_transform trending 
         if (self.trend == 'linear'):
             X = ts.index.factorize()[0].reshape(-1,1)
             trending = self.fitting.predict(X)
@@ -755,7 +755,7 @@ class transformer():
         else:
             ts_detrend = ts_deseasonal
 
-        # Restore transformation
+        # inverse_transform transformation
         if (self.trans == 'log'):
             ts_detrans = numpy.exp(ts_detrend)
         elif (self.trans == 'log10'):

@@ -24,7 +24,7 @@ def bic(n, k, error):
 def get_frequency(ts):
     """ Find a series' frequency integer
         
-    >>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+    >>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
     >>> int_frq = get_frequency(ts)
     >>> int_frq
     12
@@ -40,7 +40,7 @@ def get_frequency(ts):
 def get_pandas_frequency(ts):
     """ Find a series' frequency integer
         
-    >>> ts = pandas.Series.from_csv('../datasets/champagne_short.csv', index_col = 0, header = 0)
+    >>> ts = pandas.Series.from_csv('datasets/champagne_short.csv', index_col = 0, header = 0)
     >>> int_frq = get_frequency(ts)
     >>> int_frq
     12

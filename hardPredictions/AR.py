@@ -17,7 +17,7 @@ AR model using SciPy's minimization:
 
 Get predicted values as a DataFrame:
     
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR(p = 3)
 >>> model
 AR(p = 3, intercept = None, phi = None)
@@ -42,7 +42,7 @@ If confidence intervals are calculated with 95% level and 300 iterations:
 
 AR model using SciKit's Ridge linear model:
     
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Ridge(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -54,7 +54,7 @@ AR model using SciKit's Ridge linear model:
 
 AR model using SciKit's Lasso linear model:
     
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Lasso(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)
@@ -66,7 +66,7 @@ AR model using SciKit's Lasso linear model:
 
 AR model using SciKit's Elastic Net linear model:
     
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_ElasticNet(p = 3)
 >>> model = model.fit(ts)
 >>> fitted_model = model.predict(ts)

@@ -9,12 +9,12 @@ from paver.tasks import task, needs
 def nosetests():
     """unit testing"""
     sh('nosetests --cover-package=skfor --cover-tests '
-       ' --with-doctest --rednose  ./skfor/')
+       ' --with-doctest --rednose  ./skfore/')
 
 @task
 def pylint():
     """pyltin"""
-    sh('pylint ./skfor/')
+    sh('pylint ./skfore/')
 
 @task
 def pypi():
@@ -25,7 +25,7 @@ def pypi():
 @task
 def local():
     """local install"""
-    sh("pip uninstall skfor")
+    sh("pip uninstall skfore")
     sh("python setup.py install develop")
 
 

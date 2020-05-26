@@ -12,7 +12,7 @@ Examples
 -------------------------------------------------------------------------------
 
 
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
 
 """
 

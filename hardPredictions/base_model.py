@@ -67,15 +67,27 @@ class base_model():
         return error
 
     
-    def filter_ts(self, ts, ignore_first = 0):
+    def filter_ts(self, ts, ignore_first = None):
         """ Returns model's residuals
         
         Args:
             ts: Time series to estimate residuals
             
         """
-        prediction = self.predict(ts)[ignore_first:]
-        residuals = ts[ignore_first:].subtract(prediction)
+           
+        if ignore_first != None:
+            ignore = ignore_first
+        else:
+            try:
+                ignore = self.q
+            except:
+                try:
+                    ignore = self.p
+                except:
+                    ignore = 0
+                    
+        prediction = self.predict(ts)[ignore:]
+        residuals = ts[ignore:].subtract(prediction)
         return residuals            
    
     
@@ -105,6 +117,57 @@ class base_model():
     def normality(self):
         self.residuals.normality()
         
+    def normal_error(self, n, ts, ignore_first = None):
+        residuals = self.filter_ts(ts, ignore_first)
+        var = numpy.var(residuals)
+        generate_values = numpy.random.normal(0, var, n)
+        
+        return generate_values
+        
+        
+    def forecast(self, ts, periods, confidence_interval = None, iterations = 300, error_sample = 'bootstrap'):
+        """ Predicts future values in a given period
+        
+        Args:
+            ts (pandas.Series): Time series to predict
+            periods (int): Number of periods ahead to predict
+            confidence_interval (double): Confidence interval level
+            iterations (int): Number of iterations
+            error_sample (str): Use 'bootstrap' to forecast using sample errors 
+                of filtered time series or 'normal' to forecast using errors 
+                from a gaussian distribution with known variance
+            
+        Returns:
+            Dataframe of confidence intervals and time series of predicted 
+            values: (ci_inf, ci_sup, series) 
+        
+        """
+        for i in range(periods):
+            if i == 0:
+                y = ts
+
+            value = self.__forward__(y)
+            y = add_next_date(y, value)
+        
+        if confidence_interval == None:
+            for i in range(periods):
+                if i == 0:
+                    ci_zero = ts
+                ci_zero = add_next_date(ci_zero, None)
+            
+            ci_inf = ci_zero[-periods:]
+            ci_sup = ci_zero[-periods:]
+            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
+        else:
+            ci = self.simulate(ts, periods, confidence_interval, iterations)
+            
+        prediction = y[-periods:]
+        prediction.name = 'series'
+        result = ci.append(prediction)
+
+        return result.transpose()
+    
+        
     def simulate(self, ts, periods = 5, confidence_interval = 0.95, iterations = 500):
         values = self.filter_ts(ts, self.p).values
         results = list()
@@ -128,45 +191,10 @@ class base_model():
         results = pandas.DataFrame(results)
         ci_inf = results.quantile(1-confidence_interval)
         ci_sup = results.quantile(confidence_interval)
-        ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
+        mean = results.mean()
+        ci = pandas.DataFrame([ci_inf, ci_sup, mean], index = ['ci_inf', 'ci_sup', 'forecast'])
 
         return ci
-    
-    def simulate_bootstrap(self, ts, ts_test, confidence_interval = 0.95, iterations = 300):
-        periods = len(ts_test)
-        values = self.filter_ts(ts, self.p).values
-        #results = list()
-        errors = list()
-        for i in range(iterations):
-
-            for j in range(periods):
-                train = sklearn.utils.resample(values, n_samples = 1)
-
-                if j == 0:
-                    y = ts
-                else:
-                    y = add_next_date(y, next_value_bootstrap)
-
-                next_value = self.forecast(y, 1).series
-                next_value_bootstrap = next_value + train[0]
-                result_complete = add_next_date(y, next_value_bootstrap)
-                result = result_complete[-periods:]
-            
-            error = sklearn.metrics.mean_squared_error(ts_test, result)
-
-            #results.append(result)
-            errors.append(error)
-            
-        mean_error = numpy.mean(errors)      
-        
-
-        #results = pandas.DataFrame(results)
-        #ci_inf = results.quantile(1-confidence_interval)
-        #ci_sup = results.quantile(confidence_interval)
-        #ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
-
-        return mean_error
-
 
     def plot(self, ts, periods = 5, confidence_interval = None, iterations = 300, ignore_first = None):
         

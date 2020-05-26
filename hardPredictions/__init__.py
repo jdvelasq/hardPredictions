@@ -4,4 +4,5 @@ from hardPredictions.extras import *
 from hardPredictions.base_model import *
 from hardPredictions.AR import *
 from hardPredictions.HoltWinters import *
-from hardPredictions.MA import *
+
+from hardPredictions.datasets import *

@@ -16,7 +16,7 @@ NO. 8, AUG. 2015.
 Examples
 -------------------------------------------------------------------------------
 
->>> ts = pandas.Series.from_csv('../datasets/WWWusage.csv', index_col = 0, header = 0)
+>>> ts = pandas.Series.from_csv('datasets/WWWusage.csv', index_col = 0, header = 0)
 >>> model = AMNFIS(p = 4, c = 4)
 >>> model.fit(ts)
 AMNFIS(p = 4, c = 4)

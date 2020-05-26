@@ -270,46 +270,6 @@ class AR(base_model):
             self.vector2params(vector = optim_params.x)
 
         return self
-    
-
-    def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
-        """ Predicts future values in a given period
-        
-        Args:
-            ts (pandas.Series): Time series to predict
-            periods (int): Number of periods ahead to predict
-            confidence_interval (double): Confidence interval level
-            iterations (int): Number of iterations
-            
-        Returns:
-            Dataframe of confidence intervals and time series of predicted 
-            values: (ci_inf, ci_sup, series) 
-        
-        """
-        for i in range(periods):
-            if i == 0:
-                y = ts
-
-            value = self.__forward__(y)
-            y = add_next_date(y, value)
-        
-        if confidence_interval == None:
-            for i in range(periods):
-                if i == 0:
-                    ci_zero = ts
-                ci_zero = add_next_date(ci_zero, None)
-            
-            ci_inf = ci_zero[-periods:]
-            ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
-            
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        result = ci.append(prediction)
-
-        return result.transpose()
 
 
 class AR_Ridge(AR):

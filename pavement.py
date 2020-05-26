@@ -8,13 +8,13 @@ from paver.tasks import task, needs
 @task
 def nosetests():
     """unit testing"""
-    sh('nosetests --cover-package=hardPredictions --cover-tests '
-       ' --with-doctest --rednose  ./hardPredictions/')
+    sh('nosetests --cover-package=skfor --cover-tests '
+       ' --with-doctest --rednose  ./skfor/')
 
 @task
 def pylint():
     """pyltin"""
-    sh('pylint ./hardPredictions/')
+    sh('pylint ./skfor/')
 
 @task
 def pypi():
@@ -25,14 +25,14 @@ def pypi():
 @task
 def local():
     """local install"""
-    sh("pip uninstall hardPredictions")
+    sh("pip uninstall skfor")
     sh("python setup.py install develop")
 
 
 @task
 def sphinx():
     """Document creation using Shinx"""
-    sh('cd guide; make html; cd ..; cp -R guide/_build/html/* docs/')
+    sh('cd guide; make sphinx; cd ..; mv  sphinx/_build/html/* docs/')
 
 @needs('nosetests', 'pylint', 'sphinx')
 @task

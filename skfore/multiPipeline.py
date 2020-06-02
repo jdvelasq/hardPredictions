@@ -1,6 +1,6 @@
 """
 
-hardPredictions Pipeline for multiple time series
+skfore Pipeline for multiple time series
 
 
 """

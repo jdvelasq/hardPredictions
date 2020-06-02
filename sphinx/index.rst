@@ -1,32 +1,32 @@
-.. hardPredictions: A library in Python for time series forecasting documentation master file, created by
+.. skfore: A library in Python for time series forecasting documentation master file, created by
    sphinx-quickstart on Sun Jun 24 20:37:30 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to hardPredictions: A library in Python for time series forecasting's documentation!
+Welcome to skfore: A library in Python for time series forecasting's documentation!
 ============================================================================================
 
 **Date**: Jun 30, 2018  **Version**: 0.0.1
 
-**Binary Installers:** https://pypi.org/project/hardPredictions
+**Binary Installers:** https://pypi.org/project/skfore
 
-**Source Repository**: https://github.com/jdvelasq/hardPredictions
+**Source Repository**: https://github.com/jdvelasq/skfore
 
-**Documentation**: http://hardPredictions.readthedocs.io/en/latest/
+**Documentation**: http://skfore.readthedocs.io/en/latest/
 
-**hardPredictions** is an open source (distributed under the MIT license) and friendly-user
+**skfore** is an open source (distributed under the MIT license) and friendly-user
 package to forecast. The package was developed and tested in Python
 version 3.6. It can be installed from the command line using:
 
-``$ pip install hardPredictions``
+``$ pip install skfore``
 
-**hardPredictions** can be used interactively at the Python’s command prompt, but a better
+**skfore** can be used interactively at the Python’s command prompt, but a better
 experience is achieved when IPython or Jupyter’s notebook are used, allows the
 user to fully document the analysis and draw conclusions. Due to the design of
-the package, it is easy to use hardPredictions with the tools available in the ecosystem
+the package, it is easy to use skfore with the tools available in the ecosystem
 of open source tools for data science.
 
-**hardPredictions** is well suited for predicting time series and it can be used to:
+**skfore** is well suited for predicting time series and it can be used to:
 
 * Time series forecast
 
@@ -35,12 +35,12 @@ of open source tools for data science.
 Table of Contents
 ===============================================================================
 
-**hardPredictions** is organized in the following modules:
+**skfore** is organized in the following modules:
 
 .. toctree::
    :maxdepth: 4
 
-   hardPredictions
+   skfore
    base_model
    extras
    transformer

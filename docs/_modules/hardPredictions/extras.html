@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>hardPredictions.extras &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <title>skfore.extras &#8212; skfore: A library in Python for time series forecasting 0.0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -36,10 +36,10 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for hardPredictions.extras</h1><div class="highlight"><pre>
+  <h1>Source code for skfore.extras</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">ExtraFunctions</span>
-<span class="sd">hardPredictions</span>
+<span class="sd">skfore</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -47,20 +47,20 @@
 <span class="kn">import</span> <span class="nn">math</span>
 
 
-<div class="viewcode-block" id="aic"><a class="viewcode-back" href="../../extras.html#hardPredictions.extras.aic">[docs]</a><span class="k">def</span> <span class="nf">aic</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+<div class="viewcode-block" id="aic"><a class="viewcode-back" href="../../extras.html#skfore.extras.aic">[docs]</a><span class="k">def</span> <span class="nf">aic</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Akaike Information Criteria &quot;&quot;&quot;</span>
         
     <span class="n">AIC</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>        
     <span class="k">return</span> <span class="n">AIC</span></div>
 
-<div class="viewcode-block" id="bic"><a class="viewcode-back" href="../../extras.html#hardPredictions.extras.bic">[docs]</a><span class="k">def</span> <span class="nf">bic</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+<div class="viewcode-block" id="bic"><a class="viewcode-back" href="../../extras.html#skfore.extras.bic">[docs]</a><span class="k">def</span> <span class="nf">bic</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Bayesian Information Criteria &quot;&quot;&quot;</span>
         
     <span class="n">BIC</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">error</span><span class="o">/</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="n">k</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>       
     <span class="k">return</span> <span class="n">BIC</span>        </div>
 
 
-<div class="viewcode-block" id="get_frequency"><a class="viewcode-back" href="../../extras.html#hardPredictions.extras.get_frequency">[docs]</a><span class="k">def</span> <span class="nf">get_frequency</span><span class="p">(</span><span class="n">ts</span><span class="p">):</span>
+<div class="viewcode-block" id="get_frequency"><a class="viewcode-back" href="../../extras.html#skfore.extras.get_frequency">[docs]</a><span class="k">def</span> <span class="nf">get_frequency</span><span class="p">(</span><span class="n">ts</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Find a series&#39; frequency integer</span>
 <span class="sd">        </span>
 <span class="sd">    &gt;&gt;&gt; ts = pandas.Series.from_csv(&#39;../datasets/champagne_short.csv&#39;, index_col = 0, header = 0)</span>
@@ -77,7 +77,7 @@
     <span class="k">return</span> <span class="n">int_frq</span></div>
 
 
-<div class="viewcode-block" id="add_next_date"><a class="viewcode-back" href="../../extras.html#hardPredictions.extras.add_next_date">[docs]</a><span class="k">def</span> <span class="nf">add_next_date</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="add_next_date"><a class="viewcode-back" href="../../extras.html#skfore.extras.add_next_date">[docs]</a><span class="k">def</span> <span class="nf">add_next_date</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Assigns a value to the next date in a series</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
@@ -127,7 +127,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

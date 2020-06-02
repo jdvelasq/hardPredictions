@@ -55,7 +55,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'hardPredictions: A library in Python for time series forecasting'
+project = 'skfore: A library in Python for time series forecasting'
 copyright = '2018, Juan David Velasquez & Maria Alejandra Arango'
 author = 'Juan David Velasquez & Maria Alejandra Arango'
 
@@ -115,7 +115,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'hardPredictionsAlibraryinPythonfortimeseriesforecastingdoc'
+htmlhelp_basename = 'skforeAlibraryinPythonfortimeseriesforecastingdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -142,7 +142,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'hardPredictionsAlibraryinPythonfortimeseriesforecasting.tex', 'hardPredictions: A library in Python for time series forecasting Documentation',
+    (master_doc, 'skforeAlibraryinPythonfortimeseriesforecasting.tex', 'skfore: A library in Python for time series forecasting Documentation',
      'Juan David Velasquez \\& Maria Alejandra Arango', 'manual'),
 ]
 
@@ -152,7 +152,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'hardpredictionsalibraryinpythonfortimeseriesforecasting', 'hardPredictions: A library in Python for time series forecasting Documentation',
+    (master_doc, 'skforealibraryinpythonfortimeseriesforecasting', 'skfore: A library in Python for time series forecasting Documentation',
      [author], 1)
 ]
 
@@ -163,8 +163,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'hardPredictionsAlibraryinPythonfortimeseriesforecasting', 'hardPredictions: A library in Python for time series forecasting Documentation',
-     author, 'hardPredictionsAlibraryinPythonfortimeseriesforecasting', 'One line description of project.',
+    (master_doc, 'skforeAlibraryinPythonfortimeseriesforecasting', 'skfore: A library in Python for time series forecasting Documentation',
+     author, 'skforeAlibraryinPythonfortimeseriesforecasting', 'One line description of project.',
      'Miscellaneous'),
 ]
 

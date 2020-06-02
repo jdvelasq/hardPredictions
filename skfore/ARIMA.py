@@ -6,7 +6,7 @@ ARIMA Model
 Overview
 -------------------------------------------------------------------------------
 
-This module contains ARIMA model based on hardPredictions ARMA models.
+This module contains ARIMA model based on skfore ARMA models.
 
 Examples
 -------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>hardPredictions.MA &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <title>skfore.MA &#8212; skfore: A library in Python for time series forecasting 0.0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -36,7 +36,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for hardPredictions.MA</h1><div class="highlight"><pre>
+  <h1>Source code for skfore.MA</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">MA Model</span>
@@ -92,11 +92,11 @@
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
 
-<span class="kn">from</span> <span class="nn">hardPredictions.base_model</span> <span class="kn">import</span> <span class="n">base_model</span>
-<span class="kn">from</span> <span class="nn">hardPredictions.extras</span> <span class="kn">import</span> <span class="n">add_next_date</span>
+<span class="kn">from</span> <span class="nn">skfore.base_model</span> <span class="kn">import</span> <span class="n">base_model</span>
+<span class="kn">from</span> <span class="nn">skfore.extras</span> <span class="kn">import</span> <span class="n">add_next_date</span>
 
 
-<div class="viewcode-block" id="MA"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA">[docs]</a><span class="k">class</span> <span class="nc">MA</span><span class="p">(</span><span class="n">base_model</span><span class="p">):</span>
+<div class="viewcode-block" id="MA"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA">[docs]</a><span class="k">class</span> <span class="nc">MA</span><span class="p">(</span><span class="n">base_model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Moving-average model</span>
 <span class="sd">    </span>
 <span class="sd">    Parameter optimization method: scipy&#39;s minimization</span>
@@ -141,7 +141,7 @@
         <span class="k">return</span> <span class="s1">&#39;MA(q = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, intercept = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, theta = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
         
 
-<div class="viewcode-block" id="MA.params2vector"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.params2vector">[docs]</a>    <span class="k">def</span> <span class="nf">params2vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MA.params2vector"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA.params2vector">[docs]</a>    <span class="k">def</span> <span class="nf">params2vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Parameters to vector</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
@@ -173,7 +173,7 @@
             <span class="k">pass</span></div>
         
 
-<div class="viewcode-block" id="MA.vector2params"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.vector2params">[docs]</a>    <span class="k">def</span> <span class="nf">vector2params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="p">):</span>
+<div class="viewcode-block" id="MA.vector2params"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA.vector2params">[docs]</a>    <span class="k">def</span> <span class="nf">vector2params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Vector to parameters</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
@@ -239,7 +239,7 @@
 
         <span class="k">return</span> <span class="n">result</span>
 
-<div class="viewcode-block" id="MA.predict"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+<div class="viewcode-block" id="MA.predict"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fits a time series using self model parameters</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
@@ -276,7 +276,7 @@
         <span class="k">return</span> <span class="n">prediction</span></div>
 
 
-<div class="viewcode-block" id="MA.fit"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">error_function</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MA.fit"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">error_function</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Finds optimal parameters using a given optimization function</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
@@ -301,7 +301,7 @@
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="MA.forecast"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA.forecast">[docs]</a>    <span class="k">def</span> <span class="nf">forecast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">confidence_interval</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">300</span><span class="p">):</span>
+<div class="viewcode-block" id="MA.forecast"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA.forecast">[docs]</a>    <span class="k">def</span> <span class="nf">forecast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">confidence_interval</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">=</span> <span class="mi">300</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Predicts future values in a given period</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
@@ -338,7 +338,7 @@
         <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span></div></div>
     
 
-<div class="viewcode-block" id="MA_Ridge"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_Ridge">[docs]</a><span class="k">class</span> <span class="nc">MA_Ridge</span><span class="p">(</span><span class="n">MA</span><span class="p">):</span>
+<div class="viewcode-block" id="MA_Ridge"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA_Ridge">[docs]</a><span class="k">class</span> <span class="nc">MA_Ridge</span><span class="p">(</span><span class="n">MA</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Parameter optimization method: SciKit&#39;s Ridge linear model &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">copy_X</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -381,7 +381,7 @@
         <span class="k">return</span> <span class="s1">&#39;MA_Ridge(q = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, intercept = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, theta = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
         
 
-<div class="viewcode-block" id="MA_Ridge.fit"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_Ridge.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+<div class="viewcode-block" id="MA_Ridge.fit"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA_Ridge.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
              <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
@@ -420,7 +420,7 @@
         
         <span class="k">return</span> <span class="bp">self</span>   </div></div>
 
-<div class="viewcode-block" id="MA_Lasso"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_Lasso">[docs]</a><span class="k">class</span> <span class="nc">MA_Lasso</span><span class="p">(</span><span class="n">MA</span><span class="p">):</span>
+<div class="viewcode-block" id="MA_Lasso"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA_Lasso">[docs]</a><span class="k">class</span> <span class="nc">MA_Lasso</span><span class="p">(</span><span class="n">MA</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Parameter optimization method: SciKit&#39;s Lasso linear model &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">copy_X</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
@@ -467,7 +467,7 @@
         <span class="k">return</span> <span class="s1">&#39;MA_Lasso(q = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, intercept = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, theta = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
         
 
-<div class="viewcode-block" id="MA_Lasso.fit"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_Lasso.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+<div class="viewcode-block" id="MA_Lasso.fit"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA_Lasso.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
             <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
@@ -514,7 +514,7 @@
 
 
 
-<div class="viewcode-block" id="MA_ElasticNet"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_ElasticNet">[docs]</a><span class="k">class</span> <span class="nc">MA_ElasticNet</span><span class="p">(</span><span class="n">MA</span><span class="p">):</span>
+<div class="viewcode-block" id="MA_ElasticNet"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA_ElasticNet">[docs]</a><span class="k">class</span> <span class="nc">MA_ElasticNet</span><span class="p">(</span><span class="n">MA</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Parameter optimization method: SciKit&#39;s Elastic Net linear model &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">copy_X</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">l1_ratio</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
@@ -563,7 +563,7 @@
         <span class="k">return</span> <span class="s1">&#39;MA_ElasticNet(q = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, intercept = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, theta = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
         
     
-<div class="viewcode-block" id="MA_ElasticNet.fit"><a class="viewcode-back" href="../../MA.html#hardPredictions.MA.MA_ElasticNet.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+<div class="viewcode-block" id="MA_ElasticNet.fit"><a class="viewcode-back" href="../../MA.html#skfore.MA.MA_ElasticNet.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_type</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
              <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X__</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
@@ -639,7 +639,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

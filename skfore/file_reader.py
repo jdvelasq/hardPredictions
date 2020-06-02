@@ -1,7 +1,7 @@
 """
 
 
-hardPredictions file reader
+skfore file reader
 
 
 """

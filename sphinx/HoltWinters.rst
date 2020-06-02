@@ -1,6 +1,6 @@
 Holt Winters Model
 *******************
-.. automodule:: hardPredictions.HoltWinters
+.. automodule:: skfore.HoltWinters
     :members:
     :undoc-members:
     :show-inheritance:

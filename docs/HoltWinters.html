@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Holt Winters Model &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <title>Holt Winters Model &#8212; skfore: A library in Python for time series forecasting 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="AR.html" title="AR Model"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -43,8 +43,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-hardPredictions.HoltWinters">
-<span id="holt-winters-model"></span><h1>Holt Winters Model<a class="headerlink" href="#module-hardPredictions.HoltWinters" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-skfore.HoltWinters">
+<span id="holt-winters-model"></span><h1>Holt Winters Model<a class="headerlink" href="#module-skfore.HoltWinters" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
 <h2>Holt Winters Model<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="overview">
@@ -104,53 +104,53 @@ multiplicative. Additive seasonal is set by default.</p>
 </pre></div>
 </div>
 <dl class="class">
-<dt id="hardPredictions.HoltWinters.HoltWinters">
-<em class="property">class </em><code class="sig-prename descclassname">hardPredictions.HoltWinters.</code><code class="sig-name descname">HoltWinters</code><span class="sig-paren">(</span><em class="sig-param">alpha=None</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">gamma=None</em>, <em class="sig-param">seasonal='additive'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="base_model.html#hardPredictions.base_model.base_model" title="hardPredictions.base_model.base_model"><code class="xref py py-class docutils literal notranslate"><span class="pre">hardPredictions.base_model.base_model</span></code></a></p>
+<dt id="skfore.HoltWinters.HoltWinters">
+<em class="property">class </em><code class="sig-prename descclassname">skfore.HoltWinters.</code><code class="sig-name descname">HoltWinters</code><span class="sig-paren">(</span><em class="sig-param">alpha=None</em>, <em class="sig-param">beta=None</em>, <em class="sig-param">gamma=None</em>, <em class="sig-param">seasonal='additive'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/HoltWinters.html#HoltWinters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.HoltWinters.HoltWinters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_model.html#skfore.base_model.base_model" title="skfore.base_model.base_model"><code class="xref py py-class docutils literal notranslate"><span class="pre">skfore.base_model.base_model</span></code></a></p>
 <dl class="method">
-<dt id="hardPredictions.HoltWinters.HoltWinters.additive">
-<code class="sig-name descname">additive</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">forecast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.additive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.additive" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.HoltWinters.HoltWinters.additive">
+<code class="sig-name descname">additive</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">forecast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/HoltWinters.html#HoltWinters.additive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.HoltWinters.HoltWinters.additive" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.HoltWinters.HoltWinters.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">error_function=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.fit" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.HoltWinters.HoltWinters.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">error_function=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/HoltWinters.html#HoltWinters.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.HoltWinters.HoltWinters.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="hardPredictions.HoltWinters.HoltWinters.fit_model">
-<code class="sig-name descname">fit_model</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.fit_model" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.HoltWinters.HoltWinters.fit_model">
+<code class="sig-name descname">fit_model</code><em class="property"> = None</em><a class="headerlink" href="#skfore.HoltWinters.HoltWinters.fit_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks parameters</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.HoltWinters.HoltWinters.forecast">
-<code class="sig-name descname">forecast</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods</em>, <em class="sig-param">confidence_interval=None</em>, <em class="sig-param">iterations=300</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.forecast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.forecast" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.HoltWinters.HoltWinters.forecast">
+<code class="sig-name descname">forecast</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods</em>, <em class="sig-param">confidence_interval=None</em>, <em class="sig-param">iterations=300</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/HoltWinters.html#HoltWinters.forecast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.HoltWinters.HoltWinters.forecast" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.HoltWinters.HoltWinters.multiplicative">
-<code class="sig-name descname">multiplicative</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">forecast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.multiplicative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.multiplicative" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.HoltWinters.HoltWinters.multiplicative">
+<code class="sig-name descname">multiplicative</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">forecast=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/HoltWinters.html#HoltWinters.multiplicative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.HoltWinters.HoltWinters.multiplicative" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.HoltWinters.HoltWinters.params2vector">
-<code class="sig-name descname">params2vector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.params2vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.params2vector" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.HoltWinters.HoltWinters.params2vector">
+<code class="sig-name descname">params2vector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/HoltWinters.html#HoltWinters.params2vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.HoltWinters.HoltWinters.params2vector" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.HoltWinters.HoltWinters.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.predict" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.HoltWinters.HoltWinters.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/HoltWinters.html#HoltWinters.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.HoltWinters.HoltWinters.predict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.HoltWinters.HoltWinters.simulate">
-<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods=5</em>, <em class="sig-param">confidence_interval=0.95</em>, <em class="sig-param">iterations=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.simulate" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.HoltWinters.HoltWinters.simulate">
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods=5</em>, <em class="sig-param">confidence_interval=0.95</em>, <em class="sig-param">iterations=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/HoltWinters.html#HoltWinters.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.HoltWinters.HoltWinters.simulate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.HoltWinters.HoltWinters.vector2params">
-<code class="sig-name descname">vector2params</code><span class="sig-paren">(</span><em class="sig-param">vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/HoltWinters.html#HoltWinters.vector2params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.HoltWinters.HoltWinters.vector2params" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.HoltWinters.HoltWinters.vector2params">
+<code class="sig-name descname">vector2params</code><span class="sig-paren">(</span><em class="sig-param">vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/HoltWinters.html#HoltWinters.vector2params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.HoltWinters.HoltWinters.vector2params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -219,7 +219,7 @@ multiplicative. Additive seasonal is set by default.</p>
         <li class="right" >
           <a href="AR.html" title="AR Model"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

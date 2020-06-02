@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>hardPredictions.hardPredictions &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <title>skfore.skfore &#8212; skfore: A library in Python for time series forecasting 0.0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -36,9 +36,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for hardPredictions.hardPredictions</h1><div class="highlight"><pre>
+  <h1>Source code for skfore.skfore</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">hardPredictions</span>
+<span class="sd">skfore</span>
 <span class="sd">A library in Python for time series forecasting</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -55,37 +55,37 @@
     
         
 <span class="sd">&quot;&quot;&quot; Time series&#39; and model&#39;s diagnostics &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="series_viewer"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer">[docs]</a><span class="k">class</span> <span class="nc">series_viewer</span><span class="p">():</span>
+<div class="viewcode-block" id="series_viewer"><a class="viewcode-back" href="../../skfore.html#skfore.skfore.series_viewer">[docs]</a><span class="k">class</span> <span class="nc">series_viewer</span><span class="p">():</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span>
     
-<div class="viewcode-block" id="series_viewer.time_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.time_plot">[docs]</a>    <span class="k">def</span> <span class="nf">time_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="series_viewer.time_plot"><a class="viewcode-back" href="../../skfore.html#skfore.skfore.series_viewer.time_plot">[docs]</a>    <span class="k">def</span> <span class="nf">time_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">tp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">tp</span></div>
         
-<div class="viewcode-block" id="series_viewer.ACF_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.ACF_plot">[docs]</a>    <span class="k">def</span> <span class="nf">ACF_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="series_viewer.ACF_plot"><a class="viewcode-back" href="../../skfore.html#skfore.skfore.series_viewer.ACF_plot">[docs]</a>    <span class="k">def</span> <span class="nf">ACF_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">acf</span> <span class="o">=</span> <span class="n">statsmodels</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">tsaplots</span><span class="o">.</span><span class="n">plot_acf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">acf</span></div>
         
-<div class="viewcode-block" id="series_viewer.PACF_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.PACF_plot">[docs]</a>    <span class="k">def</span> <span class="nf">PACF_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="series_viewer.PACF_plot"><a class="viewcode-back" href="../../skfore.html#skfore.skfore.series_viewer.PACF_plot">[docs]</a>    <span class="k">def</span> <span class="nf">PACF_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">pacf</span> <span class="o">=</span> <span class="n">statsmodels</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">tsaplots</span><span class="o">.</span><span class="n">plot_pacf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pacf</span></div>
         
-<div class="viewcode-block" id="series_viewer.qq_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.qq_plot">[docs]</a>    <span class="k">def</span> <span class="nf">qq_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="series_viewer.qq_plot"><a class="viewcode-back" href="../../skfore.html#skfore.skfore.series_viewer.qq_plot">[docs]</a>    <span class="k">def</span> <span class="nf">qq_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">qq_plot</span> <span class="o">=</span> <span class="n">statsmodels</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">gofplots</span><span class="o">.</span><span class="n">qqplot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">qq_plot</span></div>
     
-<div class="viewcode-block" id="series_viewer.density_plot"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.density_plot">[docs]</a>    <span class="k">def</span> <span class="nf">density_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="series_viewer.density_plot"><a class="viewcode-back" href="../../skfore.html#skfore.skfore.series_viewer.density_plot">[docs]</a>    <span class="k">def</span> <span class="nf">density_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">den_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">den_plot</span></div>
     
     <span class="sd">&quot;&quot;&quot; Histogram of frequencies &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="series_viewer.histogram"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.histogram">[docs]</a>    <span class="k">def</span> <span class="nf">histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="series_viewer.histogram"><a class="viewcode-back" href="../../skfore.html#skfore.skfore.series_viewer.histogram">[docs]</a>    <span class="k">def</span> <span class="nf">histogram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">hist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="o">.</span><span class="n">hist</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">hist</span></div>
     
     <span class="sd">&quot;&quot;&quot; Jarque Bera normality test &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="series_viewer.normality"><a class="viewcode-back" href="../../hardPredictions.html#hardPredictions.hardPredictions.series_viewer.normality">[docs]</a>    <span class="k">def</span> <span class="nf">normality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="series_viewer.normality"><a class="viewcode-back" href="../../skfore.html#skfore.skfore.series_viewer.normality">[docs]</a>    <span class="k">def</span> <span class="nf">normality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">jb</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">jarque_bera</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ts</span><span class="p">)</span>
         <span class="n">jb_value</span> <span class="o">=</span> <span class="n">jb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">p_value</span> <span class="o">=</span> <span class="n">jb</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -121,7 +121,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

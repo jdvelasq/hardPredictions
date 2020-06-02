@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Time series transformation module &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <title>Time series transformation module &#8212; skfore: A library in Python for time series forecasting 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="extras.html" title="Extra Functions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -43,8 +43,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-hardPredictions.transformer">
-<span id="time-series-transformation-module"></span><h1>Time series transformation module<a class="headerlink" href="#module-hardPredictions.transformer" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-skfore.transformer">
+<span id="time-series-transformation-module"></span><h1>Time series transformation module<a class="headerlink" href="#module-skfore.transformer" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="transformer-time-series-transformation-module">
 <h2>Transformer: time series’ transformation module<a class="headerlink" href="#transformer-time-series-transformation-module" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="overview">
@@ -577,8 +577,8 @@ cbrt, boxcox), trending (linear, cuadratic, cubic, diff1, diff2) and seasonal
 </pre></div>
 </div>
 <dl class="class">
-<dt id="hardPredictions.transformer.transformer">
-<em class="property">class </em><code class="sig-prename descclassname">hardPredictions.transformer.</code><code class="sig-name descname">transformer</code><span class="sig-paren">(</span><em class="sig-param">trans=None</em>, <em class="sig-param">trend=None</em>, <em class="sig-param">seasonal=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/transformer.html#transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.transformer.transformer" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.transformer.transformer">
+<em class="property">class </em><code class="sig-prename descclassname">skfore.transformer.</code><code class="sig-name descname">transformer</code><span class="sig-paren">(</span><em class="sig-param">trans=None</em>, <em class="sig-param">trend=None</em>, <em class="sig-param">seasonal=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/transformer.html#transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.transformer.transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to transform the series</p>
 <dl class="simple">
@@ -588,8 +588,8 @@ seasonal (poly2, diff): Seasonality to apply</p>
 </dd>
 </dl>
 <dl class="method">
-<dt id="hardPredictions.transformer.transformer.fit_transform">
-<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/transformer.html#transformer.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.transformer.transformer.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.transformer.transformer.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/transformer.html#transformer.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.transformer.transformer.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the transformed series</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ts: Time series to apply transformation</p>
@@ -598,26 +598,26 @@ seasonal (poly2, diff): Seasonality to apply</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="hardPredictions.transformer.transformer.intfrq">
-<code class="sig-name descname">intfrq</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.transformer.transformer.intfrq" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.transformer.transformer.intfrq">
+<code class="sig-name descname">intfrq</code><em class="property"> = None</em><a class="headerlink" href="#skfore.transformer.transformer.intfrq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Time series after transformation and restore</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="hardPredictions.transformer.transformer.model">
-<code class="sig-name descname">model</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.transformer.transformer.model" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.transformer.transformer.model">
+<code class="sig-name descname">model</code><em class="property"> = None</em><a class="headerlink" href="#skfore.transformer.transformer.model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Box Cox transformation lambda (if necessary)</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="hardPredictions.transformer.transformer.original">
-<code class="sig-name descname">original</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.transformer.transformer.original" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.transformer.transformer.original">
+<code class="sig-name descname">original</code><em class="property"> = None</em><a class="headerlink" href="#skfore.transformer.transformer.original" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transformation values to restore series</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.transformer.transformer.restore">
-<code class="sig-name descname">restore</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/transformer.html#transformer.restore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.transformer.transformer.restore" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.transformer.transformer.restore">
+<code class="sig-name descname">restore</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/transformer.html#transformer.restore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.transformer.transformer.restore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Restore series to its original values</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ts: Time series to restore</p>
@@ -626,8 +626,8 @@ seasonal (poly2, diff): Seasonality to apply</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="hardPredictions.transformer.transformer.ts">
-<code class="sig-name descname">ts</code><em class="property"> = None</em><a class="headerlink" href="#hardPredictions.transformer.transformer.ts" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.transformer.transformer.ts">
+<code class="sig-name descname">ts</code><em class="property"> = None</em><a class="headerlink" href="#skfore.transformer.transformer.ts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Frequency integer of the transformed time series</p>
 </dd></dl>
 
@@ -706,7 +706,7 @@ seasonal (poly2, diff): Seasonality to apply</p>
         <li class="right" >
           <a href="extras.html" title="Extra Functions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

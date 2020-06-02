@@ -1,10 +1,10 @@
 """
 
-hardPredictions Pipeline
+skfore Pipeline
 
 """
 
-import hardPredictions.transformer
+import skfore.transformer
 
 class Pipeline():
     

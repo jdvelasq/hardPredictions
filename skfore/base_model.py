@@ -8,7 +8,7 @@ Methods:
 
 """
 
-from hardPredictions import series_viewer
+from skfore import series_viewer
 
 import pandas
 import numpy

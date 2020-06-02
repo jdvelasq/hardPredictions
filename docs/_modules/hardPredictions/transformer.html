@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>hardPredictions.transformer &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <title>skfore.transformer &#8212; skfore: A library in Python for time series forecasting 0.0.1 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -36,7 +36,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for hardPredictions.transformer</h1><div class="highlight"><pre>
+  <h1>Source code for skfore.transformer</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">Transformer: time series&#39; transformation module</span>
@@ -553,7 +553,7 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">hardPredictions.extras</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">skfore.extras</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
@@ -562,7 +562,7 @@
 
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
 
-<div class="viewcode-block" id="transformer"><a class="viewcode-back" href="../../transformer.html#hardPredictions.transformer.transformer">[docs]</a><span class="k">class</span> <span class="nc">transformer</span><span class="p">():</span>
+<div class="viewcode-block" id="transformer"><a class="viewcode-back" href="../../transformer.html#skfore.transformer.transformer">[docs]</a><span class="k">class</span> <span class="nc">transformer</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Class to transform the series</span>
 
 <span class="sd">    Args:</span>
@@ -598,7 +598,7 @@
         <span class="k">return</span> <span class="s1">&#39;transformer(trans = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trans</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, trend = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trend</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;, seasonal = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seasonal</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span>
         
 
-<div class="viewcode-block" id="transformer.fit_transform"><a class="viewcode-back" href="../../transformer.html#hardPredictions.transformer.transformer.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+<div class="viewcode-block" id="transformer.fit_transform"><a class="viewcode-back" href="../../transformer.html#skfore.transformer.transformer.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the transformed series</span>
 
 <span class="sd">        Args:</span>
@@ -735,7 +735,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span></div>
 
 
-<div class="viewcode-block" id="transformer.restore"><a class="viewcode-back" href="../../transformer.html#hardPredictions.transformer.transformer.restore">[docs]</a>    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+<div class="viewcode-block" id="transformer.restore"><a class="viewcode-back" href="../../transformer.html#skfore.transformer.transformer.restore">[docs]</a>    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Restore series to its original values</span>
 
 <span class="sd">        Args:</span>
@@ -848,7 +848,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

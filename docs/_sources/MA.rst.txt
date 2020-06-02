@@ -1,4 +1,4 @@
-.. automodule:: hardPredictions.MA
+.. automodule:: skfore.MA
     :members:
     :undoc-members:
     :show-inheritance:

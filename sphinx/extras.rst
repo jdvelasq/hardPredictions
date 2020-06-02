@@ -1,6 +1,6 @@
 Extra Functions
 ****************
-.. automodule:: hardPredictions.extras
+.. automodule:: skfore.extras
     :members:
     :undoc-members:
     :show-inheritance:

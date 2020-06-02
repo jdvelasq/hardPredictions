@@ -1,6 +1,6 @@
-hardPredictions
+skfore
 ****************
-.. automodule:: hardPredictions.hardPredictions
+.. automodule:: skfore.skfore
     :members:
     :undoc-members:
     :show-inheritance:

@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>MA Model &#8212; hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</title>
+    <title>MA Model &#8212; skfore: A library in Python for time series forecasting 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -30,7 +30,7 @@
         <li class="right" >
           <a href="HoltWinters.html" title="Holt Winters Model"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -39,7 +39,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <span class="target" id="module-hardPredictions.MA"></span><div class="section" id="ma-model">
+  <span class="target" id="module-skfore.MA"></span><div class="section" id="ma-model">
 <h1>MA Model<a class="headerlink" href="#ma-model" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
@@ -74,9 +74,9 @@ linear model and SciKit’s Elastic Net linear model.</p>
 </div>
 <a class="reference internal image-reference" href="_images/ma_1.png"><img alt="MA 3" class="align-center" src="_images/ma_1.png" style="width: 400px;" /></a>
 <dl class="class">
-<dt id="hardPredictions.MA.MA">
-<em class="property">class </em><code class="sig-prename descclassname">hardPredictions.MA.</code><code class="sig-name descname">MA</code><span class="sig-paren">(</span><em class="sig-param">q=None</em>, <em class="sig-param">intercept=None</em>, <em class="sig-param">theta=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="base_model.html#hardPredictions.base_model.base_model" title="hardPredictions.base_model.base_model"><code class="xref py py-class docutils literal notranslate"><span class="pre">hardPredictions.base_model.base_model</span></code></a></p>
+<dt id="skfore.MA.MA">
+<em class="property">class </em><code class="sig-prename descclassname">skfore.MA.</code><code class="sig-name descname">MA</code><span class="sig-paren">(</span><em class="sig-param">q=None</em>, <em class="sig-param">intercept=None</em>, <em class="sig-param">theta=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="base_model.html#skfore.base_model.base_model" title="skfore.base_model.base_model"><code class="xref py py-class docutils literal notranslate"><span class="pre">skfore.base_model.base_model</span></code></a></p>
 <p>Moving-average model</p>
 <p>Parameter optimization method: scipy’s minimization</p>
 <dl class="simple">
@@ -86,8 +86,8 @@ linear model and SciKit’s Elastic Net linear model.</p>
 </dd>
 </dl>
 <dl class="method">
-<dt id="hardPredictions.MA.MA.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">error_function=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA.fit" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.MA.MA.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">error_function=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds optimal parameters using a given optimization function</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ts (pandas.Series): Time series to fit.
@@ -99,8 +99,8 @@ error_function (function): Function to estimates error.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.MA.MA.forecast">
-<code class="sig-name descname">forecast</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods</em>, <em class="sig-param">confidence_interval=None</em>, <em class="sig-param">iterations=300</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA.forecast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA.forecast" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.MA.MA.forecast">
+<code class="sig-name descname">forecast</code><span class="sig-paren">(</span><em class="sig-param">ts</em>, <em class="sig-param">periods</em>, <em class="sig-param">confidence_interval=None</em>, <em class="sig-param">iterations=300</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA.forecast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA.forecast" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predicts future values in a given period</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ts (pandas.Series): Time series to predict.
@@ -112,8 +112,8 @@ periods (int): Number of periods ahead to predict.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.MA.MA.params2vector">
-<code class="sig-name descname">params2vector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA.params2vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA.params2vector" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.MA.MA.params2vector">
+<code class="sig-name descname">params2vector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA.params2vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA.params2vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parameters to vector</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>None.</p>
@@ -124,8 +124,8 @@ periods (int): Number of periods ahead to predict.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.MA.MA.predict">
-<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA.predict" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.MA.MA.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fits a time series using self model parameters</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ts (pandas.Series): Time series to fit.</p>
@@ -136,8 +136,8 @@ periods (int): Number of periods ahead to predict.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="hardPredictions.MA.MA.vector2params">
-<code class="sig-name descname">vector2params</code><span class="sig-paren">(</span><em class="sig-param">vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA.vector2params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA.vector2params" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.MA.MA.vector2params">
+<code class="sig-name descname">vector2params</code><span class="sig-paren">(</span><em class="sig-param">vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA.vector2params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA.vector2params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Vector to parameters</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>vector (list): vector of length q+1 to convert into parameters of 
@@ -151,13 +151,13 @@ the model.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="hardPredictions.MA.MA_ElasticNet">
-<em class="property">class </em><code class="sig-prename descclassname">hardPredictions.MA.</code><code class="sig-name descname">MA_ElasticNet</code><span class="sig-paren">(</span><em class="sig-param">q=None</em>, <em class="sig-param">intercept=None</em>, <em class="sig-param">theta=None</em>, <em class="sig-param">alpha=1.0</em>, <em class="sig-param">copy_X=True</em>, <em class="sig-param">fit_intercept=True</em>, <em class="sig-param">l1_ratio=0.5</em>, <em class="sig-param">max_iter=1000</em>, <em class="sig-param">normalize=False</em>, <em class="sig-param">positive=False</em>, <em class="sig-param">precompute=False</em>, <em class="sig-param">random_state=0</em>, <em class="sig-param">selection='cyclic'</em>, <em class="sig-param">tol=0.0001</em>, <em class="sig-param">warm_start=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA_ElasticNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA_ElasticNet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hardPredictions.MA.MA" title="hardPredictions.MA.MA"><code class="xref py py-class docutils literal notranslate"><span class="pre">hardPredictions.MA.MA</span></code></a></p>
+<dt id="skfore.MA.MA_ElasticNet">
+<em class="property">class </em><code class="sig-prename descclassname">skfore.MA.</code><code class="sig-name descname">MA_ElasticNet</code><span class="sig-paren">(</span><em class="sig-param">q=None</em>, <em class="sig-param">intercept=None</em>, <em class="sig-param">theta=None</em>, <em class="sig-param">alpha=1.0</em>, <em class="sig-param">copy_X=True</em>, <em class="sig-param">fit_intercept=True</em>, <em class="sig-param">l1_ratio=0.5</em>, <em class="sig-param">max_iter=1000</em>, <em class="sig-param">normalize=False</em>, <em class="sig-param">positive=False</em>, <em class="sig-param">precompute=False</em>, <em class="sig-param">random_state=0</em>, <em class="sig-param">selection='cyclic'</em>, <em class="sig-param">tol=0.0001</em>, <em class="sig-param">warm_start=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA_ElasticNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA_ElasticNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#skfore.MA.MA" title="skfore.MA.MA"><code class="xref py py-class docutils literal notranslate"><span class="pre">skfore.MA.MA</span></code></a></p>
 <p>Parameter optimization method: SciKit’s Elastic Net linear model</p>
 <dl class="method">
-<dt id="hardPredictions.MA.MA_ElasticNet.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA_ElasticNet.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA_ElasticNet.fit" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.MA.MA_ElasticNet.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA_ElasticNet.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA_ElasticNet.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds optimal parameters using a given optimization function</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ts (pandas.Series): Time series to fit.
@@ -171,13 +171,13 @@ error_function (function): Function to estimates error.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="hardPredictions.MA.MA_Lasso">
-<em class="property">class </em><code class="sig-prename descclassname">hardPredictions.MA.</code><code class="sig-name descname">MA_Lasso</code><span class="sig-paren">(</span><em class="sig-param">q=None</em>, <em class="sig-param">intercept=None</em>, <em class="sig-param">theta=None</em>, <em class="sig-param">alpha=0.1</em>, <em class="sig-param">copy_X=True</em>, <em class="sig-param">fit_intercept=True</em>, <em class="sig-param">max_iter=1000</em>, <em class="sig-param">normalize=False</em>, <em class="sig-param">positive=False</em>, <em class="sig-param">precompute=False</em>, <em class="sig-param">random_state=None</em>, <em class="sig-param">selection='cyclic'</em>, <em class="sig-param">tol=0.0001</em>, <em class="sig-param">warm_start=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA_Lasso"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA_Lasso" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hardPredictions.MA.MA" title="hardPredictions.MA.MA"><code class="xref py py-class docutils literal notranslate"><span class="pre">hardPredictions.MA.MA</span></code></a></p>
+<dt id="skfore.MA.MA_Lasso">
+<em class="property">class </em><code class="sig-prename descclassname">skfore.MA.</code><code class="sig-name descname">MA_Lasso</code><span class="sig-paren">(</span><em class="sig-param">q=None</em>, <em class="sig-param">intercept=None</em>, <em class="sig-param">theta=None</em>, <em class="sig-param">alpha=0.1</em>, <em class="sig-param">copy_X=True</em>, <em class="sig-param">fit_intercept=True</em>, <em class="sig-param">max_iter=1000</em>, <em class="sig-param">normalize=False</em>, <em class="sig-param">positive=False</em>, <em class="sig-param">precompute=False</em>, <em class="sig-param">random_state=None</em>, <em class="sig-param">selection='cyclic'</em>, <em class="sig-param">tol=0.0001</em>, <em class="sig-param">warm_start=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA_Lasso"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA_Lasso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#skfore.MA.MA" title="skfore.MA.MA"><code class="xref py py-class docutils literal notranslate"><span class="pre">skfore.MA.MA</span></code></a></p>
 <p>Parameter optimization method: SciKit’s Lasso linear model</p>
 <dl class="method">
-<dt id="hardPredictions.MA.MA_Lasso.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA_Lasso.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA_Lasso.fit" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.MA.MA_Lasso.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA_Lasso.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA_Lasso.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds optimal parameters using a given optimization function</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ts (pandas.Series): Time series to fit.
@@ -191,13 +191,13 @@ error_function (function): Function to estimates error.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="hardPredictions.MA.MA_Ridge">
-<em class="property">class </em><code class="sig-prename descclassname">hardPredictions.MA.</code><code class="sig-name descname">MA_Ridge</code><span class="sig-paren">(</span><em class="sig-param">q=None</em>, <em class="sig-param">intercept=None</em>, <em class="sig-param">theta=None</em>, <em class="sig-param">alpha=0.5</em>, <em class="sig-param">copy_X=True</em>, <em class="sig-param">fit_intercept=True</em>, <em class="sig-param">max_iter=None</em>, <em class="sig-param">normalize=False</em>, <em class="sig-param">random_state=None</em>, <em class="sig-param">solver='auto'</em>, <em class="sig-param">tol=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA_Ridge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA_Ridge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#hardPredictions.MA.MA" title="hardPredictions.MA.MA"><code class="xref py py-class docutils literal notranslate"><span class="pre">hardPredictions.MA.MA</span></code></a></p>
+<dt id="skfore.MA.MA_Ridge">
+<em class="property">class </em><code class="sig-prename descclassname">skfore.MA.</code><code class="sig-name descname">MA_Ridge</code><span class="sig-paren">(</span><em class="sig-param">q=None</em>, <em class="sig-param">intercept=None</em>, <em class="sig-param">theta=None</em>, <em class="sig-param">alpha=0.5</em>, <em class="sig-param">copy_X=True</em>, <em class="sig-param">fit_intercept=True</em>, <em class="sig-param">max_iter=None</em>, <em class="sig-param">normalize=False</em>, <em class="sig-param">random_state=None</em>, <em class="sig-param">solver='auto'</em>, <em class="sig-param">tol=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA_Ridge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA_Ridge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#skfore.MA.MA" title="skfore.MA.MA"><code class="xref py py-class docutils literal notranslate"><span class="pre">skfore.MA.MA</span></code></a></p>
 <p>Parameter optimization method: SciKit’s Ridge linear model</p>
 <dl class="method">
-<dt id="hardPredictions.MA.MA_Ridge.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hardPredictions/MA.html#MA_Ridge.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hardPredictions.MA.MA_Ridge.fit" title="Permalink to this definition">¶</a></dt>
+<dt id="skfore.MA.MA_Ridge.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/skfore/MA.html#MA_Ridge.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#skfore.MA.MA_Ridge.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds optimal parameters using a given optimization function</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>ts (pandas.Series): Time series to fit.
@@ -264,7 +264,7 @@ error_function (function): Function to estimates error.</p>
         <li class="right" >
           <a href="HoltWinters.html" title="Holt Winters Model"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">hardPredictions: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">skfore: A library in Python for time series forecasting 0.0.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

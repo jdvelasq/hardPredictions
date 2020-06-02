@@ -2,7 +2,7 @@
 Time series transformation module
 **********************************
 
-.. automodule:: hardPredictions.transformer
+.. automodule:: skfore.transformer
     :members:
     :undoc-members:
     :show-inheritance:

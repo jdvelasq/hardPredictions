@@ -15,7 +15,7 @@ Classes
 
 """
 
-from base_model import base_model
+from skfore.base_model import base_model
 
 import numpy
 import scipy

@@ -5,7 +5,7 @@ skfore Pipeline for multiple time series
 
 """
 
-import Pipeline
+import skfore.Pipeline
 
 class multiPipeline():
     

@@ -14,7 +14,7 @@ import pandas
 import numpy
 import sklearn
 import matplotlib
-from extras import add_next_date
+from skfore.extras import add_next_date
 from sklearn import preprocessing
 
 class base_model():

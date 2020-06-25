@@ -514,7 +514,7 @@ Name: Perrin, dtype: float64
 
 """
 
-from extras import *
+from skfore.extras import *
 
 import pandas
 import numpy

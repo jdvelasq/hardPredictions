@@ -13,13 +13,13 @@ Classes
 
 """
 
-from base_model import base_model
+from skfore.base_model import base_model
 
 import numpy
 import scipy
 import pandas
 import statsmodels
-from extras import add_next_date
+from skfore.extras import add_next_date
 
 
 class SARIMA(base_model):

@@ -14,7 +14,8 @@ import pandas
 import numpy
 import sklearn
 import matplotlib
-from skfore.extras import add_next_date
+import math
+from extras import add_next_date
 from sklearn import preprocessing
 
 class base_model():
@@ -120,12 +121,22 @@ class base_model():
     def normal_error(self, n, ts, ignore_first = None):
         residuals = self.filter_ts(ts, ignore_first)
         var = numpy.var(residuals)
-        generate_values = numpy.random.normal(0, var, n)
+        var2 = math.sqrt(var)
+        generated_values = numpy.random.normal(0, var2 , n)
         
-        return generate_values
+        for i in range(n):
+            if i == 0:
+                y = ts
+            value = self.__forward__(y)
+            value = value + generated_values[i]
+            y = add_next_date(y, value)
+        
+        result = pandas.DataFrame(y[-n:].values, index = y[-n:].index, columns = ['normal_for'])
+        
+        return result
         
         
-    def forecast(self, ts, periods, confidence_interval = None, iterations = 300, error_sample = 'bootstrap'):
+    def forecast(self, ts, periods, confidence_interval = None, iterations = 300, error_sample = 'bootstrap', ignore_first = None):
         """ Predicts future values in a given period
         
         Args:
@@ -135,7 +146,7 @@ class base_model():
             iterations (int): Number of iterations
             error_sample (str): Use 'bootstrap' to forecast using sample errors 
                 of filtered time series or 'normal' to forecast using errors 
-                from a gaussian distribution with known variance
+                from a gaussian distribution with known variance. 
             
         Returns:
             Dataframe of confidence intervals and time series of predicted 
@@ -145,11 +156,11 @@ class base_model():
         for i in range(periods):
             if i == 0:
                 y = ts
-
             value = self.__forward__(y)
             y = add_next_date(y, value)
         
         if confidence_interval == None:
+            
             for i in range(periods):
                 if i == 0:
                     ci_zero = ts
@@ -157,13 +168,40 @@ class base_model():
             
             ci_inf = ci_zero[-periods:]
             ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
+            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])
+            prediction = y[-periods:]
+            prediction.name = 'series'
+            ci = ci.append(prediction)
             
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        result = ci.append(prediction)
+            if error_sample == 'bootstrap':
+                simulation = self.simulate(ts, periods, confidence_interval = 0.95, iterations = iterations)
+                result = ci.append(simulation.transpose().loc[:,'bootstrap_for'])
+                
+            elif error_sample == 'normal':
+                simulation = self.normal_error(periods, ts, ignore_first)
+                result = ci.append(simulation.transpose())
+                
+            else:
+                raise ValueError('Error sample has not been defined correctly')         
+                       
+                        
+        else:
+            
+            ci = self.simulate(ts, periods, confidence_interval, iterations)
+            prediction = y[-periods:]
+            prediction.name = 'series'
+            ci = ci.append(prediction)
+            
+            if error_sample == 'bootstrap':
+                result = ci
+                
+            elif error_sample == 'normal':
+                simulation = self.normal_error(periods, ts, ignore_first)
+                result = ci.append(simulation.transpose())
+                
+            else:
+                raise ValueError('Error sample has not been defined correctly') 
+
 
         return result.transpose()
     
@@ -181,7 +219,7 @@ class base_model():
                 else:
                     y = add_next_date(y, next_value_bootstrap)
 
-                next_value = self.forecast(y, 1).series
+                next_value = self.__forward__(y)
                 next_value_bootstrap = next_value + train[0]
                 result_complete = add_next_date(y, next_value_bootstrap)
                 result = result_complete[-periods:]
@@ -192,7 +230,7 @@ class base_model():
         ci_inf = results.quantile(1-confidence_interval)
         ci_sup = results.quantile(confidence_interval)
         mean = results.mean()
-        ci = pandas.DataFrame([ci_inf, ci_sup, mean], index = ['ci_inf', 'ci_sup', 'forecast'])
+        ci = pandas.DataFrame([ci_inf, ci_sup, mean], index = ['ci_inf', 'ci_sup', 'bootstrap_for'])
 
         return ci
 

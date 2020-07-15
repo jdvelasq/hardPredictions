@@ -84,12 +84,12 @@ Classes
 
 """
 
-from skfore.base_model import base_model
+from base_model import base_model
 
 import numpy
 import scipy
 import pandas
-from skfore.extras import add_next_date
+from extras import add_next_date
 from sklearn import linear_model
 
 class AR(base_model):
@@ -562,6 +562,6 @@ class AR_ElasticNet(AR):
         
         return self  
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+#if __name__ == "__main__":
+#    import doctest
+#    doctest.testmod()

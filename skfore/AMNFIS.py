@@ -35,7 +35,7 @@ Classes
 
 """
 
-from skfore.base_model import base_model
+from base_model import base_model
 
 import numpy
 import scipy
@@ -43,7 +43,7 @@ import pandas
 import random
 import math
 from sklearn import *
-from skfore.extras import add_next_date
+from extras import add_next_date
 
 class AMNFIS(base_model):
     """ AMNFIS model
@@ -216,8 +216,6 @@ class AMNFIS(base_model):
         
         """
         
-        #if not isinstance(ts, pandas.Series):
-        #    ts = 
         
         if self.optim_type == 'no_optim':
             pass
@@ -242,42 +240,3 @@ class AMNFIS(base_model):
             self.centers = optim_centers.x
 
         return self
-
-    def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
-        """ Predicts future values in a given period
-        
-        Args:
-            ts (pandas.Series): Time series to predict.
-            periods (int): Number of periods ahead to predict.
-            confidence_interval (double): Confidence interval level
-            iterations (int): Number of iterations
-            
-        Returns:
-            Dataframe of confidence intervals and time series of predicted 
-            values: (ci_inf, ci_sup, series) 
-        
-        """
-        for i in range(periods):
-            if i == 0:
-                y = ts
-
-            value = self.__forward__(y)
-            y = add_next_date(y, value)
-        
-        if confidence_interval == None:
-            for i in range(periods):
-                if i == 0:
-                    ci_zero = ts
-                ci_zero = add_next_date(ci_zero, None)
-            
-            ci_inf = ci_zero[-periods:]
-            ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
-            
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        result = ci.append(prediction)
-
-        return result.transpose()

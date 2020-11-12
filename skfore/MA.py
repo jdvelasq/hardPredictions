@@ -22,13 +22,13 @@ MA(q = 3, intercept = None, theta = None)
 >>> model = model.fit(ts)
 >>> model
 MA(q = 3, intercept = 0.7576070305877793, theta = [0.47415837 0.96800789 0.50682355])
->>> prediction = model.forecast(ts, periods = 3)
+>>> prediction = model.predict(ts, periods = 3)
 >>> prediction
             ci_inf  ci_sup       series
 1972-10-01     NaN     NaN  3644.781559
 1972-11-01     NaN     NaN  4762.075950
 1972-12-01     NaN     NaN  4204.870830
->>> prediction = model.forecast(ts, periods = 3, confidence_interval = 0.95)
+>>> prediction = model.predict(ts, periods = 3, confidence_interval = 0.95)
 >>> prediction
                  ci_inf       ci_sup       series
 1972-10-01  -254.905599  6322.683321  3645.819521
@@ -46,12 +46,12 @@ MA(q = 3, intercept = 0.7576070305877793, theta = [0.47415837 0.96800789 0.50682
 
 """
 
-from skfore.base_model import base_model
+from base_model import base_model
 
 import numpy
 import scipy
 import pandas
-from skfore.extras import add_next_date
+from extras import add_next_date
 from sklearn import linear_model
 
 class MA(base_model):
@@ -173,7 +173,16 @@ class MA(base_model):
                 X.append(value)
         return X
     
-    def __forward__(self, ts):
+    def forecast(self, ts):
+        """ Next step 
+        
+        Args:
+            ts (pandas.Series): Time series to find next value
+            
+        Returns:
+            Value of next time stamp
+            
+        """
 
         lon = len(ts)
         history = list()
@@ -207,7 +216,7 @@ class MA(base_model):
 
         return result
 
-    def predict(self, ts):
+    def simulate(self, ts):
         """ Fits a time series using self model parameters
         
         Args:
@@ -219,7 +228,7 @@ class MA(base_model):
         """
         prediction = list()
         for i in range(len(ts)):
-            result = self.__forward__(ts[0:i])
+            result = self.forecast(ts[0:i])
             prediction.append(result)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
@@ -250,41 +259,6 @@ class MA(base_model):
 
         return self
 
-    def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
-        """ Predicts future values in a given period
-        
-        Args:
-            ts (pandas.Series): Time series to predict.
-            periods (int): Number of periods ahead to predict.
-            
-        Returns:
-            Time series of predicted values.
-        
-        """
-        for i in range(periods):
-            if i == 0:
-                y = ts
-
-            value = self.__forward__(y)
-            y = add_next_date(y, value)
-        
-        if confidence_interval == None:
-            for i in range(periods):
-                if i == 0:
-                    ci_zero = ts
-                ci_zero = add_next_date(ci_zero, None)
-            
-            ci_inf = ci_zero[-periods:]
-            ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
-            
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        result = ci.append(prediction)
-
-        return result.transpose()
     
 
 class MA_Ridge(MA):

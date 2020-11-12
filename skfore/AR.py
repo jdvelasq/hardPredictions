@@ -16,65 +16,61 @@ Examples
 AR model using SciPy's minimization:
 
 Get predicted values as a DataFrame:
-    
->>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
+   
+Load time series
+>>> ts = load_champagne()
+
 >>> model = AR(p = 3)
 >>> model
 AR(p = 3, intercept = None, phi = None)
 
->>> model = model.fit(ts)
->>> model # doctest: +ELLIPSIS
+>>> model.fit(ts) # doctest: +ELLIPSIS
 AR(p = 3, intercept = ..., phi = [-0.0... -0.1...  0.5...])
 
->>> fitted_model = model.predict(ts)
->>> prediction = model.forecast(ts, periods = 2)
->>> prediction # doctest: +ELLIPSIS
-            ci_inf  ci_sup       series
-1972-10-01     NaN     NaN  610...
-1972-11-01     NaN     NaN  563...
+>>> fitted_model = model.simulate(ts)
+>>> model.predict(ts, periods = 2) # doctest: +ELLIPSIS
+            ci_inf  ci_sup       series    bootstrap
+1972-10-01     NaN     NaN  6...  6...
+1972-11-01     NaN     NaN  5...  5...
 
 If confidence intervals are calculated with 95% level and 300 iterations:
->>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
->>> prediction # doctest: +ELLIPSIS
-                 ci_inf        ci_sup       series
-1972-10-01  ...  ...  610...
-1972-11-01  ...  ...  563...
+>>> model.predict(ts, periods = 2, confidence_interval = 0.95) # doctest: +ELLIPSIS
+                 ci_inf        ci_sup    bootstrap       series
+1972-10-01  ...  ...  6...  6...
+1972-11-01  ...  ...  5...  5...
 
 AR model using SciKit's Ridge linear model:
     
->>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Ridge(p = 3)
 >>> model = model.fit(ts)
->>> fitted_model = model.predict(ts)
->>> prediction = model.forecast(ts, periods = 2)
+>>> fitted_model = model.simulate(ts)
+>>> prediction = model.predict(ts, periods = 2)
 >>> prediction # doctest: +ELLIPSIS
-            ci_inf  ci_sup       series
-1972-10-01     NaN     NaN  6056...
-1972-11-01     NaN     NaN  5514...
+            ci_inf  ci_sup       series    bootstrap
+1972-10-01     NaN     NaN  6...  5...
+1972-11-01     NaN     NaN  5...  5...
 
 AR model using SciKit's Lasso linear model:
     
->>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_Lasso(p = 3)
 >>> model = model.fit(ts)
->>> fitted_model = model.predict(ts)
->>> prediction = model.forecast(ts, periods = 2)
+>>> fitted_model = model.simulate(ts)
+>>> prediction = model.predict(ts, periods = 2)
 >>> prediction # doctest: +ELLIPSIS
-            ci_inf  ci_sup       series
-1972-10-01     NaN     NaN  6056...
-1972-11-01     NaN     NaN  5514...
+            ci_inf  ci_sup       series    bootstrap
+1972-10-01     NaN     NaN  6...  6...
+1972-11-01     NaN     NaN  5...  5...
 
 AR model using SciKit's Elastic Net linear model:
     
->>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
 >>> model = AR_ElasticNet(p = 3)
 >>> model = model.fit(ts)
->>> fitted_model = model.predict(ts)
->>> prediction = model.forecast(ts, periods = 2)
+>>> fitted_model = model.simulate(ts)
+>>> prediction = model.predict(ts, periods = 2)
 >>> prediction # doctest: +ELLIPSIS
-            ci_inf  ci_sup       series
-1972-10-01     NaN     NaN  6056...
-1972-11-01     NaN     NaN  5514...
+            ci_inf  ci_sup       series    bootstrap
+1972-10-01     NaN     NaN  6...  6...
+1972-11-01     NaN     NaN  5...  5...
 
 AR SciKit's models receives same parameters as regression models. 
 
@@ -85,6 +81,7 @@ Classes
 """
 
 from base_model import base_model
+from datasets import *
 
 import numpy
 import scipy
@@ -108,10 +105,13 @@ class AR(base_model):
     """
 
     def __init__(self, p=None, intercept=None, phi=None):
+        
+        
         if p == None:
-            raise ValueError('Please insert parameter p')
+            self.p = 1
         else:
             self.p = p
+        
         
         if intercept == False:
             self.phi0 = 0
@@ -134,8 +134,8 @@ class AR(base_model):
         
     def __repr__(self):
         return 'AR(p = ' + str(self.p) + ', intercept = ' + str(self.phi0) + ', phi = ' + str(self.phi) +')'
+               
         
-
     def params2vector(self):
         """ Parameters to vector
         
@@ -192,7 +192,7 @@ class AR(base_model):
             
         return self
 
-    def __get_X__(self, ts):
+    def get_X(self, ts):
         y = ts.values
         X = list()
         for i in range(len(ts)):
@@ -210,20 +210,32 @@ class AR(base_model):
                 X.append(value)
         return X
     
-    def __forward__(self, y):
-        y = y.values
+    def forecast(self, ts):
+        """ Next step 
+        
+        Args:
+            ts (pandas.Series): Time series to find next value
+            
+        Returns:
+            Value of next time stamp
+            
+        """
+        
+        if len(self.phi) != self.p:
+            self.phi = numpy.random.rand(self.p)        
+        
+        y = ts.values
         lon = len(y)
         if lon <= self.p:
             y_last = y[0:lon]
             result = self.phi0 + numpy.dot(y_last, self.phi[0:lon])
-            #result = numpy.nan
         else:
             y_last = y[lon-self.p:lon]
             result = self.phi0 + numpy.dot(y_last, self.phi)
 
         return result
 
-    def predict(self, ts):
+    def simulate(self, ts):
         """ Fits a time series using self model parameters
         
         Args:
@@ -239,7 +251,7 @@ class AR(base_model):
             if i == 0:
                 result = self.phi0
             else:
-                result = self.__forward__(y[0:i])
+                result = self.forecast(y[0:i])
             prediction.append(result)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
@@ -562,6 +574,6 @@ class AR_ElasticNet(AR):
         
         return self  
 
-#if __name__ == "__main__":
-#    import doctest
-#    doctest.testmod()
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

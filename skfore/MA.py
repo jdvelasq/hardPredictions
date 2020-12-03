@@ -69,7 +69,10 @@ class MA(base_model):
 
     def __init__(self, q=None, intercept=None, theta=None):
 
-        self.q = q
+        if q == None:
+            self.q = 0
+        else:
+            self.q = q
         
         if intercept == None:
             self.theta0 = numpy.random.rand(1)[0]

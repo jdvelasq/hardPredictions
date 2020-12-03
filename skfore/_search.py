@@ -3,36 +3,43 @@
 """
 
 from sklearn.model_selection import ParameterGrid
+import copy
+
 
 class GridSearchCV():
     
     def __init__(self, model, parameters, error_function = None):
+        self.initial_model = model
         self.model = model
+        self.parameters = parameters
         self.param_grid = ParameterGrid(parameters)
-    
-    def fit(self, ts, **fit_params):
         
-        error = list()
-        cv_results_ = list()
-        best_score_ = None
-        best_params_ = None
-        best_model_ = None
+        self.cv_results_ = list()
+        self.best_score_ = None
+        self.best_params_ = None
+        self.best_model_ = None
+        
+    def __repr__(self):
+        return 'GridSearchCV(model = ' + str(self.initial_model) + ', parameters = ' + str(self.parameters) +')'
+    
+    def fit(self, ts, **fit_params):        
+        
         for parameters in self.param_grid:
-            self.model.__init__()
-            model = self.model.update(parameters)
+            model = copy.deepcopy(self.model)
+            model.__init__()
+            model = model.update(parameters)
             model.fit(ts, **fit_params)
             i_error = model.calc_error(ts)
-            error.append(i_error)
             
             params = parameters
             params['score'] = i_error
-            cv_results_.append(params)
+            self.cv_results_.append(params)
             
-            if best_score_ == None or i_error < best_score_:
-                best_score_ = i_error
-                best_params_ = parameters
-                best_model_ = model
+            if self.best_score_ == None or i_error < self.best_score_:
+                self.best_score_ = i_error
+                self.best_params_ = parameters
+                self.best_model_ = model
 
-        return cv_results_, best_model_, best_score_, best_params_
+        return self
 
     

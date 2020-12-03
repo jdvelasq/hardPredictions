@@ -108,7 +108,7 @@ class AR(base_model):
         
         
         if p == None:
-            self.p = 1
+            self.p = 0
         else:
             self.p = p
         

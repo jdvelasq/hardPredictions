@@ -24,53 +24,40 @@ Load time series
 >>> model
 AR(p = 3, intercept = None, phi = None)
 
+>>> random.seed(1)
 >>> model.fit(ts) # doctest: +ELLIPSIS
-AR(p = 3, intercept = ..., phi = [-0.0... -0.1...  0.5...])
+AR(p = 3, intercept = 3568.0..., phi = [-0.094... -0.193...   0.549...])
 
->>> fitted_model = model.simulate(ts)
+>>> random.seed(1)
 >>> model.predict(ts, periods = 2) # doctest: +ELLIPSIS
-            ci_inf  ci_sup       series    bootstrap
-1972-10-01     NaN     NaN  6...  6...
-1972-11-01     NaN     NaN  5...  5...
+                 ci_inf        ci_sup  ...      forecast  real
+1972-10-01  2813...   9878...  ...   6080...  None
+1972-11-01  1979...  11063...  ...   5880...  None
+<BLANKLINE>
+[2 rows x 6 columns]
 
 If confidence intervals are calculated with 95% level and 300 iterations:
->>> model.predict(ts, periods = 2, confidence_interval = 0.95) # doctest: +ELLIPSIS
-                 ci_inf        ci_sup    bootstrap       series
-1972-10-01  ...  ...  6...  6...
-1972-11-01  ...  ...  5...  5...
+>>> random.seed(1)
+>>> model.predict(ts, periods = 2, confidence_interval = 0.90) # doctest: +ELLIPSIS
+                 ci_inf       ci_sup  ...      forecast  real
+1972-10-01  3017...  8954...  ...   6049...  None
+1972-11-01  2421...  8677...  ...   5514...  None
+<BLANKLINE>
+[2 rows x 6 columns]
 
 AR model using SciKit's Ridge linear model:
     
 >>> model = AR_Ridge(p = 3)
+>>> random.seed(1)
 >>> model = model.fit(ts)
->>> fitted_model = model.simulate(ts)
+>>> random.seed(1)
 >>> prediction = model.predict(ts, periods = 2)
 >>> prediction # doctest: +ELLIPSIS
-            ci_inf  ci_sup       series    bootstrap
-1972-10-01     NaN     NaN  6...  5...
-1972-11-01     NaN     NaN  5...  5...
-
-AR model using SciKit's Lasso linear model:
-    
->>> model = AR_Lasso(p = 3)
->>> model = model.fit(ts)
->>> fitted_model = model.simulate(ts)
->>> prediction = model.predict(ts, periods = 2)
->>> prediction # doctest: +ELLIPSIS
-            ci_inf  ci_sup       series    bootstrap
-1972-10-01     NaN     NaN  6...  6...
-1972-11-01     NaN     NaN  5...  5...
-
-AR model using SciKit's Elastic Net linear model:
-    
->>> model = AR_ElasticNet(p = 3)
->>> model = model.fit(ts)
->>> fitted_model = model.simulate(ts)
->>> prediction = model.predict(ts, periods = 2)
->>> prediction # doctest: +ELLIPSIS
-            ci_inf  ci_sup       series    bootstrap
-1972-10-01     NaN     NaN  6...  6...
-1972-11-01     NaN     NaN  5...  5...
+                 ci_inf        ci_sup  ...      forecast  real
+1972-10-01  2550...   9904...  ...   5992...  None
+1972-11-01  2020...  10068...  ...   5675...  None
+<BLANKLINE>
+[2 rows x 6 columns]
 
 AR SciKit's models receives same parameters as regression models. 
 
@@ -86,6 +73,7 @@ from datasets import *
 import numpy
 import scipy
 import pandas
+import random
 from extras import add_next_date
 from sklearn import linear_model
 
@@ -193,6 +181,15 @@ class AR(base_model):
         return self
 
     def get_X(self, ts):
+        """ Get matrix of regressors
+        
+        Args:
+            ts (pandas.Series): Time series to create matrix of regressors
+            
+        Returns:
+            List of list of regressors for every time in series
+        
+        """
         y = ts.values
         X = list()
         for i in range(len(ts)):
@@ -329,7 +326,7 @@ class AR_Ridge(AR):
     def fit(self, ts):
         
         if self.optim_type == 'complete':
-             X = self.__get_X__(ts)
+             X = self.get_X(ts)
              y = ts.values.tolist()
              ridge_model = linear_model.Ridge(alpha = self.alpha, copy_X = self.copy_X,
                                               fit_intercept = self.fit_intercept,
@@ -344,7 +341,7 @@ class AR_Ridge(AR):
              self.vector2params(vector = optim_params)
         
         elif self.optim_type == 'no_intercept':
-            X = self.__get_X__(ts)
+            X = self.get_X(ts)
             y = ts.values.tolist()
             ridge_model = linear_model.Ridge(alpha = self.alpha, copy_X = self.copy_X,
                                              fit_intercept = False,
@@ -435,7 +432,7 @@ class AR_Lasso(AR):
     def fit(self, ts):
         
         if self.optim_type == 'complete':
-            X = self.__get_X__(ts)
+            X = self.get_X(ts)
             y = ts.values.tolist()
             lasso_model = linear_model.Lasso(alpha = self.alpha, copy_X = self.copy_X,
                                              fit_intercept = self.fit_intercept,
@@ -453,7 +450,7 @@ class AR_Lasso(AR):
             self.vector2params(vector = optim_params)
         
         elif self.optim_type == 'no_intercept':
-            X = self.__get_X__(ts)
+            X = self.get_X(ts)
             y = ts.values.tolist()
             lasso_model = linear_model.Lasso(alpha = self.alpha, copy_X = self.copy_X,
                                              fit_intercept = False,
@@ -530,7 +527,7 @@ class AR_ElasticNet(AR):
     def fit(self, ts):
         
         if self.optim_type == 'complete':
-             X = self.__get_X__(ts)
+             X = self.get_X(ts)
              y = ts.values.tolist()
              lasso_model = linear_model.ElasticNet(alpha = self.alpha, copy_X = self.copy_X,
                                                    fit_intercept = self.fit_intercept,
@@ -549,7 +546,7 @@ class AR_ElasticNet(AR):
              self.vector2params(vector = optim_params)
         
         elif self.optim_type == 'no_intercept':
-             X = self.__get_X__(ts)
+             X = self.get_X(ts)
              y = ts.values.tolist()
              lasso_model = linear_model.ElasticNet(alpha = self.alpha, copy_X = self.copy_X,
                                                    fit_intercept = False,
@@ -576,4 +573,4 @@ class AR_ElasticNet(AR):
 
 if __name__ == "__main__":
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags = doctest.ELLIPSIS)

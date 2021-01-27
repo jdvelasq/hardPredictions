@@ -11,32 +11,40 @@ This module contains ARMA models using SciPy's minimization method.
 Examples
 -------------------------------------------------------------------------------
 
+AR model using SciPy's minimization
 
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
->>> model = ARMA(p = 2, q = 3)
->>> model = model.fit(ts)
->>> fitted_model = model.predict(ts)
->>> prediction = model.forecast(ts, periods = 3)
->>> prediction
-            ci_inf  ci_sup       series
-1972-10-01     NaN     NaN  3646.138084
-1972-11-01     NaN     NaN  4763.476525
-1972-12-01     NaN     NaN  4205.279228
->>> prediction = model.forecast(ts, periods = 2, confidence_interval = 0.95)
->>> prediction
-                ci_inf       ci_sup       series
-1972-10-01   80.935482  6479.458676  3645.453875
-1972-11-01  733.457614  8092.782317  4762.201208
+Get predicted values as a DataFrame:
+
+Load time series
+>>> ts = load_champagne()
+
+>>> model = ARMA(p = 2, q = 3) 
+ARMA(p = 2, q = 3, intercept = None, phi = None, theta = None)
+
+>>> random.seed(1)
+>>> model.fit(ts) # doctest: +ELLIPSIS
+ARMA(p = 2, q = 3, intercept = 2469..., phi = [-0.072... -0.620...], theta = [0.355... 0.589... 0.917...])
+
+>>> random.seed(1)
+>>> model.predict(ts, periods = 3) # doctest: +ELLIPSIS
+                 ci_inf        ci_sup  ...      forecast  real
+1972-10-01  3080...   9706...  ...   5744...  None
+1972-11-01   773...   9113...  ...   4746...  None
+1972-12-01  2063...  10183...  ...   6043...  None
+<BLANKLINE>
+[3 rows x 6 columns]
+
 
 """
 
-from skfore.base_model import base_model
+from base_model import base_model
 
 import numpy
 import scipy
 import pandas
+import random
 from sklearn import *
-from skfore.extras import add_next_date
+from extras import add_next_date
 
 class ARMA(base_model):
     """ Moving-average model
@@ -56,12 +64,12 @@ class ARMA(base_model):
         self.y = None
         
         if p == None:
-            raise ValueError('Please insert parameter p')
+            self.p = 0
         else:
             self.p = p
         
         if q == None:
-            raise ValueError('Please insert parameter q')
+            self.q = 0
         else:
             self.q = q
         
@@ -162,8 +170,16 @@ class ARMA(base_model):
             
         return self
 
-    def __forward__(self, ts):
+    def forecast(self, ts):
+        """ Next step 
         
+        Args:
+            ts (pandas.Series): Time series to find next value
+            
+        Returns:
+            Value of next time stamp
+            
+        """
         lon_ts = len(ts.values)
             
         if self.p == 0:
@@ -210,14 +226,14 @@ class ARMA(base_model):
 
         return result
 
-    def predict(self, ts):
+    def simulate(self, ts):
         """ Fits a time series using self model parameters
         
         Args:
-            ts (pandas.Series): Time series to fit.
+            ts (pandas.Series): Time series to fit
         
         Returns:
-            Fitted time series.
+            Fitted time series
             
         """
 
@@ -226,7 +242,7 @@ class ARMA(base_model):
             if i == 0:
                 result = self.intercept
             else:
-                result = self.__forward__(ts[0:i])
+                result = self.forecast(ts[0:i])
             prediction.append(result)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
@@ -236,8 +252,8 @@ class ARMA(base_model):
         """ Finds optimal parameters using a given optimization function
         
         Args:
-            ts (pandas.Series): Time series to fit.
-            error_function (function): Function to estimates error.
+            ts (pandas.Series): Time series to fit
+            error_function (function): Function to estimates error
             
         Return:
             self
@@ -256,39 +272,7 @@ class ARMA(base_model):
             self.vector2params(vector = optim_params.x)
 
         return self
-
-    def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
-        """ Predicts future values in a given period
-        
-        Args:
-            ts (pandas.Series): Time series to predict.
-            periods (int): Number of periods ahead to predict.
-            
-        Returns:
-            Time series of predicted values.
-        
-        """
-        for i in range(periods):
-            if i == 0:
-                y = ts
-
-            value = self.__forward__(y)
-            y = add_next_date(y, value)
-        
-        if confidence_interval == None:
-            for i in range(periods):
-                if i == 0:
-                    ci_zero = ts
-                ci_zero = add_next_date(ci_zero, None)
-            
-            ci_inf = ci_zero[-periods:]
-            ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
-            
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        result = ci.append(prediction)
-
-        return result.transpose()
+    
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags = doctest.ELLIPSIS)

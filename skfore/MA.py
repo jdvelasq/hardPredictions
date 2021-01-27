@@ -15,34 +15,33 @@ Examples
 
 MA model using SciPy's minimization:
 
->>> ts = pandas.Series.from_csv('../datasets/champagne.csv', index_col = 0, header = 0)
+>>> ts = load_champagne()
+
 >>> model = MA(q = 3)
 >>> model
 MA(q = 3, intercept = None, theta = None)
->>> model = model.fit(ts)
->>> model
-MA(q = 3, intercept = 0.7576070305877793, theta = [0.47415837 0.96800789 0.50682355])
->>> prediction = model.predict(ts, periods = 3)
->>> prediction
-            ci_inf  ci_sup       series
-1972-10-01     NaN     NaN  3644.781559
-1972-11-01     NaN     NaN  4762.075950
-1972-12-01     NaN     NaN  4204.870830
->>> prediction = model.predict(ts, periods = 3, confidence_interval = 0.95)
->>> prediction
-                 ci_inf       ci_sup       series
-1972-10-01  -254.905599  6322.683321  3645.819521
-1972-11-01   464.706361  7951.797533  4762.630139
-1972-12-01 -1114.609601  8133.907219  4205.907253
->>> model.plot(ts, periods = 3, confidence_interval = 0.95)
 
-.. image:: ./images/ma_1.png
-  :width: 400
-  :alt: MA 3
-  :align: center
-  
+>>> random.seed(1)
+>>> model.fit(ts) # doctest: +ELLIPSIS
+MA(q = 3, intercept = 153..., theta = [-0.489... -0.678... -0.112...])
 
+>>> random.seed(1)
+>>> model.predict(ts, periods = 3) # doctest: +ELLIPSIS
+                 ci_inf        ci_sup  ...      forecast  real
+1972-10-01  3824...  11215...  ...   7069...  None
+1972-11-01  3277...  11575...  ...   6585...  None
+1972-12-01  3430...  11987...  ...   6555...  None
+<BLANKLINE>
+[3 rows x 6 columns]
 
+>>> random.seed(1)
+>>> model.predict(ts, periods = 3, confidence_interval = 0.90) # doctest: +ELLIPSIS
+                 ci_inf        ci_sup  ...      forecast  real
+1972-10-01  4473...  10328...  ...   6864...  None
+1972-11-01  4235...   9363...  ...   6396...  None
+1972-12-01  3279...   8801...  ...   5835...  None
+<BLANKLINE>
+[3 rows x 6 columns]
 
 """
 
@@ -61,6 +60,8 @@ class MA(base_model):
 
     Args:
         q (int): order.
+        intercept (boolean or double): False for set intercept to 0 or double 
+        theta (array): array of q-length for set parameters without optimization
 
     Returns:
         MA model structure of order q.
@@ -74,17 +75,12 @@ class MA(base_model):
         else:
             self.q = q
         
-        if intercept == None:
-            self.theta0 = numpy.random.rand(1)[0]
-        elif intercept == False:
+        if intercept == False:
             self.theta0 = 0
         else:
             self.theta0 = intercept
             
-        if theta == None:
-            self.theta = numpy.random.rand(self.q)
-        else:
-            self.theta = theta
+        self.theta = theta
             
         if intercept == None and theta == None:
             self.optim_type = 'complete'
@@ -113,6 +109,10 @@ class MA(base_model):
 
         """        
         params = list()
+        if self.theta0 == None:
+            self.theta0 = numpy.random.rand(1)[0]
+        if self.theta == None:
+            self.theta = numpy.random.rand(self.q)
         
         if self.optim_type == 'complete':
             params.append(self.theta0)
@@ -135,7 +135,7 @@ class MA(base_model):
         
         Args:
             vector (list): vector of length q+1 to convert into parameters of 
-            the model.
+            the model
             
         Returns:
             self
@@ -155,6 +155,15 @@ class MA(base_model):
         return self
 
     def __get_X__(self, ts):
+        """ Get matrix of regressors
+        
+        Args:
+            ts (pandas.Series): Time series to create matrix of regressors
+            
+        Returns:
+            List of list of regressors for every time in series
+        
+        """
         if self.y == None:
             lon = len(ts.values)
             y = numpy.random.randn(lon)
@@ -223,10 +232,10 @@ class MA(base_model):
         """ Fits a time series using self model parameters
         
         Args:
-            ts (pandas.Series): Time series to fit.
+            ts (pandas.Series): Time series to fit
         
         Returns:
-            Fitted time series.
+            Fitted time series
             
         """
         prediction = list()
@@ -535,3 +544,7 @@ class MA_ElasticNet(MA):
             raise ValueError(error_message) 
         
         return self  
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags = doctest.ELLIPSIS)

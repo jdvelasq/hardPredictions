@@ -119,7 +119,7 @@ class ARMA(base_model):
             None.
             
         Returns:
-            Vector parameters of length p+1 to use in optimization.
+            Vector parameters of length p+q+1 to use in optimization.
 
         """        
         params = list()

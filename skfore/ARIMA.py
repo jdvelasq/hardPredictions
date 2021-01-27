@@ -11,21 +11,40 @@ This module contains ARIMA model based on skfore ARMA models.
 Examples
 -------------------------------------------------------------------------------
 
+Get predicted values as a DataFrame:
+   
+Load time series
+>>> ts = load_champagne()
 
->>> ts = pandas.Series.from_csv('datasets/champagne.csv', index_col = 0, header = 0)
+>>> model = ARIMA(p = 3, d = 1, q = 3)
+>>> model
+ARIMA(p = 3, d = 1, q = 3, intercept = None, phi = None, theta = None)
+
+>>> random.seed(1)
+>>> model.fit(ts) # doctest: +ELLIPSIS
+ARIMA(p = 3, d = 1, q = 3, intercept = 158..., phi = [-0.401...  0.227...  0.294...], theta = [ 0.008... -0.932... -0.275...])
+
+>>> random.seed(1)
+>>> model.predict(ts, periods = 2) # doctest: +ELLIPSIS
+                 ci_inf        ci_sup  ...      forecast  real
+1972-10-01  3390...   9592...  ...   6380...  None
+1972-11-01  3541...  10152...  ...   6696...  None
+<BLANKLINE>
+[2 rows x 6 columns]
+
 
 """
 
-from skfore.base_model import base_model
+from base_model import base_model
 
 import numpy
 import scipy
 import pandas
 from sklearn import *
-from skfore.extras import add_next_date
+from extras import add_next_date
 
 class ARIMA(base_model):
-    """ Moving-average model
+    """ Autoregressive integrated moving average model
     
     Parameter optimization method: scipy's minimization
 
@@ -33,8 +52,12 @@ class ARIMA(base_model):
         p (int): AR order
         d (int): I
         q (int): MA order
+        intercept (boolean or double): False for set intercept to 0 or double
+        phi (array): array of p-length for set parameters without optimization
+        theta (array): array of q-length for set parameters without optimization
 
     Returns:
+        ARIMA model structure of order p,d,q
 
     """
 
@@ -42,36 +65,27 @@ class ARIMA(base_model):
         self.y = None
         
         if p == None:
-            raise ValueError('Please insert parameter p')
+            self.p = 0
         else:
             self.p = p
             
         if d == None:
-            raise ValueError('Please insert parameter d')
+            self.d = 0
         else:
             self.d = d
         
         if q == None:
-            raise ValueError('Please insert parameter q')
+            self.q = 0
         else:
             self.q = q
         
-        if intercept == None:
-            self.intercept = numpy.random.rand(1)[0]
-        elif intercept == False:
+        if intercept == False:
             self.intercept = 0
         else:
             self.intercept = intercept
         
-        if phi == None:
-            self.phi = numpy.random.rand(self.p)
-        else:
-            self.phi = phi
-            
-        if theta == None:
-            self.theta = numpy.random.rand(self.q)
-        else:
-            self.theta = theta
+        self.phi = phi
+        self.theta = theta
             
         if intercept == None and theta == None and phi == None:
             self.optim_type = 'complete'
@@ -95,13 +109,20 @@ class ARIMA(base_model):
         """ Parameters to vector
         
         Args:
-            None.
+            None
             
         Returns:
-            
+            Vector parameters of length p+q+1 to use in optimization           
 
         """        
         params = list()
+        
+        if self.intercept == None:
+            self.intercept = numpy.random.rand(1)[0]
+        if self.phi == None:
+            self.phi = numpy.random.rand(self.p)
+        if self.theta== None:
+            self.theta = numpy.random.rand(self.p)
         
         if self.optim_type == 'complete':
             params.append(self.intercept)
@@ -127,6 +148,8 @@ class ARIMA(base_model):
         """ Vector to parameters
         
         Args:
+            vector (list): vector of length p+1 to convert into parameters of 
+            the model
             
         Returns:
             self
@@ -147,8 +170,16 @@ class ARIMA(base_model):
             
         return self
 
-    def __forward__(self, ts):
-
+    def forecast(self, ts):
+        """ Next step 
+        
+        Args:
+            ts (pandas.Series): Time series to find next value
+            
+        Returns:
+            Value of next time stamp
+            
+        """
         lon_ts = len(ts.values)
         
         if self.d == 0:
@@ -202,14 +233,14 @@ class ARIMA(base_model):
 
         return result
 
-    def predict(self, ts):
+    def simulate(self, ts):
         """ Fits a time series using self model parameters
         
         Args:
-            ts (pandas.Series): Time series to fit.
+            ts (pandas.Series): Time series to fit
         
         Returns:
-            Fitted time series.
+            Fitted time series
             
         """
 
@@ -221,7 +252,7 @@ class ARIMA(base_model):
                 except:
                     result = 0
             else:
-                result = self.__forward__(ts[0:i])
+                result = self.forecast(ts[0:i])
             prediction.append(result)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
@@ -231,8 +262,8 @@ class ARIMA(base_model):
         """ Finds optimal parameters using a given optimization function
         
         Args:
-            ts (pandas.Series): Time series to fit.
-            error_function (function): Function to estimates error.
+            ts (pandas.Series): Time series to fit
+            error_function (function): Function to estimates error
             
         Return:
             self
@@ -252,38 +283,6 @@ class ARIMA(base_model):
 
         return self
 
-    def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
-        """ Predicts future values in a given period
-        
-        Args:
-            ts (pandas.Series): Time series to predict.
-            periods (int): Number of periods ahead to predict.
-            
-        Returns:
-            Time series of predicted values.
-        
-        """
-        for i in range(periods):
-            if i == 0:
-                y = ts
-
-            value = self.__forward__(y)
-            y = add_next_date(y, value)
-        
-        if confidence_interval == None:
-            for i in range(periods):
-                if i == 0:
-                    ci_zero = ts
-                ci_zero = add_next_date(ci_zero, None)
-            
-            ci_inf = ci_zero[-periods:]
-            ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
-            
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        result = ci.append(prediction)
-
-        return result.transpose()
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags = doctest.ELLIPSIS)

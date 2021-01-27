@@ -54,9 +54,13 @@ class ARMA(base_model):
     Args:
         p (int): AR order
         q (int): MA order
+        intercept (boolean or double): False for set intercept to 0 or double
+        phi (array): array of p-length for set parameters without optimization
+        theta (array): array of q-length for set parameters without optimization
+
 
     Returns:
-        ARMA model structure of order q.
+        ARMA model structure of order p,q
 
     """
 

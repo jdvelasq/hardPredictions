@@ -12,31 +12,61 @@ models.
 Examples
 -------------------------------------------------------------------------------
 
+Get predicted values as a DataFrame:
+   
+Load time series
+>>> ts = load_champagne()
+
+>>> model = TAR(p = 3)
+>>> model
+TAR(p = 3, intercept_1 = None, intercept_2 = None, phi_1 = None, phi_2 = None)
+
+>>> random.seed(1)
+>>> model.fit(ts) # doctest: +ELLIPSIS
+TAR(p = 3, intercept_1 = 2758..., intercept_2 = 4144..., phi_1 = [-0.106... -0.250...   0.776... ], phi_2 = [-0.074... -0.188...  0.479...])
+
+>>> random.seed(1)
+>>> model.predict(ts, periods = 2) # doctest: +ELLIPSIS
+                 ci_inf       ci_sup  ...      forecast  real
+1972-10-01  2435...  9979...  ...   6239...  None
+1972-11-01  2150...  9655...  ...   5917...  None
+<BLANKLINE>
+[2 rows x 6 columns]
+
 
 
 """
 
-from skfore.base_model import base_model
+from base_model import base_model
 
 from AR import AR
 
 import numpy
 import scipy
 import pandas
-from skfore.extras import add_next_date
+from extras import add_next_date
 
 class TAR(base_model):
-    """ 
+    """ Threshold autoregressive for AR based models
+    
+    Parameter optimization method: scipy's minimization
+
+    Args:
+        p (int): order
+        intercept_1 (boolean or double): Intercept for first model. False for set intercept to 0 or double 
+        intercept_2 (boolean or double): Intercept for second model. False for set intercept to 0 or double 
+        phi_1 (array): array of p-length for set parameters of first model without optimization
+        phi_2 (array): array of p-length for set parameters of second model without optimization
+
+    Returns:
+        AR model structure of order p
 
     """
 
     def __init__(self, p=None, intercept_1=None, intercept_2 =None, phi_1=None, phi_2=None, max_interval = 10):
         
         
-        if p == None:
-            raise ValueError('Please insert parameter p')
-        else:
-            self.p = p
+        self.p = p
         
         self.intercept_1 = intercept_1
         self.intercept_2 = intercept_2
@@ -51,22 +81,22 @@ class TAR(base_model):
             
         
     def __repr__(self):
-        return 'TAR(p = ' + str(self.p) + ', intercept_1 = ' + str(self.model_1.phi0) + ', intercept_2 = ' + str(self.model_2.phi0) + ', phi_1 = ' + str(self.model_1.phi) + ', phi_2 = ' + str(self.model_2.phi) +')'
+        return 'TAR(p = ' + str(self.p) + ', intercept_1 = ' + str(self.intercept_1) + ', intercept_2 = ' + str(self.intercept_2) + ', phi_1 = ' + str(self.phi_1) + ', phi_2 = ' + str(self.phi_2) +')'
         
 
-    def predict(self, ts):
+    def simulate(self, ts):
         """ Fits a time series using self model parameters
         
         Args:
-            ts (pandas.Series): Time series to fit.
+            ts (pandas.Series): Time series to fit
         
         Returns:
-            Fitted time series.
+            Fitted time series
             
         """
 
-        prediction_1 = self.model_1.predict(self.ts_1)
-        prediction_2 = self.model_2.predict(self.ts_2)
+        prediction_1 = self.model_1.simulate(self.ts_1)
+        prediction_2 = self.model_2.simulate(self.ts_2)
         prediction = prediction_1.append(prediction_2)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
@@ -83,6 +113,10 @@ class TAR(base_model):
             self
         
         """
+        
+        if self.p == None:
+            raise ValueError('Please insert parameter p')
+            
         errors = list()
         tes = list()
         for d in range(self.max_interval, len(ts)-self.max_interval):
@@ -103,42 +137,28 @@ class TAR(base_model):
         self.model_1 = self.model_1.fit(self.ts_1, error_function)
         self.model_2 = AR(p = self.p, intercept = self.intercept_2, phi = self.phi_2)
         self.model_2 = self.model_2.fit(self.ts_2, error_function)
+        
+        self.intercept_1 = self.model_1.phi0
+        self.intercept_2 = self.model_2.phi0
+        self.phi_1 = self.model_1.phi
+        self.phi_2 = self.model_2.phi
 
         return self
     
 
-    def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
-        """ Predicts future values in a given period
+    def forecast(self, ts):
+        """ Next step 
         
         Args:
-            ts (pandas.Series): Time series to predict.
-            periods (int): Number of periods ahead to predict.
+            ts (pandas.Series): Time series to find next value
             
         Returns:
-            Time series of predicted values.
-        
+            Value of next time stamp
+            
         """
-        for i in range(periods):
-            if i == 0:
-                y = ts[self.d:]
 
-            value = self.model_2.__forward__(y)
-            y = add_next_date(y, value)
-        
-        if confidence_interval == None:
-            for i in range(periods):
-                if i == 0:
-                    ci_zero = ts
-                ci_zero = add_next_date(ci_zero, None)
-            
-            ci_inf = ci_zero[-periods:]
-            ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
-            
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        result = ci.append(prediction)
+        return self.model_2.forecast(ts)
 
-        return result.transpose()
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags = doctest.ELLIPSIS)

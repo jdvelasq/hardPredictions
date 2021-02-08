@@ -6,8 +6,42 @@ Multi Layer Perceptron Model
 Overview
 -------------------------------------------------------------------------------
 
+This module contains a Multi Layer Perceptron model based on SciKit's MLPRegressor
+model. 
+
+
 Examples
 -------------------------------------------------------------------------------
+
+Get predicted values as a DataFrame:
+   
+Load time series
+>>> ts = load_champagne()
+
+>>> model = MLP(p = 3, optim_type='auto')
+>>> model
+MLP(p = 3, model = None)
+
+>>> random.seed(100)
+>>> model.fit(ts) # doctest: +ELLIPSIS
+MLP(p = 3, model = MLPRegressor(activation='relu', alpha=0.0005901, batch_size='auto',
+       beta_1=0.9, beta_2=0.999, early_stopping=False, epsilon=1e-08,
+       hidden_layer_sizes=(11,), learning_rate='constant',
+       learning_rate_init=0.001, max_iter=5000, momentum=0.9,
+       nesterovs_momentum=True, power_t=0.5, random_state=None,
+       shuffle=True, solver='adam', tol=0.0001, validation_fraction=0.1,
+       verbose=False, warm_start=False))
+
+>>> random.seed(100)
+>>> model.predict(ts, periods = 2) # doctest: +ELLIPSIS
+                 ci_inf       ci_sup  ...      forecast  real
+1972-10-01  3438...  7854...  ...   5609...  None
+1972-11-01  4007...  7835...  ...   6230... None
+<BLANKLINE>
+[2 rows x 6 columns]
+
+
+
 
 
 Classes
@@ -15,7 +49,8 @@ Classes
 
 """
 
-from skfore.base_model import base_model
+from base_model import base_model
+from datasets import *
 
 import numpy
 import scipy
@@ -26,8 +61,6 @@ from sklearn import neural_network
 
 class MLP(base_model):
     """ Multi Layer Perceptron Model
-    
-    Parameter optimization method: scipy's minimization
 
     Args:
         p (int): order
@@ -40,9 +73,10 @@ class MLP(base_model):
 
     """
 
-    def __init__(self, p=None, optim_type='auto', hidden_layer_sizes=(100, ), activation='relu', solver='adam', alpha=0.0001, batch_size='auto', learning_rate='constant', learning_rate_init=0.001, power_t=0.5, max_iter=200, shuffle=True, random_state=None, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True, early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08, n_iter_no_change=10):
+    def __init__(self, p=None, optim_type='use_parameters', hidden_layer_sizes=(100, ), activation='relu', solver='adam', alpha=0.0001, batch_size='auto', learning_rate='constant', learning_rate_init=0.001, power_t=0.5, max_iter=200, shuffle=True, random_state=None, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True, early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08, n_iter_no_change=10):
+        
         if p == None:
-            raise ValueError('Please insert parameter p')
+            self.p = 0
         else:
             self.p = p
         
@@ -99,13 +133,22 @@ class MLP(base_model):
                 X.append(value)
         return X
     
-    def __forward__(self, y):
+    def forecast(self, y):
+        """ Next step 
+        
+        Args:
+            y (list): Time series list to find next value
+            
+        Returns:
+            Value of next time stamp
+            
+        """
         Xtest = self.__get_X__(y)
         result = self.model.predict(Xtest)
         return result[-1]
     
 
-    def predict(self, ts):
+    def simulate(self, ts):
         """ Fits a time series using self model parameters
         
         Args:
@@ -167,43 +210,4 @@ class MLP(base_model):
             
         return self
 
-    def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
-        """ Predicts future values in a given period
-        
-        Args:
-            ts (pandas.Series): Time series to predict
-            periods (int): Number of periods ahead to predict
-            confidence_interval (double): Confidence interval level (0 to 1)
-            iterations (int): Number of iterations
-            
-        Returns:
-            Time series of predicted values.
-        
-        """
-        
-        for i in range(periods):
-            if i == 0:
-                y = ts
-
-            value = self.__forward__(y)
-            y = add_next_date(y, value)
-        
-        if confidence_interval == None:
-            for i in range(periods):
-                if i == 0:
-                    ci_zero = ts
-                ci_zero = add_next_date(ci_zero, None)
-            
-            ci_inf = ci_zero[-periods:]
-            ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
-            
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        pre_result = ci.append(prediction)
-        
-        result = pre_result.transpose()
-
-        return result
+   

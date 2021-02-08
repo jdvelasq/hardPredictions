@@ -209,5 +209,9 @@ class MLP(base_model):
             raise ValueError(error_message)
             
         return self
+    
+    
 
-   
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags = doctest.ELLIPSIS)

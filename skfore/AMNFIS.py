@@ -16,19 +16,33 @@ NO. 8, AUG. 2015.
 Examples
 -------------------------------------------------------------------------------
 
->>> ts = pandas.Series.from_csv('datasets/WWWusage.csv', index_col = 0, header = 0)
->>> model = AMNFIS(p = 4, c = 4)
->>> model.fit(ts)
-AMNFIS(p = 4, c = 4)
->>> prediction = model.forecast(ts, periods = 5)
->>> prediction # doctest: +ELLIPSIS
-            ci_inf  ci_sup      series
-1971-12-31     NaN     NaN  219.9...
-1972-12-31     NaN     NaN  219.0...
-1973-12-31     NaN     NaN  216.8...
-1974-12-31     NaN     NaN  214.7...
-1975-12-31     NaN     NaN  214.0...
+Get predicted values as a DataFrame:
+   
+Load time series
+>>> ts = load_champagne()
 
+>>> random.seed(100)
+>>> model = AMNFIS(p = 4, c = 4)
+>>> model  # doctest: +ELLIPSIS
+AMNFIS(p = 4, c = 4, phi0 = [0.504... 0.610... 0.129... 0.5783...], phi = [[0.847... 0.517... 0.656... 0.978...]
+ [0.105...  0.830... 0.595... 0.047...]
+ [0.094... 0.997... 0.106... 0.893...]
+ [0.121... 0.189... 0.833... 0.415...]])
+
+>>> random.seed(100)
+>>> model.fit(ts) # doctest: +ELLIPSIS
+AMNFIS(p = 4, c = 4, phi0 = [112994..., -57501..., -58520..., 83910...], phi = [[  -2...   -1...  -12...  -30...]
+ [ 935... -556...  15...  954...]
+ [-926...  554...  -14... -953...]
+ [ -12...    2...    10...   34...]])
+
+>>> random.seed(100)
+>>> model.predict(ts, periods = 2) # doctest: +ELLIPSIS
+                 ci_inf        ci_sup  ...      forecast  real
+1972-10-01  4668...   8992...  ...   6700...  None
+1972-11-01  5502...  11967...  ...   8616...  None
+<BLANKLINE>
+[2 rows x 6 columns]
 
 Classes
 -------------------------------------------------------------------------------
@@ -36,6 +50,7 @@ Classes
 """
 
 from base_model import base_model
+from datasets import *
 
 import numpy
 import scipy
@@ -63,13 +78,14 @@ class AMNFIS(base_model):
     """
 
     def __init__(self, p=None, c=None, optim_type='complete', phi0=None, phi=None):
+        
         if p == None:
-            raise ValueError('Please insert parameter p')
+            self.p = 0
         else:
             self.p = p
             
         if c == None:
-            raise ValueError('Please insert parameter c')
+            self.c = 1
         else:
             self.c = c   
             
@@ -87,7 +103,7 @@ class AMNFIS(base_model):
             
         
     def __repr__(self):
-        return 'AMNFIS(p = ' + str(self.p) + ', c = ' + str(self.c) +')'
+        return 'AMNFIS(p = ' + str(self.p) + ', c = ' + str(self.c) + ', phi0 = ' + str(self.phi0) +', phi = ' + str(self.phi) + ')'
         
 
     def params2vector(self):
@@ -166,8 +182,18 @@ class AMNFIS(base_model):
         return wi
         
 
-    def __forward__(self, y):
-        y = y.values
+    def forecast(self, ts):
+        """ Next step 
+        
+        Args:
+            ts (pandas.Series): Time series to find next value
+            
+        Returns:
+            Value of next time stamp
+            
+        """
+        
+        y = ts.values
         lon = len(y)
         y_last = y[lon-self.p:lon]        
         wi = self.__calc_wi__(y_last)
@@ -181,7 +207,7 @@ class AMNFIS(base_model):
 
         return total
 
-    def predict(self, ts):
+    def simulate(self, ts):
         """ Fits a time series using self model parameters
         
         Args:
@@ -197,7 +223,7 @@ class AMNFIS(base_model):
             if i < self.p:
                 result = 0
             else:
-                result = self.__forward__(y[0:i])
+                result = self.forecast(y[0:i])
             prediction.append(result)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
@@ -240,3 +266,7 @@ class AMNFIS(base_model):
             self.centers = optim_centers.x
 
         return self
+    
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags = doctest.ELLIPSIS)

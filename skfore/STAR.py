@@ -6,10 +6,33 @@ STAR Model
 Overview
 -------------------------------------------------------------------------------
 
-This module contains STAR models
+This module contains STAR models using SciPy's minimization method for parameter
+optimization.
 
 Examples
 -------------------------------------------------------------------------------
+
+Get predicted values as a DataFrame:
+ 
+Load time series
+>>> ts = load_champagne()
+
+>>> model = STAR(p = 3)
+>>> model
+STAR(p = 3, gamma = None, center = None, intercept_1 = None, phi_1 = None, intercept_2 = None, phi_2 = None)
+
+>>> random.seed(100)
+>>> model.fit(ts) # doctest: +ELLIPSIS
+STAR(p = 3, gamma = 0.627..., center = 0.567..., intercept_1 = 3567..., phi_1 = [-0.094...   -0.193...  0.549... ], intercept_2 = 0.970..., phi_2 = [0.231... 0.769... 0.990...])
+
+>>> random.seed(100)
+>>> model.predict(ts, periods = 2) # doctest: +ELLIPSIS
+                 ci_inf        ci_sup  ...      forecast  real
+1972-10-01  2497...  10038...  ...   6119...  None
+1972-11-01  1974...  10220...  ...   5706...  None
+<BLANKLINE>
+[2 rows x 6 columns]
+    
 
 
 Classes
@@ -18,15 +41,30 @@ Classes
 """
 
 from base_model import base_model
+from datasets import *
 
 import numpy
 import scipy
 import pandas
 import math
-from skfore.extras import add_next_date
+import random
+from extras import add_next_date
 
 class STAR(base_model):
-    """ 
+    """ Smooth Transition Autoregressive model
+    
+    Parameter optimization method: scipy's minimization
+
+    Args:
+        p (int): order
+        gamma (float): gamma parameter for transition function
+        intercept_1 (boolean or double): Intercept for first model. False for set intercept to 0 or double 
+        intercept_2 (boolean or double): Intercept for second model. False for set intercept to 0 or double 
+        phi_1 (array): array of p-length for set parameters of first model without optimization
+        phi_2 (array): array of p-length for set parameters of second model without optimization
+
+    Returns:
+        STAR model structure of order p
 
     """
 
@@ -62,7 +100,11 @@ class STAR(base_model):
     def params2vector(self):
         """ Parameters to vector
         
-        
+        Args:
+            None
+            
+        Returns:
+            Vector parameters of length p+1 to use in optimization
 
         """        
         params = list()
@@ -102,6 +144,12 @@ class STAR(base_model):
     def vector2params(self, vector):
         """ Vector to parameters
         
+        Args:
+            vector (list): vector of length p+1 to convert into parameters of 
+            the model
+            
+        Returns:
+            self
 
         """ 
         
@@ -129,7 +177,16 @@ class STAR(base_model):
             
         return self
     
-    def __forward__(self, y):
+    def forecast(self, y):
+        """ Next step 
+        
+        Args:
+            ts (pandas.Series): Time series to find next value
+            
+        Returns:
+            Value of next time stamp
+            
+        """
         y = y.values
         lon = len(y)
         if lon <= self.p:
@@ -145,20 +202,20 @@ class STAR(base_model):
 
         return result
 
-    def predict(self, ts):
+    def simulate(self, ts):
         """ Fits a time series using self model parameters
         
         Args:
-            ts (pandas.Series): Time series to fit.
+            ts (pandas.Series): Time series to fit
         
         Returns:
-            Fitted time series.
+            Fitted time series
             
         """
         y = ts
         prediction = list()
         for i in range(len(y)):
-            result = self.__forward__(y[0:i])
+            result = self.forecast(y[0:i])
             prediction.append(result)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
@@ -189,40 +246,7 @@ class STAR(base_model):
             self.vector2params(vector = optim_params.x)
 
         return self
-    
 
-    def forecast(self, ts, periods, confidence_interval = None, iterations = 300):
-        """ Predicts future values in a given period
-        
-        Args:
-            ts (pandas.Series): Time series to predict.
-            periods (int): Number of periods ahead to predict.
-            
-        Returns:
-            Time series of predicted values.
-        
-        """
-        for i in range(periods):
-            if i == 0:
-                y = ts
-
-            value = self.__forward__(y)
-            y = add_next_date(y, value)
-        
-        if confidence_interval == None:
-            for i in range(periods):
-                if i == 0:
-                    ci_zero = ts
-                ci_zero = add_next_date(ci_zero, None)
-            
-            ci_inf = ci_zero[-periods:]
-            ci_sup = ci_zero[-periods:]
-            ci = pandas.DataFrame([ci_inf, ci_sup], index = ['ci_inf', 'ci_sup'])            
-        else:
-            ci = self.simulate(ts, periods, confidence_interval, iterations)
-            
-        prediction = y[-periods:]
-        prediction.name = 'series'
-        result = ci.append(prediction)
-
-        return result.transpose()
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(optionflags = doctest.ELLIPSIS)

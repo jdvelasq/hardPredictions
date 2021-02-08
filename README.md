@@ -15,7 +15,7 @@ It can be installed from the command line using:
 
 ``$ pip install skfore``
 
-Source code can be download from *https://github.com/jdvelasq/scikit-forecasts*.
+Source code can be download from *https://github.com/jdvelasq/scikit-forecasts*
 
 **scikit-forecast** can be used interactively at the Python’s command prompt, but a better
 experience is achieved when IPython or Jupyter’s notebook are used, allows the

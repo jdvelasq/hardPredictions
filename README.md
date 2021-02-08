@@ -2,7 +2,7 @@
 A library in Python for time series forecasting
 
 
-**Binary Installers:** https://pypi.org/project/skfore
+**Binary Installers:** https://pypi.org/project/scikit-forecasts
 
 **Source Repository**: https://github.com/jdvelasq/scikit-forecasts
 
@@ -13,7 +13,7 @@ package for time series forecasting. It is considered as a scikit-learn extensio
 designed for time series analysis.The package was developed and tested in Python version 3.7. 
 It can be installed from the command line using:
 
-``$ pip install skfore``
+``$ pip install scikit-forecasts``
 
 Source code can be download from *https://github.com/jdvelasq/scikit-forecasts*
 

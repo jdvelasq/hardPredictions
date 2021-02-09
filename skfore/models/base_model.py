@@ -8,11 +8,15 @@ Methods:
 
 """
 
+import sys
+sys.path.append('../')
+
 from skfore import series_viewer
 from datasets import *
 
 import pandas
 import numpy
+import scipy
 import sklearn
 import matplotlib
 import random

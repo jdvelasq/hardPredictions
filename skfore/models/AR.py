@@ -68,13 +68,7 @@ Classes
 """
 
 from base_model import base_model
-from datasets import *
 
-import numpy
-import scipy
-import pandas
-import random
-from extras import add_next_date
 from sklearn import linear_model
 
 class AR(base_model):

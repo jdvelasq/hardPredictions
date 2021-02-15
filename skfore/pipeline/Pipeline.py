@@ -4,17 +4,17 @@ skfore Pipeline
 
 """
 
-import skfore.transformer
+import skfore.preprocessing.transformer
 
 class Pipeline():
-    
+
     def __init__(self, ts, transformation = None, model = None):
         self.transformation = transformation
         self.model = model
         self.ts = ts
-        
-    
-    def fit(self):        
+
+
+    def fit(self):
         for trans_i in self.transformation:
             for model_i in self.model:
                 model = model_i
@@ -26,9 +26,3 @@ class Pipeline():
                 print(model)
                 print(error)
         return error
-            
-        
-    
-        
-        
-

@@ -12,7 +12,7 @@ Examples
 -------------------------------------------------------------------------------
 
 Get predicted values as a DataFrame:
-   
+
 Load time series
 >>> ts = load_champagne()
 
@@ -38,18 +38,15 @@ Classes
 
 """
 
-from base_model import base_model
+from skfore.base_model import base_model
 
-import numpy
-import scipy
-import pandas
 import statsmodels
-from extras import add_next_date
+
 
 
 class SARIMA(base_model):
     """ Seasonal autoregressive integrated moving average model
-    
+
     Parameter optimization method: scipy's minimization
 
     Args:
@@ -68,51 +65,51 @@ class SARIMA(base_model):
     """
 
     def __init__(self, p=None, d=None, q=None, P=None, D=None, Q=None, s=None, **kwargs):
-        
+
         self.p = p
         self.d = d
         self.q = q
         self.P = P
         self.D = D
         self.Q = Q
-        
+
         if s == None:
             self.s = 0
         else:
             self.s = s
-            
-        self.model = None     
-        
-            
-        
+
+        self.model = None
+
+
+
     def __repr__(self):
         return 'SARIMA(p = ' + str(self.p) + ', d = ' + str(self.d) + ', q = ' + str(self.q) + ', P = ' + str(self.P) + ', D = ' + str(self.D) + ', Q = ' + str(self.Q) +', s = ' + str(self.s) +')'
-        
-    
+
+
     def forecast(self, y):
-        """ Next step 
-        
+        """ Next step
+
         Args:
             ts (pandas.Series): Time series to find next value
-            
+
         Returns:
             Value of next time stamp
-            
+
         """
-        
+
         result = self.model.predict(start=len(y), end=len(y))
-        
+
         return result.values[0]
 
     def simulate(self, ts):
         """ Fits a time series using self model parameters
-        
+
         Args:
             ts (pandas.Series): Time series to fit
-    
+
         Returns:
             Fitted time series
-            
+
         """
         y = ts
         prediction = list()
@@ -121,46 +118,46 @@ class SARIMA(base_model):
             prediction.append(result)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
-    
+
 
 
     def fit(self, ts, error_function = None, **kwargs):
         """ Finds optimal parameters using a given optimization function
-        
+
         Args:
             ts (pandas.Series): Time series to fit
             error_function (function): Function to estimates error
-            
+
         Return:
             self
-        
+
         """
-        
+
         if self.p == None:
-            raise ValueError('Please insert parameter p')   
-        
+            raise ValueError('Please insert parameter p')
+
         if self.d == None:
-            raise ValueError('Please insert parameter d')   
-        
+            raise ValueError('Please insert parameter d')
+
         if self.q == None:
             raise ValueError('Please insert parameter q')
-        
+
         if self.P == None:
             raise ValueError('Please insert parameter P')
-        
+
         if self.D == None:
             raise ValueError('Please insert parameter D')
-        
+
         if self.Q == None:
             raise ValueError('Please insert parameter Q')
-        
+
         try:
             self.model = statsmodels.tsa.statespace.sarimax.SARIMAX(ts, order = (self.p,self.d,self.q), seasonal_order = (self.P,self.D,self.Q,self.s), **kwargs)
             self.model = self.model.fit()
         except:
             self.model = statsmodels.tsa.statespace.sarimax.SARIMAX(ts, order = (self.p,self.d,self.q), seasonal_order = (self.P,self.D,self.Q,self.s), enforce_invertibility = False, **kwargs)
             self.model = self.model.fit()
-        
+
         return self
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ Examples
 -------------------------------------------------------------------------------
 
 Get predicted values as a DataFrame:
-   
+
 Load time series
 >>> ts = load_champagne()
 
@@ -35,17 +35,14 @@ ARIMA(p = 3, d = 1, q = 3, intercept = 158..., phi = [-0.401...  0.227...  0.294
 
 """
 
-from base_model import base_model
+from skfore.base_model import base_model
 
-import numpy
-import scipy
-import pandas
 from sklearn import *
-from extras import add_next_date
+
 
 class ARIMA(base_model):
     """ Autoregressive integrated moving average model
-    
+
     Parameter optimization method: scipy's minimization
 
     Args:
@@ -63,30 +60,30 @@ class ARIMA(base_model):
 
     def __init__(self, p=None, d=None, q=None, intercept=None, phi=None, theta=None):
         self.y = None
-        
+
         if p == None:
             self.p = 0
         else:
             self.p = p
-            
+
         if d == None:
             self.d = 0
         else:
             self.d = d
-        
+
         if q == None:
             self.q = 0
         else:
             self.q = q
-        
+
         if intercept == False:
             self.intercept = 0
         else:
             self.intercept = intercept
-        
+
         self.phi = phi
         self.theta = theta
-            
+
         if intercept == None and theta == None and phi == None:
             self.optim_type = 'complete'
         elif intercept == None and theta != None and phi != None:
@@ -99,31 +96,31 @@ class ARIMA(base_model):
             self.optim_type = 'no_optim'
         else:
             raise ValueError('Please fulfill all parameters')
-            
-        
+
+
     def __repr__(self):
         return 'ARIMA(p = ' + str(self.p) + ', d = ' + str(self.d) + ', q = ' + str(self.q) + ', intercept = ' + str(self.intercept) + ', phi = ' + str(self.phi) + ', theta = ' + str(self.theta) +')'
-        
+
 
     def params2vector(self):
         """ Parameters to vector
-        
+
         Args:
             None
-            
-        Returns:
-            Vector parameters of length p+q+1 to use in optimization           
 
-        """        
+        Returns:
+            Vector parameters of length p+q+1 to use in optimization
+
+        """
         params = list()
-        
+
         if self.intercept == None:
             self.intercept = numpy.random.rand(1)[0]
         if self.phi == None:
             self.phi = numpy.random.rand(self.p)
         if self.theta== None:
             self.theta = numpy.random.rand(self.p)
-        
+
         if self.optim_type == 'complete':
             params.append(self.intercept)
             for i in range(len(self.phi)):
@@ -142,20 +139,20 @@ class ARIMA(base_model):
             return params
         elif self.optim_type == 'no_optim':
             pass
-        
+
 
     def vector2params(self, vector):
         """ Vector to parameters
-        
+
         Args:
-            vector (list): vector of length p+1 to convert into parameters of 
+            vector (list): vector of length p+1 to convert into parameters of
             the model
-            
+
         Returns:
             self
 
-        """ 
-        
+        """
+
         if self.optim_type == 'complete':
             self.intercept = vector[0]
             self.phi = vector[1:self.p + 1]
@@ -167,28 +164,28 @@ class ARIMA(base_model):
             self.intercept = vector[0]
         elif self.optim_type == 'no_optim':
             pass
-            
+
         return self
 
     def forecast(self, ts):
-        """ Next step 
-        
+        """ Next step
+
         Args:
             ts (pandas.Series): Time series to find next value
-            
+
         Returns:
             Value of next time stamp
-            
+
         """
         lon_ts = len(ts.values)
-        
+
         if self.d == 0:
             diff = 0
         elif lon_ts <= self.d:
             diff = 0
         else:
             diff = ts.values[-1] - ts.values[-self.d]
-            
+
         if self.p == 0:
             p_sum = 0
         elif lon_ts <= self.p:
@@ -197,7 +194,7 @@ class ARIMA(base_model):
         else:
             ts_last = ts.values[lon_ts-self.p:lon_ts]
             p_sum = self.intercept + numpy.dot(ts_last, self.phi)
-        
+
         if self.q == 0:
             q_sum = 0
         else:
@@ -205,7 +202,7 @@ class ARIMA(base_model):
             predictions = list()
             for t in numpy.arange(0,lon_ts,1):
                 length = len(history)
-            
+
                 if length <= self.q:
                     yhat = numpy.mean(ts.values[0:t])
                 else:
@@ -214,10 +211,10 @@ class ARIMA(base_model):
                     mean_predicted = numpy.mean(ts_last)
                     new_predicted = self.intercept + numpy.dot(numpy.subtract(ts_last, predicted), self.theta)
                     yhat = mean_predicted + new_predicted
-            
+
                 predictions.append(yhat)
                 history.append(ts.values[t])
-        
+
             if lon_ts == 1:
                 q_sum = ts.values[0]
             elif lon_ts <= self.q:
@@ -227,21 +224,21 @@ class ARIMA(base_model):
                 predicted = predictions[lon_ts-self.q:lon_ts]
                 mean_predicted = numpy.mean(ts_last)
                 new_predicted = self.intercept + numpy.dot(numpy.subtract(ts_last, predicted), self.theta)
-                q_sum = mean_predicted + new_predicted    
-            
+                q_sum = mean_predicted + new_predicted
+
         result = -diff + p_sum + q_sum
 
         return result
 
     def simulate(self, ts):
         """ Fits a time series using self model parameters
-        
+
         Args:
             ts (pandas.Series): Time series to fit
-        
+
         Returns:
             Fitted time series
-            
+
         """
 
         prediction = list()
@@ -260,16 +257,16 @@ class ARIMA(base_model):
 
     def fit(self, ts, error_function = None):
         """ Finds optimal parameters using a given optimization function
-        
+
         Args:
             ts (pandas.Series): Time series to fit
             error_function (function): Function to estimates error
-            
+
         Return:
             self
-        
+
         """
-        
+
         if self.optim_type == 'no_optim':
             pass
         else:

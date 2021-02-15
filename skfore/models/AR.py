@@ -16,7 +16,7 @@ Examples
 AR model using SciPy's minimization:
 
 Get predicted values as a DataFrame:
-   
+
 Load time series
 >>> ts = load_champagne()
 
@@ -46,7 +46,7 @@ If confidence intervals are calculated with 95% level and 300 iterations:
 [2 rows x 6 columns]
 
 AR model using SciKit's Ridge linear model:
-    
+
 >>> model = AR_Ridge(p = 3)
 >>> random.seed(1)
 >>> model = model.fit(ts)
@@ -59,7 +59,7 @@ AR model using SciKit's Ridge linear model:
 <BLANKLINE>
 [2 rows x 6 columns]
 
-AR SciKit's models receives same parameters as regression models. 
+AR SciKit's models receives same parameters as regression models.
 
 
 Classes
@@ -67,18 +67,18 @@ Classes
 
 """
 
-from base_model import base_model
+from skfore.models.base_model import base_model
 
 from sklearn import linear_model
 
 class AR(base_model):
     """ Autoregressive model
-    
+
     Parameter optimization method: scipy's minimization
 
     Args:
         p (int): order
-        intercept (boolean or double): False for set intercept to 0 or double 
+        intercept (boolean or double): False for set intercept to 0 or double
         phi (array): array of p-length for set parameters without optimization
 
     Returns:
@@ -87,21 +87,21 @@ class AR(base_model):
     """
 
     def __init__(self, p=None, intercept=None, phi=None):
-        
-        
+
+
         if p == None:
             self.p = 0
         else:
             self.p = p
-        
-        
+
+
         if intercept == False:
             self.phi0 = 0
         else:
             self.phi0 = intercept
-            
+
         self.phi = phi
-            
+
         if intercept == None and phi == None:
             self.optim_type = 'complete'
         elif intercept == None and phi != None:
@@ -112,28 +112,28 @@ class AR(base_model):
             self.optim_type = 'optim_params'
         elif intercept != None and phi != None:
             self.optim_type = 'no_optim'
-            
-        
+
+
     def __repr__(self):
         return 'AR(p = ' + str(self.p) + ', intercept = ' + str(self.phi0) + ', phi = ' + str(self.phi) +')'
-               
-        
+
+
     def params2vector(self):
         """ Parameters to vector
-        
+
         Args:
             None
-            
+
         Returns:
             Vector parameters of length p+1 to use in optimization
 
-        """        
+        """
         params = list()
         if self.phi0 == None:
             self.phi0 = numpy.random.rand(1)[0]
         if self.phi == None:
             self.phi = numpy.random.rand(self.p)
-        
+
         if self.optim_type == 'complete':
             params.append(self.phi0)
             for i in range(len(self.phi)):
@@ -148,20 +148,20 @@ class AR(base_model):
             return params
         elif self.optim_type == 'no_optim':
             pass
-        
+
 
     def vector2params(self, vector):
         """ Vector to parameters
-        
+
         Args:
-            vector (list): vector of length p+1 to convert into parameters of 
+            vector (list): vector of length p+1 to convert into parameters of
             the model
-            
+
         Returns:
             self
 
-        """ 
-        
+        """
+
         if self.optim_type == 'complete':
             self.phi0 = vector[0]
             self.phi = vector[1:]
@@ -171,18 +171,18 @@ class AR(base_model):
             self.phi0 = vector[0]
         elif self.optim_type == 'no_optim':
             pass
-            
+
         return self
 
     def get_X(self, ts):
         """ Get matrix of regressors
-        
+
         Args:
             ts (pandas.Series): Time series to create matrix of regressors
-            
+
         Returns:
             List of list of regressors for every time in series
-        
+
         """
         y = ts.values
         X = list()
@@ -200,21 +200,21 @@ class AR(base_model):
                 value = y[i-self.p:i].tolist()
                 X.append(value)
         return X
-    
+
     def forecast(self, ts):
-        """ Next step 
-        
+        """ Next step
+
         Args:
             ts (pandas.Series): Time series to find next value
-            
+
         Returns:
             Value of next time stamp
-            
+
         """
-        
+
         if len(self.phi) != self.p:
-            self.phi = numpy.random.rand(self.p)        
-        
+            self.phi = numpy.random.rand(self.p)
+
         y = ts.values
         lon = len(y)
         if lon <= self.p:
@@ -228,13 +228,13 @@ class AR(base_model):
 
     def simulate(self, ts):
         """ Fits a time series using self model parameters
-        
+
         Args:
             ts (pandas.Series): Time series to fit
-    
+
         Returns:
             Fitted time series
-            
+
         """
         y = ts
         prediction = list()
@@ -246,21 +246,21 @@ class AR(base_model):
             prediction.append(result)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
-    
+
 
 
     def fit(self, ts, error_function = None):
         """ Finds optimal parameters using a given optimization function
-        
+
         Args:
             ts (pandas.Series): Time series to fit
             error_function (function): Function to estimates error
-            
+
         Return:
             self
-        
+
         """
-        
+
         if self.optim_type == 'no_optim':
             pass
         else:
@@ -289,19 +289,19 @@ class AR_Ridge(AR):
         self.random_state = random_state
         self.solver = solver
         self.tol = tol
-        
+
         if intercept == None:
             self.phi0 = numpy.random.rand(1)
         elif intercept == False:
             self.phi0 = 0
         else:
             self.phi0 = intercept
-            
+
         if phi == None:
             self.phi = numpy.random.rand(p)
         else:
             self.phi = phi
-        
+
         if intercept == None and phi == None:
             self.optim_type = 'complete'
         elif intercept == None and phi != None:
@@ -312,13 +312,13 @@ class AR_Ridge(AR):
             self.optim_type = 'optim_params'
         elif intercept != None and phi != None:
             self.optim_type = 'no_optim'
-    
+
     def __repr__(self):
         return 'AR_Ridge(p = ' + str(self.p) + ', intercept = ' + str(self.phi0) + ', phi = ' + str(self.phi) +')'
-        
+
 
     def fit(self, ts):
-        
+
         if self.optim_type == 'complete':
              X = self.get_X(ts)
              y = ts.values.tolist()
@@ -333,7 +333,7 @@ class AR_Ridge(AR):
              optim_params.append(ridge_model.intercept_)
              optim_params = optim_params + ridge_model.coef_.tolist()
              self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_intercept':
             X = self.get_X(ts)
             y = ts.values.tolist()
@@ -347,14 +347,14 @@ class AR_Ridge(AR):
             optim_params = list()
             optim_params = optim_params + ridge_model.coef_.tolist()
             self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_optim':
             pass
         else:
             error_message = "Can't apply Lasso regression using given parameters"
-            raise ValueError(error_message) 
-        
-        return self   
+            raise ValueError(error_message)
+
+        return self
 
 
 #class AR_Ridge_2(AR):
@@ -395,19 +395,19 @@ class AR_Lasso(AR):
         self.selection = selection
         self.tol = tol
         self.warm_start = warm_start
-        
+
         if intercept == None:
             self.phi0 = numpy.random.rand(1)
         elif intercept == False:
             self.phi0 = 0
         else:
             self.phi0 = intercept
-            
+
         if phi == None:
             self.phi = numpy.random.rand(p)
         else:
             self.phi = phi
-        
+
         if intercept == None and phi == None:
             self.optim_type = 'complete'
         elif intercept == None and phi != None:
@@ -418,13 +418,13 @@ class AR_Lasso(AR):
             self.optim_type = 'optim_params'
         elif intercept != None and phi != None:
             self.optim_type = 'no_optim'
-    
+
     def __repr__(self):
         return 'AR_Lasso(p = ' + str(self.p) + ', intercept = ' + str(self.phi0) + ', phi = ' + str(self.phi) +')'
-        
+
 
     def fit(self, ts):
-        
+
         if self.optim_type == 'complete':
             X = self.get_X(ts)
             y = ts.values.tolist()
@@ -442,7 +442,7 @@ class AR_Lasso(AR):
             optim_params.append(lasso_model.intercept_)
             optim_params = optim_params + lasso_model.coef_.tolist()
             self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_intercept':
             X = self.get_X(ts)
             y = ts.values.tolist()
@@ -459,14 +459,14 @@ class AR_Lasso(AR):
             optim_params = list()
             optim_params = optim_params + lasso_model.coef_.tolist()
             self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_optim':
             pass
         else:
             error_message = "Can't apply Lasso regression using given parameters"
-            raise ValueError(error_message) 
-        
-        return self        
+            raise ValueError(error_message)
+
+        return self
 
 
 
@@ -476,7 +476,7 @@ class AR_ElasticNet(AR):
     def __init__(self, p=None, intercept=None, phi=None, alpha=1.0, copy_X=True, fit_intercept=True, l1_ratio=0.5,
                  max_iter=1000, normalize=False, positive=False, precompute=False,
                  random_state=0, selection='cyclic', tol=0.0001, warm_start=False):
-        
+
         self.p = p
         self.alpha = alpha
         self.copy_X = copy_X
@@ -490,19 +490,19 @@ class AR_ElasticNet(AR):
         self.selection = selection
         self.tol = tol
         self.warm_start = warm_start
-        
+
         if intercept == None:
             self.phi0 = numpy.random.rand(1)
         elif intercept == False:
             self.phi0 = 0
         else:
             self.phi0 = intercept
-            
+
         if phi == None:
             self.phi = numpy.random.rand(p)
         else:
             self.phi = phi
-        
+
         if intercept == None and phi == None:
             self.optim_type = 'complete'
         elif intercept == None and phi != None:
@@ -513,13 +513,13 @@ class AR_ElasticNet(AR):
             self.optim_type = 'optim_params'
         elif intercept != None and phi != None:
             self.optim_type = 'no_optim'
-    
+
     def __repr__(self):
         return 'AR_ElasticNet(p = ' + str(self.p) + ', intercept = ' + str(self.phi0) + ', phi = ' + str(self.phi) +')'
-        
-    
+
+
     def fit(self, ts):
-        
+
         if self.optim_type == 'complete':
              X = self.get_X(ts)
              y = ts.values.tolist()
@@ -538,7 +538,7 @@ class AR_ElasticNet(AR):
              optim_params.append(lasso_model.intercept_)
              optim_params = optim_params + lasso_model.coef_.tolist()
              self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_intercept':
              X = self.get_X(ts)
              y = ts.values.tolist()
@@ -556,14 +556,14 @@ class AR_ElasticNet(AR):
              optim_params = list()
              optim_params = optim_params + lasso_model.coef_.tolist()
              self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_optim':
             pass
         else:
             error_message = "Can't apply Elastic Net regression using given parameters"
-            raise ValueError(error_message) 
-        
-        return self  
+            raise ValueError(error_message)
+
+        return self
 
 if __name__ == "__main__":
     import doctest

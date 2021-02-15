@@ -7,14 +7,14 @@ Overview
 -------------------------------------------------------------------------------
 
 This module contains a Multi Layer Perceptron model based on SciKit's MLPRegressor
-model. 
+model.
 
 
 Examples
 -------------------------------------------------------------------------------
 
 Get predicted values as a DataFrame:
-   
+
 Load time series
 >>> ts = load_champagne()
 
@@ -49,14 +49,9 @@ Classes
 
 """
 
-from base_model import base_model
-from datasets import *
+from skfore.base_model import base_model
 
-import numpy
-import scipy
-import pandas
 import sklearn
-from extras import add_next_date
 from sklearn import neural_network
 
 class MLP(base_model):
@@ -64,7 +59,7 @@ class MLP(base_model):
 
     Args:
         p (int): order
-        optim_type (str): 'auto' for alpha and hidden_layer_sizes selection or 
+        optim_type (str): 'auto' for alpha and hidden_layer_sizes selection or
             'use_parameters' to use set parameters
         **kwargs : sklearn.neural_network.MLPRegressor parameters
 
@@ -74,12 +69,12 @@ class MLP(base_model):
     """
 
     def __init__(self, p=None, optim_type='use_parameters', hidden_layer_sizes=(100, ), activation='relu', solver='adam', alpha=0.0001, batch_size='auto', learning_rate='constant', learning_rate_init=0.001, power_t=0.5, max_iter=200, shuffle=True, random_state=None, tol=0.0001, verbose=False, warm_start=False, momentum=0.9, nesterovs_momentum=True, early_stopping=False, validation_fraction=0.1, beta_1=0.9, beta_2=0.999, epsilon=1e-08, n_iter_no_change=10):
-        
+
         if p == None:
             self.p = 0
         else:
             self.p = p
-        
+
         self.hidden_layer_sizes = hidden_layer_sizes
         self.activation = activation
         self.solver = solver
@@ -89,28 +84,28 @@ class MLP(base_model):
         self.learning_rate_init = learning_rate_init
         self.power_t = power_t
         self.max_iter = max_iter
-        self.shuffle = shuffle 
+        self.shuffle = shuffle
         self.random_state = random_state
-        self.tol = tol 
+        self.tol = tol
         self.verbose = verbose
         self.warm_start = warm_start
-        self.momentum = momentum 
+        self.momentum = momentum
         self.nesterovs_momentum = nesterovs_momentum
-        self.early_stopping = early_stopping 
+        self.early_stopping = early_stopping
         self.validation_fraction = validation_fraction
         self.beta_1 = beta_1
         self.beta_2 = beta_2
         self.epsilon = epsilon
         self.n_iter_no_change = n_iter_no_change
-        
+
         self.model = None
-        
+
         self.optim_type = optim_type
-        
-        
+
+
     def __repr__(self):
         return 'MLP(p = ' + str(self.p) + ', model = ' + str(self.model) +')'
-        
+
 
     def __get_X__(self, ts):
         try:
@@ -132,50 +127,50 @@ class MLP(base_model):
                 value = y[i-self.p:i].tolist()
                 X.append(value)
         return X
-    
+
     def forecast(self, y):
-        """ Next step 
-        
+        """ Next step
+
         Args:
             y (list): Time series list to find next value
-            
+
         Returns:
             Value of next time stamp
-            
+
         """
         Xtest = self.__get_X__(y)
         result = self.model.predict(Xtest)
         return result[-1]
-    
+
 
     def simulate(self, ts):
         """ Fits a time series using self model parameters
-        
+
         Args:
             ts (pandas.Series): Time series to fit
-        
+
         Returns:
             Fitted time series.
-            
+
         """
         Xtest = self.__get_X__(ts)
         prediction = self.model.predict(Xtest)
         prediction = pandas.Series((v for v in prediction), index = ts.index)
         return prediction
-    
+
 
     def fit(self, ts, error_function = None):
         """ Finds optimal parameters using a given optimization function
-        
+
         Args:
             ts (pandas.Series): Time series to fit
             error_function (function): Function to estimates error
-            
+
         Return:
             self
-        
+
         """
-        
+
         if self.optim_type == 'auto':
              X = self.__get_X__(ts)
              y = ts
@@ -194,23 +189,23 @@ class MLP(base_model):
                      if opterror is None or opterror > error:
                          opterror = error
                          optmodel = model
-                         print('alpha = ' + str(alpha), 'hidden_layer_sizes = (' + str(neu) + ', )', 'error = ' + str(opterror))                    
+                         print('alpha = ' + str(alpha), 'hidden_layer_sizes = (' + str(neu) + ', )', 'error = ' + str(opterror))
              self.model = optmodel
         elif self.optim_type == 'use_parameters':
              X = self.__get_X__(ts)
              y = ts
              mlp_model = neural_network.MLPRegressor(hidden_layer_sizes=self.hidden_layer_sizes, activation=self.activation, solver=self.solver, alpha=self.alpha, batch_size=self.batch_size, learning_rate=self.learning_rate, learning_rate_init=self.learning_rate_init, power_t=self.power_t, max_iter=self.max_iter, shuffle=self.shuffle, random_state=self.random_state, tol=self.tol, verbose=self.verbose, warm_start=self.warm_start, momentum=self.momentum, nesterovs_momentum=self.nesterovs_momentum, early_stopping=self.early_stopping, validation_fraction=self.validation_fraction, beta_1=self.beta_1, beta_2=self.beta_2, epsilon=self.epsilon)
              mlp_model.fit(X, y)
-             self.model = mlp_model  
+             self.model = mlp_model
         elif self.optim_type == 'no_optim':
             pass
         else:
             error_message = "Can't apply MLPRegressor using given parameters"
             raise ValueError(error_message)
-            
+
         return self
-    
-    
+
+
 
 if __name__ == "__main__":
     import doctest

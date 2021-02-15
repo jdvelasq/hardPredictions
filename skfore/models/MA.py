@@ -45,22 +45,18 @@ MA(q = 3, intercept = 153..., theta = [-0.489... -0.678... -0.112...])
 
 """
 
-from base_model import base_model
+from skfore.base_model import base_model
 
-import numpy
-import scipy
-import pandas
-from extras import add_next_date
 from sklearn import linear_model
 
 class MA(base_model):
     """ Moving-average model
-    
+
     Parameter optimization method: scipy's minimization
 
     Args:
         q (int): order.
-        intercept (boolean or double): False for set intercept to 0 or double 
+        intercept (boolean or double): False for set intercept to 0 or double
         theta (array): array of q-length for set parameters without optimization
 
     Returns:
@@ -74,14 +70,14 @@ class MA(base_model):
             self.q = 0
         else:
             self.q = q
-        
+
         if intercept == False:
             self.theta0 = 0
         else:
             self.theta0 = intercept
-            
+
         self.theta = theta
-            
+
         if intercept == None and theta == None:
             self.optim_type = 'complete'
         elif intercept == None and theta != None:
@@ -92,28 +88,28 @@ class MA(base_model):
             self.optim_type = 'optim_params'
         elif intercept != None and theta != None:
             self.optim_type = 'no_optim'
-            
-        
+
+
     def __repr__(self):
         return 'MA(q = ' + str(self.q) + ', intercept = ' + str(self.theta0) + ', theta = ' + str(self.theta) +')'
-        
+
 
     def params2vector(self):
         """ Parameters to vector
-        
+
         Args:
             None.
-            
+
         Returns:
             Vector parameters of length q+1 to use in optimization.
 
-        """        
+        """
         params = list()
         if self.theta0 == None:
             self.theta0 = numpy.random.rand(1)[0]
         if self.theta == None:
             self.theta = numpy.random.rand(self.q)
-        
+
         if self.optim_type == 'complete':
             params.append(self.theta0)
             for i in range(len(self.theta)):
@@ -128,20 +124,20 @@ class MA(base_model):
             return params
         elif self.optim_type == 'no_optim':
             pass
-        
+
 
     def vector2params(self, vector):
         """ Vector to parameters
-        
+
         Args:
-            vector (list): vector of length q+1 to convert into parameters of 
+            vector (list): vector of length q+1 to convert into parameters of
             the model
-            
+
         Returns:
             self
 
-        """ 
-        
+        """
+
         if self.optim_type == 'complete':
             self.theta0 = vector[0]
             self.theta = vector[1:]
@@ -151,18 +147,18 @@ class MA(base_model):
             self.theta0 = vector[0]
         elif self.optim_type == 'no_optim':
             pass
-            
+
         return self
 
     def __get_X__(self, ts):
         """ Get matrix of regressors
-        
+
         Args:
             ts (pandas.Series): Time series to create matrix of regressors
-            
+
         Returns:
             List of list of regressors for every time in series
-        
+
         """
         if self.y == None:
             lon = len(ts.values)
@@ -184,25 +180,25 @@ class MA(base_model):
                 value = y[i-self.q:i].tolist()
                 X.append(value)
         return X
-    
+
     def forecast(self, ts):
-        """ Next step 
-        
+        """ Next step
+
         Args:
             ts (pandas.Series): Time series to find next value
-            
+
         Returns:
             Value of next time stamp
-            
+
         """
 
         lon = len(ts)
         history = list()
         predictions = list()
-        
+
         for t in numpy.arange(0,lon,1):
             length = len(history)
-            
+
             if length <= self.q:
                 yhat = numpy.mean(ts.values[0:t])
             else:
@@ -211,10 +207,10 @@ class MA(base_model):
                 mean_predicted = numpy.mean(ts_last)
                 new_predicted = self.theta0 + numpy.dot(numpy.subtract(ts_last, predicted), self.theta)
                 yhat = mean_predicted + new_predicted
-            
+
             predictions.append(yhat)
             history.append(ts.values[t])
-        
+
         if lon == 1:
             result = ts[0]
         elif lon <= self.q:
@@ -230,13 +226,13 @@ class MA(base_model):
 
     def simulate(self, ts):
         """ Fits a time series using self model parameters
-        
+
         Args:
             ts (pandas.Series): Time series to fit
-        
+
         Returns:
             Fitted time series
-            
+
         """
         prediction = list()
         for i in range(len(ts)):
@@ -248,16 +244,16 @@ class MA(base_model):
 
     def fit(self, ts, error_function = None):
         """ Finds optimal parameters using a given optimization function
-        
+
         Args:
             ts (pandas.Series): Time series to fit.
             error_function (function): Function to estimates error.
-            
+
         Return:
             self
-        
+
         """
-        
+
         if self.optim_type == 'no_optim':
             pass
         else:
@@ -271,7 +267,7 @@ class MA(base_model):
 
         return self
 
-    
+
 
 class MA_Ridge(MA):
     """ Parameter optimization method: SciKit's Ridge linear model """
@@ -288,19 +284,19 @@ class MA_Ridge(MA):
         self.random_state = random_state
         self.solver = solver
         self.tol = tol
-        
+
         if intercept == None:
             self.theta0 = numpy.random.rand(1)
         elif intercept == False:
             self.theta0 = 0
         else:
             self.theta0 = intercept
-            
+
         if theta == None:
             self.theta = numpy.random.rand(q)
         else:
             self.theta = theta
-        
+
         if intercept == None and theta == None:
             self.optim_type = 'complete'
         elif intercept == None and theta != None:
@@ -311,13 +307,13 @@ class MA_Ridge(MA):
             self.optim_type = 'optim_params'
         elif intercept != None and theta != None:
             self.optim_type = 'no_optim'
-    
+
     def __repr__(self):
         return 'MA_Ridge(q = ' + str(self.q) + ', intercept = ' + str(self.theta) + ', theta = ' + str(self.theta) +')'
-        
+
 
     def fit(self, ts):
-        
+
         if self.optim_type == 'complete':
              X = self.__get_X__(ts)
              y = ts.values.tolist()
@@ -332,7 +328,7 @@ class MA_Ridge(MA):
              optim_params.append(ridge_model.intercept_)
              optim_params = optim_params + ridge_model.coef_.tolist()
              self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_intercept':
             X = self.__get_X__(ts)
             y = ts.values.tolist()
@@ -346,14 +342,14 @@ class MA_Ridge(MA):
             optim_params = list()
             optim_params = optim_params + ridge_model.coef_.tolist()
             self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_optim':
             pass
         else:
             error_message = "Can't apply Lasso regression using given parameters"
-            raise ValueError(error_message) 
-        
-        return self   
+            raise ValueError(error_message)
+
+        return self
 
 class MA_Lasso(MA):
     """ Parameter optimization method: SciKit's Lasso linear model """
@@ -374,19 +370,19 @@ class MA_Lasso(MA):
         self.selection = selection
         self.tol = tol
         self.warm_start = warm_start
-        
+
         if intercept == None:
             self.theta0 = numpy.random.rand(1)
         elif intercept == False:
             self.theta0 = 0
         else:
             self.theta0 = intercept
-            
+
         if theta == None:
             self.theta = numpy.random.rand(q)
         else:
             self.theta = theta
-        
+
         if intercept == None and theta == None:
             self.optim_type = 'complete'
         elif intercept == None and theta != None:
@@ -397,13 +393,13 @@ class MA_Lasso(MA):
             self.optim_type = 'optim_params'
         elif intercept != None and theta != None:
             self.optim_type = 'no_optim'
-    
+
     def __repr__(self):
         return 'MA_Lasso(q = ' + str(self.q) + ', intercept = ' + str(self.theta0) + ', theta = ' + str(self.theta) +')'
-        
+
 
     def fit(self, ts):
-        
+
         if self.optim_type == 'complete':
             X = self.__get_X__(ts)
             y = ts.values.tolist()
@@ -421,7 +417,7 @@ class MA_Lasso(MA):
             optim_params.append(lasso_model.intercept_)
             optim_params = optim_params + lasso_model.coef_.tolist()
             self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_intercept':
             X = self.__get_X__(ts)
             y = ts.values.tolist()
@@ -438,14 +434,14 @@ class MA_Lasso(MA):
             optim_params = list()
             optim_params = optim_params + lasso_model.coef_.tolist()
             self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_optim':
             pass
         else:
             error_message = "Can't apply Lasso regression using given parameters"
-            raise ValueError(error_message) 
-        
-        return self        
+            raise ValueError(error_message)
+
+        return self
 
 
 
@@ -455,7 +451,7 @@ class MA_ElasticNet(MA):
     def __init__(self, q=None, intercept=None, theta=None, alpha=1.0, copy_X=True, fit_intercept=True, l1_ratio=0.5,
                  max_iter=1000, normalize=False, positive=False, precompute=False,
                  random_state=0, selection='cyclic', tol=0.0001, warm_start=False):
-        
+
         self.y = None
         self.q = q
         self.alpha = alpha
@@ -470,19 +466,19 @@ class MA_ElasticNet(MA):
         self.selection = selection
         self.tol = tol
         self.warm_start = warm_start
-        
+
         if intercept == None:
             self.theta0 = numpy.random.rand(1)
         elif intercept == False:
             self.theta0 = 0
         else:
             self.theta0 = intercept
-            
+
         if theta == None:
             self.theta = numpy.random.rand(q)
         else:
             self.theta = theta
-        
+
         if intercept == None and theta == None:
             self.optim_type = 'complete'
         elif intercept == None and theta != None:
@@ -493,13 +489,13 @@ class MA_ElasticNet(MA):
             self.optim_type = 'optim_params'
         elif intercept != None and theta != None:
             self.optim_type = 'no_optim'
-    
+
     def __repr__(self):
         return 'MA_ElasticNet(q = ' + str(self.q) + ', intercept = ' + str(self.theta0) + ', theta = ' + str(self.theta) +')'
-        
-    
+
+
     def fit(self, ts):
-        
+
         if self.optim_type == 'complete':
              X = self.__get_X__(ts)
              y = ts.values.tolist()
@@ -518,7 +514,7 @@ class MA_ElasticNet(MA):
              optim_params.append(lasso_model.intercept_)
              optim_params = optim_params + lasso_model.coef_.tolist()
              self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_intercept':
              X = self.__get_X__(ts)
              y = ts.values.tolist()
@@ -536,14 +532,14 @@ class MA_ElasticNet(MA):
              optim_params = list()
              optim_params = optim_params + lasso_model.coef_.tolist()
              self.vector2params(vector = optim_params)
-        
+
         elif self.optim_type == 'no_optim':
             pass
         else:
             error_message = "Can't apply Elastic Net regression using given parameters"
-            raise ValueError(error_message) 
-        
-        return self  
+            raise ValueError(error_message)
+
+        return self
 
 if __name__ == "__main__":
     import doctest

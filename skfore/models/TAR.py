@@ -37,7 +37,7 @@ TAR(p = 3, intercept_1 = 2758..., intercept_2 = 4144..., phi_1 = [-0.106... -0.2
 
 """
 
-from skfore.base_model import base_model
+from skfore.models.base_model import base_model
 
 from skfore.models.AR import AR
 

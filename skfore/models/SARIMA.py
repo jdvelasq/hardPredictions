@@ -38,7 +38,7 @@ Classes
 
 """
 
-from skfore.base_model import base_model
+from skfore.models.base_model import base_model
 
 import statsmodels
 

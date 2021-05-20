@@ -71,6 +71,11 @@ from skfore.models.base_model import base_model
 
 from sklearn import linear_model
 
+import numpy
+import scipy
+import pandas
+import sklearn
+
 class AR(base_model):
     """ Autoregressive model
 

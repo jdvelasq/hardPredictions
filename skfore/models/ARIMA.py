@@ -35,7 +35,7 @@ ARIMA(p = 3, d = 1, q = 3, intercept = 158..., phi = [-0.401...  0.227...  0.294
 
 """
 
-from skfore.base_model import base_model
+from skfore.models.base_model import base_model
 
 from sklearn import *
 

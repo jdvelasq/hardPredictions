@@ -45,7 +45,7 @@ MA(q = 3, intercept = 153..., theta = [-0.489... -0.678... -0.112...])
 
 """
 
-from skfore.base_model import base_model
+from skfore.models.base_model import base_model
 
 from sklearn import linear_model
 

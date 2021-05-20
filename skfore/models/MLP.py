@@ -49,10 +49,13 @@ Classes
 
 """
 
-from skfore.base_model import base_model
+from skfore.models.base_model import base_model
 
 import sklearn
 from sklearn import neural_network
+
+import numpy
+import pandas
 
 class MLP(base_model):
     """ Multi Layer Perceptron Model

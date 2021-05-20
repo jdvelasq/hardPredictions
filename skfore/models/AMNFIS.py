@@ -49,10 +49,16 @@ Classes
 
 """
 
-from skfore.base_model import base_model
+from skfore.models.base_model import base_model
 
 from sklearn import *
 
+import numpy
+import random
+import scipy
+import math
+import pandas
+import sklearn
 
 class AMNFIS(base_model):
     """ AMNFIS model

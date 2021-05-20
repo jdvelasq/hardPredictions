@@ -37,7 +37,7 @@ ARMA(p = 2, q = 3, intercept = 2469..., phi = [-0.072... -0.620...], theta = [0.
 
 """
 
-from skfore.base_model import base_model
+from skfore.models.base_model import base_model
 
 from sklearn import *
 

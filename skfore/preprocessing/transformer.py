@@ -713,7 +713,7 @@ class transformer():
             ts_deseasonal = pandas.Series((v for v in ts_deseasonal), index = ts.index)
         elif (self.seasonal == 'diff'):
             len_forecast = len(ts)
-            ts = self.ts.append(ts)
+            #ts = self.ts.append(ts)
             ts_deseasonal = list()
             for j in range(0, self.intfrq):
                 ts_deseasonal.append(self.diff[j])

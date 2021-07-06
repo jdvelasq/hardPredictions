@@ -40,9 +40,9 @@ Classes
 
 """
 
-from skfore.models.base_model import base_model
+from skfore.models.BaseModel import BaseModel
 
-class STAR(base_model):
+class STAR(BaseModel):
     """ Smooth Transition Autoregressive model
 
     Parameter optimization method: scipy's minimization

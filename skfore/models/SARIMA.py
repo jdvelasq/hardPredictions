@@ -38,13 +38,14 @@ Classes
 
 """
 
-from skfore.models.base_model import base_model
+from skfore.models.BaseModel import BaseModel
 
 import statsmodels
+import pandas
 
 
 
-class SARIMA(base_model):
+class SARIMA(BaseModel):
     """ Seasonal autoregressive integrated moving average model
 
     Parameter optimization method: scipy's minimization

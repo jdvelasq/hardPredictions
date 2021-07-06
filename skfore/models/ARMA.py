@@ -37,12 +37,12 @@ ARMA(p = 2, q = 3, intercept = 2469..., phi = [-0.072... -0.620...], theta = [0.
 
 """
 
-from skfore.models.base_model import base_model
+from skfore.models.BaseModel import BaseModel
 
 from sklearn import *
 
 
-class ARMA(base_model):
+class ARMA(BaseModel):
     """ Moving-average model
 
     Parameter optimization method: scipy's minimization

@@ -49,7 +49,7 @@ Classes
 
 """
 
-from skfore.models.base_model import base_model
+from skfore.models.BaseModel import BaseModel
 
 import sklearn
 from sklearn import neural_network
@@ -57,7 +57,7 @@ from sklearn import neural_network
 import numpy
 import pandas
 
-class MLP(base_model):
+class MLP(BaseModel):
     """ Multi Layer Perceptron Model
 
     Args:

@@ -67,7 +67,7 @@ Classes
 
 """
 
-from skfore.models.base_model import base_model
+from skfore.models.BaseModel import BaseModel
 
 from sklearn import linear_model
 
@@ -76,7 +76,7 @@ import scipy
 import pandas
 import sklearn
 
-class AR(base_model):
+class AR(BaseModel):
     """ Autoregressive model
 
     Parameter optimization method: scipy's minimization

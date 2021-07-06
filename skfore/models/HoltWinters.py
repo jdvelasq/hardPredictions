@@ -13,13 +13,13 @@ Classes
 
 """
 
-from skfore.models.base_model import base_model
+from skfore.models.BaseModel import BaseModel
 
 import statsmodels
 
 
 
-class HoltWinters(base_model):
+class HoltWinters(BaseModel):
     """ Autoregressive model
 
     Parameter optimization method: scipy's minimization

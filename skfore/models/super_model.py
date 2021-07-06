@@ -1,13 +1,13 @@
 
-from skfore.models.base_model import base_model
+from skfore.models.BaseModel import BaseModel
 
 import numpy
 import scipy
 import pandas
 import sklearn
 
-class superAR(base_model):
-    """ Autoregressive model
+class Reg2TS(BaseModel):
+    """ Regression to time series model
 
 
     """
@@ -30,7 +30,7 @@ class superAR(base_model):
 
 
     def __repr__(self):
-        return 'superAR(p = ' + str(self.p) + ', model = ' + str(self.model) +')'
+        return 'Reg2TS(p = ' + str(self.p) + ', model = ' + str(self.model) +')'
 
 
 
@@ -103,23 +103,3 @@ class superAR(base_model):
 
         return self
 
-
-
-#class AR_Ridge_2(AR):
-#    """ Parameter optimization method: SciKit's Ridge linear model """
-
-#   def __init__(self, p=None, **kwargs):
-#        self.p = p
-
-#    def fit(self, ts, **kwargs):
-
-#        X = self.__get_X__(ts)
-#        y = ts.values.tolist()
-#        ridge_model = linear_model.Ridge(**kwargs)
-#        ridge_model.fit(X, y)
-#        optim_params = list()
-#        optim_params.append(ridge_model.intercept_)
-#        optim_params = optim_params + ridge_model.coef_.tolist()
-#        self.vector2params(vector = optim_params)
-
-#        return self

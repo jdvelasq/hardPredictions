@@ -45,11 +45,11 @@ MA(q = 3, intercept = 153..., theta = [-0.489... -0.678... -0.112...])
 
 """
 
-from skfore.models.base_model import base_model
+from skfore.models.BaseModel import BaseModel
 
 from sklearn import linear_model
 
-class MA(base_model):
+class MA(BaseModel):
     """ Moving-average model
 
     Parameter optimization method: scipy's minimization

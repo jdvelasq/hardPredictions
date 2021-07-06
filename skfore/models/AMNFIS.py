@@ -49,7 +49,7 @@ Classes
 
 """
 
-from skfore.models.base_model import base_model
+from skfore.models.BaseModel import BaseModel
 
 from sklearn import *
 
@@ -60,7 +60,7 @@ import math
 import pandas
 import sklearn
 
-class AMNFIS(base_model):
+class AMNFIS(BaseModel):
     """ AMNFIS model
 
     Args:
